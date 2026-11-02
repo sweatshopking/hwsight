@@ -1,0 +1,14 @@
+[workspace]
+resolver = "3"
+members = ["hwsight-core", "hwsight-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+authors = ["sweatshopking"]
+repository = "https://github.com/sweatshopking/hwsight"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
