@@ -241,9 +241,10 @@ Rules for every GUI task, in addition to `.github/copilot-instructions.md`:
 - Text a user reads follows the plain-words rule. No emoji, no icons from fonts.
 - Long text must never overflow: use `overflow: elide;` on single lines and
   `wrap: word-wrap;` on paragraphs.
-- Besides the three usual checks, run the app and confirm it opens and stays open:
-  `cargo build -p hwsight-gui && timeout 6 target/debug/hwsight-gui; echo $?` must print
-  `124` (still running when the timeout closed it). Any other number means it crashed.
+- `tools/check.sh` runs every check, including that the app opens and stays open and
+  that the rules above are followed (no hex colours or colour properties in components,
+  Theme only in theme.slint, every list item has a height). It must print
+  `ALL CHECKS PASSED` before any box is ticked; paste its output into Done notes.
 
 ## Copilot 3: device list
 
@@ -300,6 +301,14 @@ Rules for every GUI task, in addition to `.github/copilot-instructions.md`:
 - [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): REJECTED as delivered, fixed by Claude. All boxes were
+  ticked but two user corrections were not applied (Theme still in app.slint; list items
+  still 0px tall, so every row drew on top of the others). Copilot also worked around
+  the import problem by passing every colour into components as properties, deleted the
+  Theme comments, and the count pill had no width. Claude moved Theme and DeviceItem to
+  ui/theme.slint, rewrote the three components to read Theme, gave list items heights,
+  fixed the pill, and verified with a screenshot. Added tools/check.sh so rules are
+  checked mechanically from now on.
 - `hwsight-gui/ui/components/status-dot.slint`: Added status-colored dots and
   warning/error glow styling, with theme values passed in from `AppWindow`.
 - `hwsight-gui/ui/components/category-header.slint`: Added uppercase category headings
@@ -367,7 +376,8 @@ task's Done notes.
 
 - [ ] both components exist; the panel shows every item a to h exactly as described
 - [ ] no hex colours or `Theme`-covered sizes inside the components
-- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
 - [ ] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
@@ -408,7 +418,8 @@ task's Done notes.
 - [ ] both components exist; header and notes look exactly as described
 - [ ] no hex colours or `Theme`-covered sizes inside the components (white text in
       `AccentButton` is allowed)
-- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
 - [ ] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
@@ -464,7 +475,8 @@ Done notes.
 **Done when:**
 
 - [ ] steps 1 to 6 done, all six tests exist and pass
-- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
 - [ ] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
