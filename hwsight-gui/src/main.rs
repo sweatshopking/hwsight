@@ -63,7 +63,12 @@ fn snapshot_when_ready(window: slint::Weak<AppWindow>, path: std::path::PathBuf)
 /// A plain PPM image (no extra dependency); convert with any image tool.
 fn write_ppm(path: &std::path::Path, width: u32, height: u32, rgba: &[u8]) -> Result<(), String> {
     let mut out = format!("P6\n{width} {height}\n255\n").into_bytes();
-    out.extend(rgba.chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]));
+    out.extend(
+        rgba.as_chunks::<4>()
+            .0
+            .iter()
+            .flat_map(|p| [p[0], p[1], p[2]]),
+    );
     std::fs::write(path, out).map_err(|e| e.to_string())
 }
 
