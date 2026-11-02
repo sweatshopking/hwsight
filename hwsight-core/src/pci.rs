@@ -106,6 +106,7 @@ fn read_device(
         driver,
         driver_candidates,
         status,
+        log_issues: Vec::new(),
     })
 }
 

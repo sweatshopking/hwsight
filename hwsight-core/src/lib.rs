@@ -4,6 +4,7 @@
 
 pub mod data;
 pub mod device;
+pub mod kernel_log;
 pub mod modules;
 mod pci;
 pub mod pci_ids;
@@ -15,6 +16,7 @@ use serde::Serialize;
 
 pub use data::DataDirs;
 pub use device::{Bus, Category, Device, Status, short_vendor};
+pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::{DataSource, Rules, RulesProblem};
@@ -25,6 +27,8 @@ pub struct ScanReport {
     pub devices: Vec<Device>,
     pub notes: Vec<ScanNote>,
     pub data: DataInfo,
+    /// Where problem explanations were read from; `None` if the log wasn't readable.
+    pub kernel_log: Option<LogSource>,
 }
 
 /// Something the user (or a bug report) should know about the scan itself.
@@ -35,6 +39,8 @@ pub enum ScanNote {
     NoDriverList,
     /// The PCI device folder couldn't be read.
     PciUnreadable { error: String },
+    /// The kernel log couldn't be read, so problems can't be explained in detail.
+    KernelLogUnreadable,
     /// A downloaded data file needs a newer hwsight.
     DataNeedsNewerApp { path: PathBuf, schema: u32 },
     /// A data file was broken and skipped.
@@ -46,6 +52,9 @@ impl ScanNote {
         match self {
             Self::NoDriverList => "Couldn't read the kernel's list of drivers, so hwsight can't \
                 tell whether a driver is available for devices without one."
+                .to_owned(),
+            Self::KernelLogUnreadable => "Couldn't read the kernel log, so hwsight can't say why \
+                a device isn't working. On some systems only administrators can read it."
                 .to_owned(),
             Self::PciUnreadable { error } => format!("Couldn't read the PCI device list: {error}"),
             Self::DataNeedsNewerApp { path, .. } => format!(
@@ -89,6 +98,20 @@ pub struct Scanner {
     pub modprobe_dirs: Vec<PathBuf>,
     /// The kernel command line file, normally `/proc/cmdline`.
     pub kernel_cmdline: PathBuf,
+    pub kernel_log: KernelLogInput,
+    /// Folders the kernel loads firmware from.
+    pub firmware_dirs: Vec<PathBuf>,
+}
+
+/// Where to get kernel log lines.
+#[derive(Debug, Clone)]
+pub enum KernelLogInput {
+    /// Read this boot's log from the system.
+    System,
+    /// Use these lines (tests, or a log the user attached to a bug report).
+    Lines(Vec<String>),
+    /// Don't read the log.
+    Skip,
 }
 
 impl Scanner {
@@ -100,6 +123,8 @@ impl Scanner {
             loaded_modules: PathBuf::from("/sys/module"),
             modprobe_dirs: modules::MODPROBE_DIRS.iter().map(PathBuf::from).collect(),
             kernel_cmdline: PathBuf::from("/proc/cmdline"),
+            kernel_log: KernelLogInput::System,
+            firmware_dirs: kernel_log::firmware_dirs(),
         }
     }
 
@@ -128,7 +153,7 @@ impl Scanner {
         let cmdline = std::fs::read_to_string(&self.kernel_cmdline).ok();
         let blocklist = modules::Blocklist::load(&self.modprobe_dirs, cmdline.as_deref());
 
-        let devices = match pci::scan(
+        let mut devices = match pci::scan(
             &self.pci_devices,
             &names,
             aliases.as_ref(),
@@ -143,6 +168,24 @@ impl Scanner {
                 Vec::new()
             }
         };
+
+        let (log_source, log_lines) = match &self.kernel_log {
+            KernelLogInput::System => match kernel_log::read_system_log() {
+                Some((source, lines)) => (Some(source), lines),
+                None => {
+                    notes.push(ScanNote::KernelLogUnreadable);
+                    (None, Vec::new())
+                }
+            },
+            KernelLogInput::Lines(lines) => (None, lines.clone()),
+            KernelLogInput::Skip => (None, Vec::new()),
+        };
+        let mut issues = kernel_log::issues_by_device(&log_lines, &self.firmware_dirs);
+        for device in &mut devices {
+            if let Some(found) = issues.remove(&device.address) {
+                device.log_issues = found;
+            }
+        }
 
         let data = DataInfo {
             rules_version: rules.version.clone(),
@@ -164,6 +207,7 @@ impl Scanner {
             devices,
             notes,
             data,
+            kernel_log: log_source,
         }
     }
 }
@@ -171,4 +215,66 @@ impl Scanner {
 /// Scan the real machine.
 pub fn scan() -> ScanReport {
     Scanner::system().scan()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+
+    /// A whole scan of a fake machine: one network card whose driver failed because of
+    /// missing firmware, explained by the kernel log.
+    #[test]
+    fn full_scan_explains_a_broken_device() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let root = tmp.path();
+        let dev = root.join("pci/0000:07:00.0");
+        fs::create_dir_all(&dev).expect("mkdir");
+        for (file, value) in [
+            ("vendor", "0x10ec"),
+            ("device", "0x8125"),
+            ("class", "0x020000"),
+            (
+                "modalias",
+                "pci:v000010ECd00008125sv00001043sd000087D7bc02sc00i00",
+            ),
+        ] {
+            fs::write(dev.join(file), value).expect("write");
+        }
+        let modules = root.join("modules");
+        fs::create_dir_all(modules.join("r8169")).expect("mkdir");
+        fs::write(
+            modules.join("modules.alias"),
+            "alias pci:v000010ECd00008125sv*sd*bc*sc*i* r8169\n",
+        )
+        .expect("write");
+        fs::write(root.join("cmdline"), "quiet").expect("write");
+
+        let scanner = Scanner {
+            data_dirs: DataDirs::only(&root.join("data")),
+            pci_devices: root.join("pci"),
+            kernel_modules: Some(modules.clone()),
+            loaded_modules: modules, // contains an "r8169" folder, so it counts as loaded
+            modprobe_dirs: Vec::new(),
+            kernel_cmdline: root.join("cmdline"),
+            kernel_log: KernelLogInput::Lines(vec![
+                "r8169 0000:07:00.0: Direct firmware load for rtl_nic/rtl8125b-2.fw failed with error -2".into(),
+                "r8169 0000:07:00.0: probe with driver r8169 failed with error -2".into(),
+            ]),
+            firmware_dirs: vec![root.join("firmware")],
+        };
+        let report = scanner.scan();
+        assert!(report.notes.is_empty(), "{:?}", report.notes);
+        let [nic] = report.devices.as_slice() else {
+            panic!("expected one device, got {:?}", report.devices);
+        };
+        assert_eq!(nic.status, Status::DriverNotAttached);
+        assert_eq!(nic.category, Category::Network);
+        assert_eq!(nic.log_issues.len(), 2);
+        assert!(
+            nic.log_issues[0]
+                .message()
+                .contains("rtl_nic/rtl8125b-2.fw")
+        );
+    }
 }

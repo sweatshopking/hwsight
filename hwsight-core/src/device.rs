@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 use serde::Serialize;
 
+use crate::kernel_log::LogIssue;
 use crate::modules::DriverCandidate;
 
 /// How a device is connected.
@@ -126,6 +127,10 @@ pub struct Device {
     /// Installed drivers that support this device.
     pub driver_candidates: Vec<DriverCandidate>,
     pub status: Status,
+    /// What the kernel log says went wrong with this device this boot. Can include
+    /// harmless noise for working devices (drivers often try several firmware versions),
+    /// so only treat these as the explanation when `status` is a problem.
+    pub log_issues: Vec<LogIssue>,
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

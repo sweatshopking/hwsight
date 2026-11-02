@@ -121,6 +121,11 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
             detail.push_str(", not in the device database yet");
         }
         writeln!(out, "{detail}")?;
+        if device.status.is_problem() {
+            for issue in &device.log_issues {
+                writeln!(out, "      Why: {}", issue.message())?;
+            }
+        }
         if opts.show_ids {
             writeln!(
                 out,
