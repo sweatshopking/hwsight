@@ -3,7 +3,7 @@
 Tasks are marked **Copilot** (well-specified, pattern-following) or **Claude** (design,
 diagnosis logic, security, reviews). Claude reviews every Copilot task before it's pushed.
 
-## Claude 1: PCI diagnosis edge cases (in progress)
+## Claude 1: PCI diagnosis edge cases (done 2026-11-02)
 
 Blocked drivers (modprobe.d `blacklist` / `install ... /bin/false`, kernel command line),
 devices reserved for virtual machines (vfio-pci, pci-stub).
@@ -44,6 +44,36 @@ files fill gaps; malformed lines are skipped; real-file smoke test that loads
 Read `/sys/bus/usb/devices`, devices and interfaces (drivers bind per interface), hubs,
 root hubs. Uses `UsbNames` from Copilot 1.
 
-## Claude 3: explain failures from the kernel log
+## Claude 3: explain failures from the kernel log (done 2026-11-02)
 
-Why a driver didn't start; missing firmware mapped to a package per distro.
+Why a driver didn't start; missing firmware mapped to a package per distro
+(`firmware.toml`, distro detection, `--kernel-log FILE`).
+
+## Copilot 2: colour in the CLI
+
+**Goal:** easier-to-scan `hwsight` output in a terminal.
+
+**Do:** in `hwsight-cli/src/main.rs` only. Colour the status symbol and the "Why:"/"Fix:"
+labels with plain ANSI escape codes (no new dependency): green for working, yellow for
+`!`, red for `✗`, dim for "no driver needed" and the reserved-for-VM `•`. Category
+headings bold. Only colour when stdout is a terminal (`std::io::IsTerminal`) and the
+`NO_COLOR` environment variable is unset or empty (see no-color.org). Add `--no-color`
+to turn it off and list it in `HELP`. Never colour `--json` output.
+
+**Tests:** move the colour decision into a small pure function
+`fn use_color(is_terminal: bool, no_color_env: Option<&str>, flag: bool) -> bool` and test
+it; test that the text with colour off is byte-for-byte what it is today.
+
+**Done notes:**
+
+## Claude 4: verify firmware.toml for other distros
+
+Check Debian, Ubuntu, Fedora, and openSUSE package names in containers (dnf repoquery,
+apt-file, zypper search --provides). Needs a few hundred MB of downloads: ask josh
+first (Wi-Fi only, shares bandwidth with Plex).
+
+## Claude 5: "driver attached but not working" checks
+
+A bound driver doesn't always mean a working device (e.g. Wi-Fi driver loaded but its
+firmware failed, so there's no network interface). Per device type, check the interface
+the driver should create (`net/`, `sound/`, `drm/`, `nvme/`...), as data in rules.toml.
