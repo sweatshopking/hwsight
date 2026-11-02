@@ -1,0 +1,65 @@
+// Shared design tokens and data types. Components import from here (never from
+// app.slint, which imports the components).
+
+// ---------------------------------------------------------------------------------------
+// Theme tokens. The default values are the "Sweet" dark theme: deep navy surfaces,
+// purple-to-pink accents, soft glows. Other themes set these from Rust.
+export global Theme {
+    // Surfaces, darkest to lightest.
+    in-out property <color> background: #161925;
+    in-out property <color> surface: #1e2132;
+    in-out property <color> surface-raised: #262a40;
+    in-out property <color> surface-hover: #2f3450;
+    in-out property <color> border: #343a5a;
+
+    // Text.
+    in-out property <color> text: #e6e6f0;
+    in-out property <color> text-muted: #9aa0c0;
+    in-out property <color> text-faint: #6b7194;
+
+    // Accent gradient (purple to pink) and a cool highlight.
+    in-out property <color> accent-start: #c74ded;
+    in-out property <color> accent-end: #ff4d9d;
+    in-out property <color> accent-glow: #c74ded80;
+    in-out property <color> highlight: #00c1e4;
+
+    // Status colours.
+    in-out property <color> ok: #3fd18b;
+    in-out property <color> warn: #ffb347;
+    in-out property <color> error: #ff5c7a;
+    in-out property <color> neutral: #7a80a6;
+
+    // Shape and spacing.
+    in-out property <length> radius: 12px;
+    in-out property <length> radius-small: 8px;
+    in-out property <length> gap: 12px;
+    in-out property <length> padding: 16px;
+
+    // Type.
+    in-out property <length> font-small: 12px;
+    in-out property <length> font-body: 14px;
+    in-out property <length> font-title: 18px;
+    in-out property <length> font-hero: 26px;
+}
+
+// ---------------------------------------------------------------------------------------
+// One device as the window shows it (filled in by src/model.rs).
+export struct DeviceItem {
+    name: string,
+    vendor: string,
+    category: string,
+    // "ok", "warn", "error", or "neutral" (no driver needed, reserved for a VM).
+    status-kind: string,
+    status-text: string,
+    driver: string,
+    hardware-id: string,
+    address: string,
+    bus: string,
+    // Plain-English explanation of a problem, if any (may be several lines).
+    why: string,
+    // A command that fixes it, if we know one.
+    fix: string,
+    // Extra explanation, e.g. why no driver is needed.
+    note: string,
+    unrecognized: bool,
+}

@@ -1,0 +1,42 @@
+import { Theme } from "../theme.slint";
+
+// A category heading in the device list, with a pill showing how many devices it holds.
+export component CategoryHeader inherits Rectangle {
+    in property <string> text;
+    in property <int> count;
+    height: 40px;
+
+    HorizontalLayout {
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-bottom: 8px;
+        spacing: 8px;
+        alignment: stretch;
+        Text {
+            text: root.text.to-uppercase();
+            color: Theme.text-muted;
+            font-size: Theme.font-small;
+            font-weight: 700;
+            letter-spacing: 1px;
+            vertical-alignment: bottom;
+            overflow: elide;
+            horizontal-stretch: 1;
+        }
+        VerticalLayout {
+            alignment: end;
+            Rectangle {
+                height: 18px;
+                width: count-text.preferred-width + 16px;
+                border-radius: 9px;
+                background: Theme.surface-raised;
+                count-text := Text {
+                    text: root.count;
+                    color: Theme.text-faint;
+                    font-size: Theme.font-small;
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+                }
+            }
+        }
+    }
+}

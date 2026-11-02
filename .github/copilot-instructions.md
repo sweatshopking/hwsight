@@ -6,41 +6,43 @@ The work list is `docs/plan.md`. You only do tasks marked **Copilot** there.
 
 ## How you work (mandatory)
 
-These are requirements, not suggestions. A task that breaks any of them is not done.
+These are requirements, not suggestions. Breaking any of them means the task is
+rejected and done again from the start.
 
 1. **Do the whole task in this session.** Every numbered step, every listed test. Do not
    stop partway to ask "should I continue?", do not offer to "do the rest later", do not
-   split the task into follow-ups. Keep going until every item in the task's
-   **Done when** checklist is true.
-2. **No placeholders.** No `todo!()`, `unimplemented!()`, empty function bodies, stubbed
+   split the task into follow-ups.
+2. **Corrections from the user override the task text.** If the user sends a correction
+   while you work, apply it before anything else, even if you think the task was already
+   finished. In Done notes, add a "Corrections applied" list: each correction and the
+   file and line where you applied it. Never silently skip a correction.
+3. **No workarounds.** Follow every rule exactly as written. If a rule seems impossible
+   (for example an import that doesn't compile), do not invent a different approach that
+   breaks another rule. Stop, do everything else, and write `BLOCKED:` with the exact
+   problem and compiler error in Done notes.
+4. **No placeholders.** No `todo!()`, `unimplemented!()`, empty function bodies, stubbed
    tests, `#[ignore]`, or `// TODO` comments, except a TODO the task text explicitly
    tells you to write.
-3. **No skipped tests.** Write every test the task lists, with real assertions. Do not
-   weaken, delete, or `#[ignore]` an existing test to make the build pass. If an existing
-   test fails because of your change, your change is wrong: fix your code.
-4. **Stay inside the task.** Change only the files the task names. Do not refactor,
-   rename, or "tidy" anything else. Do not edit `CLAUDE.md`, `Cargo.toml` versions,
-   `.github/workflows/`, or `hwsight-core/data/`.
-5. **Never push, and never create branches.** Commit only if the user asks you to, as a
+5. **No skipped or weakened tests.** Write every test the task lists, with real
+   assertions. Do not weaken, delete, or `#[ignore]` an existing test to make the build
+   pass. If an existing test fails because of your change, your change is wrong.
+6. **Stay inside the task.** Change only the files the task names. Do not refactor,
+   rename, delete comments, or "tidy" anything else. Do not edit `CLAUDE.md`, `Cargo.toml`
+   versions, `.github/`, `tools/`, or `hwsight-core/data/`.
+7. **Never push, and never create branches.** Commit only if the user asks you to, as a
    single local commit on the current branch, with no `Co-authored-by` line. Every change
    is reviewed before it's pushed.
-6. **Run the checks yourself, in the terminal, and read the output.** Do not claim they
-   pass without running them:
-
-   ```
-   cargo fmt --check
-   cargo clippy --all-targets -- -D warnings
-   cargo test
-   ```
-
-   All three must finish with **zero errors and zero warnings**. If one fails, fix it and
-   run all three again. Repeat until clean.
-7. **If you are truly blocked** (something in the task is impossible or contradicts the
-   code), do not guess and do not silently skip it. Do everything else, then write
-   `BLOCKED:` and the exact reason in the task's **Done notes**.
-8. **Finish by filling in Done notes** in `docs/plan.md` under your task: the files you
-   changed, what each change does, and the last lines of the `cargo test` output showing
-   the pass count. Then tick every box in the task's **Done when** list (`- [x]`).
+8. **Verify with the check script, never from memory.** Run `tools/check.sh` in the
+   terminal after your last edit. It must end with `ALL CHECKS PASSED`. If anything
+   fails, fix it and run it again. Do not tick any "Done when" box until it passes, and
+   paste its complete output into Done notes. A ticked box that isn't true is the worst
+   possible failure: the reviewer re-runs the script, and a false tick means the task is
+   rejected.
+9. **Account for every step.** Before ticking boxes, re-read the task text from the top
+   and write one line per numbered step in Done notes: `Step N: done in <file> - <what>`.
+   If you find a step you missed, do it now.
+10. **If you are truly blocked**, do everything else, then write `BLOCKED:` and the exact
+    reason in Done notes. Never skip anything silently.
 
 ## Code rules (breaking any of these is a bug)
 

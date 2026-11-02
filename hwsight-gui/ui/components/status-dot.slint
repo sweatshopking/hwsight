@@ -1,0 +1,17 @@
+import { Theme } from "../theme.slint";
+
+// A small coloured circle for a status kind: "ok", "warn", "error", or "neutral".
+// Warnings and errors glow so problems stand out in a long list.
+export component StatusDot inherits Rectangle {
+    in property <string> kind;
+    property <color> colour: kind == "ok" ? Theme.ok
+        : kind == "warn" ? Theme.warn
+        : kind == "error" ? Theme.error
+        : Theme.neutral;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: colour;
+    drop-shadow-blur: kind == "warn" || kind == "error" ? 8px : 0px;
+    drop-shadow-color: colour.with-alpha(0.6);
+}

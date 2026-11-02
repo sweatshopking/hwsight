@@ -1,0 +1,61 @@
+import { Theme, DeviceItem } from "../theme.slint";
+import { StatusDot } from "status-dot.slint";
+
+// One device in the list: status dot, name, and a second line with maker and status.
+export component DeviceRow inherits Rectangle {
+    in property <DeviceItem> device;
+    in property <bool> selected;
+    callback clicked();
+    height: 52px;
+    border-radius: Theme.radius-small;
+    background: selected ? Theme.surface-raised : touch.has-hover ? Theme.surface-hover : transparent;
+    animate background { duration: 120ms; }
+
+    touch := TouchArea {
+        clicked => { root.clicked(); }
+    }
+
+    // Accent bar on the selected row.
+    Rectangle {
+        visible: root.selected;
+        x: 0px;
+        y: 6px;
+        width: 3px;
+        height: root.height - 12px;
+        border-radius: 2px;
+        background: @linear-gradient(180deg, Theme.accent-start 0%, Theme.accent-end 100%);
+    }
+
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 14px;
+        spacing: 12px;
+        VerticalLayout {
+            alignment: center;
+            StatusDot {
+                kind: root.device.status-kind;
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Text {
+                text: root.device.name;
+                color: Theme.text;
+                font-size: Theme.font-body;
+                font-weight: 600;
+                overflow: elide;
+            }
+            Text {
+                text: root.device.vendor == ""
+                    ? root.device.status-text
+                    : root.device.vendor + "  ·  " + root.device.status-text;
+                color: root.device.status-kind == "warn" ? Theme.warn
+                    : root.device.status-kind == "error" ? Theme.error
+                    : Theme.text-muted;
+                font-size: Theme.font-small;
+                overflow: elide;
+            }
+        }
+    }
+}

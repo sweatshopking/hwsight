@@ -225,12 +225,19 @@ top of it, **one at a time, in order**: each depends on the one before.
 Rules for every GUI task, in addition to `.github/copilot-instructions.md`:
 
 - **Every colour, size, radius, gap, and font size comes from `Theme`** in
-  `ui/app.slint` (for example `Theme.surface`, `Theme.radius`, `Theme.font-body`). Never
-  write a hex colour or a pixel size for these in a component. Fixed sizes the task gives
-  in px (like a row height) are fine.
+  `ui/theme.slint` (for example `Theme.surface`, `Theme.radius`, `Theme.font-body`).
+  Never write a hex colour or a pixel size for these in a component. Fixed sizes the task
+  gives in px (like a row height) are fine.
+- `Theme` and the shared structs (`DeviceItem`) live in `ui/theme.slint`. Components
+  import them with `import { Theme, DeviceItem } from "../theme.slint";`. Never import
+  from `app.slint` (it imports the components, so that would be a loop), and never
+  define `Theme` or `DeviceItem` anywhere else.
 - Put each component in its own file under `hwsight-gui/ui/components/` and `import` it
   into `ui/app.slint`. Components must not read `AppWindow` properties directly: pass
   data in through `in` properties and report clicks through callbacks.
+- Items inside a `ListView` or a `for` loop need an explicit `height`; children placed
+  with `if` don't give their parent a size, so without one every item is 0px tall and
+  they draw on top of each other.
 - Text a user reads follows the plain-words rule. No emoji, no icons from fonts.
 - Long text must never overflow: use `overflow: elide;` on single lines and
   `wrap: word-wrap;` on paragraphs.
@@ -285,14 +292,26 @@ Rules for every GUI task, in addition to `.github/copilot-instructions.md`:
 
 **Done when:**
 
-- [ ] the three component files exist and are used by `app.slint`
-- [ ] no hex colours or `Theme`-covered sizes written inside the components
-- [ ] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` all
+- [x] the three component files exist and are used by `app.slint`
+- [x] no hex colours or `Theme`-covered sizes written inside the components
+- [x] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` all
       pass with zero warnings; the app-opens check prints `124`
-- [ ] Done notes filled in (files, what each does, final `test result:` lines)
-- [ ] nothing pushed, and no co-author line
+- [x] Done notes filled in (files, what each does, final `test result:` lines)
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- `hwsight-gui/ui/components/status-dot.slint`: Added status-colored dots and
+  warning/error glow styling, with theme values passed in from `AppWindow`.
+- `hwsight-gui/ui/components/category-header.slint`: Added uppercase category headings
+  with device-count pills.
+- `hwsight-gui/ui/components/device-row.slint`: Added selectable, hoverable device rows
+  with status, vendor, and plain status text.
+- `hwsight-gui/ui/app.slint`: Replaced the placeholder list with the grouped device
+  list panel and the Copilot 4 details placeholder.
+- Test result: `test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- Test result: `test result: ok. 72 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s`
+- Test result: `test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- App-opens check: `124`
 
 ## Copilot 4: details panel
 
