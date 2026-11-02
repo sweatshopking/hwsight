@@ -178,18 +178,32 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         }
     }
 
+    // Devices that couldn't connect never appear in the list, so their ports are shown.
+    if !report.port_issues.is_empty() {
+        if !shown.is_empty() {
+            writeln!(out)?;
+        }
+        writeln!(out, "USB ports")?;
+        for p in &report.port_issues {
+            writeln!(out, "  ✗ {}", p.port)?;
+            writeln!(out, "      Why: {}", p.issue.message())?;
+        }
+    }
+
     let problems = report
         .devices
         .iter()
         .filter(|d| d.status.is_problem())
-        .count();
+        .count()
+        + report.port_issues.len();
+    let devices = report.devices.len();
     writeln!(out)?;
-    match (shown.is_empty(), problems) {
-        (true, 0) if opts.problems_only => writeln!(out, "No problems found.")?,
-        (true, _) => writeln!(out, "No devices found.")?,
-        (false, 0) => writeln!(out, "{} devices, no problems found.", report.devices.len())?,
-        (false, 1) => writeln!(out, "{} devices, 1 problem.", report.devices.len())?,
-        (false, n) => writeln!(out, "{} devices, {n} problems.", report.devices.len())?,
+    match (devices, problems) {
+        (0, 0) => writeln!(out, "No devices found.")?,
+        (_, 0) if opts.problems_only => writeln!(out, "No problems found.")?,
+        (_, 0) => writeln!(out, "{devices} devices, no problems found.")?,
+        (_, 1) => writeln!(out, "{devices} devices, 1 problem.")?,
+        (_, n) => writeln!(out, "{devices} devices, {n} problems.")?,
     }
     if let Some(note) = &report.firmware_note {
         writeln!(out, "Note: {note}")?;

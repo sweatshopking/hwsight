@@ -8,11 +8,12 @@ use crate::kernel_log::LogIssue;
 use crate::modules::DriverCandidate;
 
 /// How a device is connected.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum Bus {
     Pci,
+    Usb,
 }
 
 /// Plain-English device groups, in the order they're shown.
@@ -28,6 +29,7 @@ pub enum Category {
     Thunderbolt,
     Input,
     Camera,
+    Printers,
     Communication,
     Security,
     Accelerators,
@@ -44,16 +46,39 @@ impl Category {
             Self::Network => "Network",
             Self::Bluetooth => "Bluetooth",
             Self::Storage => "Storage",
-            Self::UsbControllers => "USB controllers",
+            Self::UsbControllers => "USB controllers and hubs",
             Self::Thunderbolt => "Thunderbolt",
             Self::Input => "Input devices",
             Self::Camera => "Cameras",
+            Self::Printers => "Printers and scanners",
             Self::Communication => "Modems and serial ports",
             Self::Security => "Security and encryption",
             Self::Accelerators => "AI and compute accelerators",
             Self::Processors => "Processors",
             Self::SystemDevices => "System devices",
             Self::Other => "Other devices",
+        }
+    }
+
+    /// One device of this kind, for sentences like "Unknown Logitech USB input device".
+    pub fn singular(self) -> &'static str {
+        match self {
+            Self::Graphics => "graphics device",
+            Self::Sound => "sound device",
+            Self::Network => "network device",
+            Self::Bluetooth => "Bluetooth device",
+            Self::Storage => "storage device",
+            Self::UsbControllers => "hub",
+            Self::Thunderbolt => "Thunderbolt device",
+            Self::Input => "input device",
+            Self::Camera => "camera",
+            Self::Printers => "printer or scanner",
+            Self::Communication => "modem or serial device",
+            Self::Security => "security device",
+            Self::Accelerators => "accelerator",
+            Self::Processors => "processor",
+            Self::SystemDevices => "system device",
+            Self::Other => "device",
         }
     }
 }
@@ -137,6 +162,9 @@ pub struct Device {
     pub log_issues: Vec<LogIssue>,
     /// For `DriverNotReady`: what the driver should have created, in plain English.
     pub missing_interface: Option<String>,
+    /// A plain-English explanation of the status when there's more to say, e.g. why no
+    /// driver is needed, or that USB security settings blocked the device.
+    pub note: Option<String>,
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

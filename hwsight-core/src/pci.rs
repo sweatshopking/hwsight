@@ -79,9 +79,8 @@ fn read_device(
         (Some(db), Some(alias)) => db.candidates(alias, blocklist),
         _ => Vec::new(),
     };
-    let needs_driver = rules
-        .no_driver_needed(class_code, vendor_id, device_id)
-        .is_none();
+    let no_driver_reason = rules.no_driver_needed(Bus::Pci, class_code, vendor_id, device_id);
+    let needs_driver = no_driver_reason.is_none();
     let mut status = diagnose(driver.as_deref(), &driver_candidates, needs_driver);
 
     // A driver being attached isn't proof the device works: check it created what it
@@ -118,6 +117,9 @@ fn read_device(
         driver_candidates,
         status,
         missing_interface,
+        note: (status == Status::NoDriverNeeded)
+            .then(|| no_driver_reason.map(str::to_owned))
+            .flatten(),
         log_issues: Vec::new(),
     })
 }

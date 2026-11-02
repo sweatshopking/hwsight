@@ -6,6 +6,7 @@
 use serde::Deserialize;
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
+use crate::device::Bus;
 
 #[derive(Debug, Clone)]
 pub struct Rules {
@@ -17,6 +18,9 @@ pub struct Rules {
 /// Which devices a rule applies to. Every given field must match.
 #[derive(Debug, Clone)]
 struct Matcher {
+    /// Class codes mean different things on different buses (09 is input on PCI but a
+    /// hub on USB), so every rule belongs to one bus. Defaults to PCI.
+    bus: Bus,
     class: Option<u8>,
     subclasses: Option<Vec<u8>>,
     prog_ifs: Option<Vec<u8>>,
@@ -25,7 +29,11 @@ struct Matcher {
 }
 
 impl Matcher {
-    fn matches(&self, class_code: u32, vendor: u16, device: u16) -> bool {
+    /// For USB, `class_code` is the interface's class, subclass, and protocol.
+    fn matches(&self, bus: Bus, class_code: u32, vendor: u16, device: u16) -> bool {
+        if bus != self.bus {
+            return false;
+        }
         let class = (class_code >> 16) as u8;
         let subclass = (class_code >> 8) as u8;
         let prog_if = class_code as u8;
@@ -76,6 +84,7 @@ struct RulesFile {
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct RawNoDriverRule {
+    bus: Option<String>,
     class: Option<String>,
     subclasses: Option<Vec<String>>,
     prog_ifs: Option<Vec<String>>,
@@ -87,6 +96,7 @@ struct RawNoDriverRule {
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct RawInterfaceRule {
+    bus: Option<String>,
     class: Option<String>,
     subclasses: Option<Vec<String>>,
     prog_ifs: Option<Vec<String>>,
@@ -116,6 +126,7 @@ impl DataFile for RuleSet {
             .map(|r| {
                 Ok(NoDriverRule {
                     matcher: compile_matcher(
+                        r.bus,
                         r.class,
                         r.subclasses,
                         r.prog_ifs,
@@ -139,6 +150,7 @@ impl DataFile for RuleSet {
                 }
                 Ok(InterfaceRule {
                     matcher: compile_matcher(
+                        r.bus,
                         r.class,
                         r.subclasses,
                         r.prog_ifs,
@@ -189,11 +201,17 @@ impl Rules {
     }
 
     /// If this device normally needs no driver, the plain-English reason why.
-    pub fn no_driver_needed(&self, class_code: u32, vendor: u16, device: u16) -> Option<&str> {
+    pub fn no_driver_needed(
+        &self,
+        bus: Bus,
+        class_code: u32,
+        vendor: u16,
+        device: u16,
+    ) -> Option<&str> {
         self.set
             .no_driver_needed
             .iter()
-            .find(|r| r.matcher.matches(class_code, vendor, device))
+            .find(|r| r.matcher.matches(bus, class_code, vendor, device))
             .map(|r| r.reason.as_str())
     }
 
@@ -207,7 +225,7 @@ impl Rules {
         self.set
             .expect_interface
             .iter()
-            .find(|r| r.matcher.matches(class_code, vendor, device))
+            .find(|r| r.matcher.matches(Bus::Pci, class_code, vendor, device))
             .map(|r| ExpectedInterface {
                 interface: &r.interface,
                 what: &r.what,
@@ -218,13 +236,20 @@ impl Rules {
 /// A rule with a bad ID rejects the whole file, so a broken download falls back to the
 /// built-in rules instead of half-working.
 fn compile_matcher(
+    bus: Option<String>,
     class: Option<String>,
     subclasses: Option<Vec<String>>,
     prog_ifs: Option<Vec<String>>,
     vendor: Option<String>,
     device: Option<String>,
 ) -> Result<Matcher, String> {
+    let bus = match bus.as_deref() {
+        None | Some("pci") => Bus::Pci,
+        Some("usb") => Bus::Usb,
+        Some(other) => return Err(format!("unknown bus `{other}`")),
+    };
     let m = Matcher {
+        bus,
         class: class.as_deref().map(hex_u8).transpose()?,
         subclasses: subclasses
             .map(|list| list.iter().map(|h| hex_u8(h)).collect())
@@ -279,11 +304,27 @@ mod tests {
         let rules = Rules::embedded();
         assert!(!rules.version.is_empty());
         // Host bridge: no driver needed. VGA controller: needs one.
-        assert!(rules.no_driver_needed(0x060000, 0x1022, 0x14d8).is_some());
-        assert!(rules.no_driver_needed(0x080600, 0x1022, 0x149e).is_some());
-        assert!(rules.no_driver_needed(0x030000, 0x10de, 0x2c05).is_none());
+        assert!(
+            rules
+                .no_driver_needed(Bus::Pci, 0x060000, 0x1022, 0x14d8)
+                .is_some()
+        );
+        assert!(
+            rules
+                .no_driver_needed(Bus::Pci, 0x080600, 0x1022, 0x149e)
+                .is_some()
+        );
+        assert!(
+            rules
+                .no_driver_needed(Bus::Pci, 0x030000, 0x10de, 0x2c05)
+                .is_none()
+        );
         // SMBus (0c05) carries sensors, so it does need a driver.
-        assert!(rules.no_driver_needed(0x0c0500, 0x1022, 0x790b).is_none());
+        assert!(
+            rules
+                .no_driver_needed(Bus::Pci, 0x0c0500, 0x1022, 0x790b)
+                .is_none()
+        );
     }
 
     fn write(dir: &Path, text: &str) {
@@ -301,7 +342,10 @@ mod tests {
         assert!(problems.is_empty());
         assert_eq!(rules.version, "2099.01.01");
         assert!(matches!(rules.source, DataSource::File(_)));
-        assert_eq!(rules.no_driver_needed(0x030000, 0, 0), Some("test"));
+        assert_eq!(
+            rules.no_driver_needed(Bus::Pci, 0x030000, 0, 0),
+            Some("test")
+        );
     }
 
     #[test]
@@ -341,12 +385,42 @@ mod tests {
 
     #[test]
     fn match_everything_rule_is_rejected() {
-        assert!(compile_matcher(None, None, None, None, None).is_err());
-        assert!(compile_matcher(None, None, None, None, Some("1234".into())).is_err());
+        assert!(compile_matcher(None, None, None, None, None, None).is_err());
+        assert!(compile_matcher(None, None, None, None, None, Some("1234".into())).is_err());
         assert!(
-            compile_matcher(Some("0c".into()), None, Some(vec!["30".into()]), None, None).is_err()
+            compile_matcher(
+                None,
+                Some("0c".into()),
+                None,
+                Some(vec!["30".into()]),
+                None,
+                None
+            )
+            .is_err()
         );
-        assert!(compile_matcher(Some("02".into()), None, None, None, None).is_ok());
+        assert!(compile_matcher(None, Some("02".into()), None, None, None, None).is_ok());
+        assert!(
+            compile_matcher(
+                Some("usb".into()),
+                Some("ff".into()),
+                None,
+                None,
+                None,
+                None
+            )
+            .is_ok()
+        );
+        assert!(
+            compile_matcher(
+                Some("isa".into()),
+                Some("02".into()),
+                None,
+                None,
+                None,
+                None
+            )
+            .is_err()
+        );
     }
 
     #[test]

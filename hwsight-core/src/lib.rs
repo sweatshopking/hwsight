@@ -11,6 +11,7 @@ pub mod modules;
 mod pci;
 pub mod pci_ids;
 pub mod rules;
+mod usb;
 
 use std::path::PathBuf;
 
@@ -29,6 +30,9 @@ pub use rules::Rules;
 #[derive(Debug, Serialize)]
 pub struct ScanReport {
     pub devices: Vec<Device>,
+    /// Problems on USB ports where nothing working is plugged in, e.g. a device that
+    /// couldn't connect. These devices never show up in `devices`.
+    pub port_issues: Vec<PortIssue>,
     pub notes: Vec<ScanNote>,
     pub data: DataInfo,
     /// Where problem explanations were read from; `None` if the log wasn't readable.
@@ -38,12 +42,22 @@ pub struct ScanReport {
     pub firmware_note: Option<String>,
 }
 
+/// A problem on a USB port rather than a device.
+#[derive(Debug, Clone, Serialize)]
+pub struct PortIssue {
+    /// e.g. "USB bus 1, port 3"
+    pub port: String,
+    pub issue: LogIssue,
+}
+
 /// Something the user (or a bug report) should know about the scan itself.
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum ScanNote {
     /// The kernel's driver list couldn't be read, so missing drivers can't be detected.
     NoDriverList,
+    /// The USB device folder couldn't be read.
+    UsbUnreadable { error: String },
     /// The PCI device folder couldn't be read.
     PciUnreadable { error: String },
     /// The kernel log couldn't be read, so problems can't be explained in detail.
@@ -63,6 +77,7 @@ impl ScanNote {
             Self::KernelLogUnreadable => "Couldn't read the kernel log, so hwsight can't say why \
                 a device isn't working. On some systems only administrators can read it."
                 .to_owned(),
+            Self::UsbUnreadable { error } => format!("Couldn't read the USB device list: {error}"),
             Self::PciUnreadable { error } => format!("Couldn't read the PCI device list: {error}"),
             Self::DataNeedsNewerApp { path, .. } => format!(
                 "{} is from a newer version of hwsight. Update hwsight to use it.",
@@ -107,6 +122,7 @@ pub struct IdsSourceInfo {
 pub struct Scanner {
     pub data_dirs: DataDirs,
     pub pci_devices: PathBuf,
+    pub usb_devices: PathBuf,
     /// The running kernel's module folder, e.g. `/lib/modules/6.18.0`.
     pub kernel_modules: Option<PathBuf>,
     /// Where loaded modules appear, normally `/sys/module`.
@@ -137,6 +153,7 @@ impl Scanner {
         Self {
             data_dirs: DataDirs::standard(),
             pci_devices: PathBuf::from("/sys/bus/pci/devices"),
+            usb_devices: PathBuf::from("/sys/bus/usb/devices"),
             kernel_modules: modules::running_kernel_modules_dir(),
             loaded_modules: PathBuf::from("/sys/module"),
             modprobe_dirs: modules::MODPROBE_DIRS.iter().map(PathBuf::from).collect(),
@@ -153,43 +170,50 @@ impl Scanner {
         let mut notes = Vec::new();
 
         let (rules, problems) = Rules::load(&self.data_dirs);
-        notes.extend(problems.into_iter().map(|p| match p {
-            DataProblem::NewerSchema { path, schema } => {
-                ScanNote::DataNeedsNewerApp { path, schema }
-            }
-            DataProblem::Invalid { path, error } => ScanNote::DataInvalid { path, error },
-        }));
-
+        notes.extend(problems.into_iter().map(ScanNote::from));
         let (firmware, problems) = FirmwarePackages::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
-        let aliases = self
-            .kernel_modules
-            .as_deref()
-            .and_then(|dir| modules::AliasDb::load(dir, &self.loaded_modules, "pci:"));
-        if aliases.is_none() {
+        let load_aliases = |bus: &str| {
+            self.kernel_modules
+                .as_deref()
+                .and_then(|dir| modules::AliasDb::load(dir, &self.loaded_modules, bus))
+        };
+        let pci_aliases = load_aliases("pci:");
+        let usb_aliases = load_aliases("usb:");
+        if pci_aliases.is_none() {
             notes.push(ScanNote::NoDriverList);
         }
 
         let cmdline = std::fs::read_to_string(&self.kernel_cmdline).ok();
         let blocklist = modules::Blocklist::load(&self.modprobe_dirs, cmdline.as_deref());
 
-        let mut devices = match pci::scan(
+        let mut devices = Vec::new();
+        match pci::scan(
             &self.pci_devices,
             &names,
-            aliases.as_ref(),
+            pci_aliases.as_ref(),
             &blocklist,
             &rules,
         ) {
-            Ok(devices) => devices,
-            Err(e) => {
-                notes.push(ScanNote::PciUnreadable {
-                    error: e.to_string(),
-                });
-                Vec::new()
-            }
-        };
+            Ok(found) => devices.extend(found),
+            Err(e) => notes.push(ScanNote::PciUnreadable {
+                error: e.to_string(),
+            }),
+        }
+        match usb::scan(&self.usb_devices, usb_aliases.as_ref(), &blocklist, &rules) {
+            Ok(found) => devices.extend(found),
+            Err(e) => notes.push(ScanNote::UsbUnreadable {
+                error: e.to_string(),
+            }),
+        }
+        devices.sort_by(|a, b| {
+            a.category
+                .cmp(&b.category)
+                .then_with(|| a.bus.cmp(&b.bus))
+                .then_with(|| natural_address(&a.address).cmp(&natural_address(&b.address)))
+        });
 
         let (log_source, log_lines) = match &self.kernel_log {
             KernelLogInput::System => match kernel_log::read_system_log() {
@@ -203,27 +227,55 @@ impl Scanner {
             KernelLogInput::Skip => (None, Vec::new()),
         };
         let mut issues = kernel_log::issues_by_device(&log_lines, &self.firmware_dirs);
-        for device in &mut devices {
-            if let Some(mut found) = issues.remove(&device.address) {
-                for issue in &mut found {
-                    if let LogIssue::MissingFirmware {
-                        file,
-                        package,
-                        install_command,
-                        ..
-                    } = issue
-                    {
-                        *package = firmware
-                            .package_for(file, self.distro.family)
-                            .map(str::to_owned);
-                        *install_command = package.as_deref().and_then(|p| {
-                            self.distro.family.install_command(p, self.distro.immutable)
-                        });
-                    }
+        for found in issues.values_mut() {
+            for issue in found {
+                if let LogIssue::MissingFirmware {
+                    file,
+                    package,
+                    install_command,
+                    ..
+                } = issue
+                {
+                    *package = firmware
+                        .package_for(file, self.distro.family)
+                        .map(str::to_owned);
+                    *install_command = package
+                        .as_deref()
+                        .and_then(|p| self.distro.family.install_command(p, self.distro.immutable));
                 }
-                device.log_issues = found;
             }
         }
+        for device in &mut devices {
+            // Messages name the device ("1-5") or one of its USB interfaces ("1-5:1.0").
+            let prefix = format!("{}:", device.address);
+            let keys: Vec<String> = issues
+                .keys()
+                .filter(|k| **k == device.address || k.starts_with(&prefix))
+                .cloned()
+                .collect();
+            for key in keys {
+                for issue in issues.remove(&key).unwrap_or_default() {
+                    if !device.log_issues.contains(&issue) {
+                        device.log_issues.push(issue);
+                    }
+                }
+            }
+        }
+        // What's left is about USB ports with nothing working plugged in: devices that
+        // couldn't connect never appear in the device list at all.
+        let mut port_issues: Vec<PortIssue> = issues
+            .into_iter()
+            .filter_map(|(key, found)| {
+                let port = usb_port_label(&key)?;
+                Some(found.into_iter().map(move |issue| PortIssue {
+                    port: port.clone(),
+                    issue,
+                }))
+            })
+            .flatten()
+            .collect();
+        port_issues.sort_by(|a, b| a.port.cmp(&b.port));
+
         let firmware_note = devices
             .iter()
             .flat_map(|d| &d.log_issues)
@@ -258,6 +310,7 @@ impl Scanner {
 
         ScanReport {
             devices,
+            port_issues,
             notes,
             data,
             kernel_log: log_source,
@@ -265,6 +318,42 @@ impl Scanner {
             firmware_note,
         }
     }
+}
+
+/// Sort "1-10" after "1-9" and "0000:0a:00.0" after "0000:09:00.0" by comparing the
+/// numbers inside addresses as numbers.
+fn natural_address(address: &str) -> Vec<(u64, String)> {
+    address
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .map(|part| match u64::from_str_radix(part, 16) {
+            Ok(n) if !part.is_empty() => (n, String::new()),
+            _ => (u64::MAX, part.to_owned()),
+        })
+        .collect()
+}
+
+/// A plain description of a USB port from a kernel name: `1-3` or `usb1-port3` becomes
+/// "USB bus 1, port 3"; `1-3.2` becomes "USB bus 1, port 3, then hub port 2". `None` for
+/// names that aren't USB ports (e.g. PCI addresses).
+pub fn usb_port_label(name: &str) -> Option<String> {
+    let (bus, ports) = if let Some(rest) = name.strip_prefix("usb") {
+        let (bus, port) = rest.split_once("-port")?;
+        (bus, port.to_owned())
+    } else {
+        let (bus, ports) = name.split_once('-')?;
+        (bus, ports.to_owned())
+    };
+    let bus: u32 = bus.parse().ok()?;
+    let ports: Vec<u32> = ports
+        .split('.')
+        .map(|p| p.parse().ok())
+        .collect::<Option<_>>()?;
+    let (first, hubs) = ports.split_first()?;
+    let mut label = format!("USB bus {bus}, port {first}");
+    for hub_port in hubs {
+        label.push_str(&format!(", then hub port {hub_port}"));
+    }
+    Some(label)
 }
 
 /// Scan the real machine.
@@ -276,6 +365,28 @@ pub fn scan() -> ScanReport {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn usb_port_labels() {
+        assert_eq!(usb_port_label("1-3").as_deref(), Some("USB bus 1, port 3"));
+        assert_eq!(
+            usb_port_label("usb2-port4").as_deref(),
+            Some("USB bus 2, port 4")
+        );
+        assert_eq!(
+            usb_port_label("3-1.4").as_deref(),
+            Some("USB bus 3, port 1, then hub port 4")
+        );
+        assert_eq!(usb_port_label("0000:07:00.0"), None);
+        assert_eq!(usb_port_label("usb1"), None);
+    }
+
+    #[test]
+    fn addresses_sort_naturally() {
+        let mut list = vec!["1-10", "1-9", "1-2.1", "1-2"];
+        list.sort_by_key(|a| natural_address(a));
+        assert_eq!(list, vec!["1-2", "1-2.1", "1-9", "1-10"]);
+    }
 
     /// A whole scan of a fake machine: one network card whose driver failed because of
     /// missing firmware, explained by the kernel log.
@@ -308,6 +419,7 @@ mod tests {
         let scanner = Scanner {
             data_dirs: DataDirs::only(&root.join("data")),
             pci_devices: root.join("pci"),
+            usb_devices: root.join("usb"),
             kernel_modules: Some(modules.clone()),
             loaded_modules: modules, // contains an "r8169" folder, so it counts as loaded
             modprobe_dirs: Vec::new(),

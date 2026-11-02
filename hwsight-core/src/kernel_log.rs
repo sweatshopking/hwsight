@@ -33,6 +33,11 @@ pub enum LogIssue {
     },
     /// The driver tried to start the device and gave up.
     DriverFailed { driver: String, error: i32 },
+    /// Something plugged into a USB port couldn't connect. `error` is 0 when the kernel
+    /// didn't give one.
+    UsbConnectFailed { error: i32 },
+    /// A USB port reported drawing too much power.
+    UsbOverCurrent,
 }
 
 impl LogIssue {
@@ -57,6 +62,20 @@ impl LogIssue {
             Self::MissingFirmware { file, .. } => {
                 format!("The driver needs a firmware file that isn't installed: {file}")
             }
+            Self::UsbConnectFailed { error } => {
+                let why = if *error == 0 {
+                    String::new()
+                } else {
+                    format!(" ({})", errno_meaning(*error))
+                };
+                format!(
+                    "A device plugged in here couldn't connect{why}. This is usually a bad \
+                     cable, a faulty device, or not enough power. Try another cable or port."
+                )
+            }
+            Self::UsbOverCurrent => "This USB port reported drawing too much power. The device \
+                plugged into it may be faulty or need its own power supply."
+                .to_owned(),
             Self::DriverFailed { driver, error } => format!(
                 "The {driver} driver couldn't start this device ({}).",
                 errno_meaning(*error)
@@ -176,6 +195,29 @@ fn parse_line(line: &str, firmware_dirs: &[PathBuf]) -> Option<(String, LogIssue
 
     let (device, message) = split_device_prefix(line)?;
 
+    // USB devices that never made it onto the bus:
+    // "usb 1-3: device descriptor read/64, error -71"
+    // "usb 1-3: device not accepting address 5, error -71"
+    // "usb usb1-port3: unable to enumerate USB device"
+    // "usb usb1-port3: over-current condition"
+    if line.starts_with("usb ") {
+        if message.starts_with("device descriptor read")
+            || message.starts_with("device not accepting address")
+        {
+            let error = message
+                .rsplit_once(", error ")
+                .and_then(|(_, e)| parse_errno(e))
+                .unwrap_or(0);
+            return Some((device.to_owned(), LogIssue::UsbConnectFailed { error }));
+        }
+        if message.starts_with("unable to enumerate USB device") {
+            return Some((device.to_owned(), LogIssue::UsbConnectFailed { error: 0 }));
+        }
+        if message.starts_with("over-current condition") {
+            return Some((device.to_owned(), LogIssue::UsbOverCurrent));
+        }
+    }
+
     // "probe with driver r8169 failed with error -5" (newer kernels)
     if let Some(rest) = message.strip_prefix("probe with driver ")
         && let Some((drv, error)) = rest.split_once(" failed with error ")
@@ -282,6 +324,8 @@ pub fn errno_meaning(error: i32) -> &'static str {
         16 => "the device was already in use",
         19 => "the device wasn't found when the driver looked for it",
         22 => "the device sent something the driver didn't expect",
+        32 => "the device stopped responding",
+        71 => "the connection kept failing",
         95 => "this device model isn't supported by the driver",
         110 => "the device didn't respond in time",
         517 => "it was waiting on another part that never became ready",
@@ -367,6 +411,35 @@ usb 1-2: new high-speed USB device number 3 using xhci_hcd
             "../../etc/passwd",
             &[tmp.path().to_path_buf()]
         ));
+    }
+
+    #[test]
+    fn usb_connection_problems() {
+        let log = lines(
+            "\
+usb 1-3: device descriptor read/64, error -71
+usb 1-3: device not accepting address 5, error -71
+usb usb1-port3: unable to enumerate USB device
+usb usb2-port1: over-current condition
+usb 1-4: new high-speed USB device number 3 using xhci_hcd
+",
+        );
+        let found = issues_by_device(&log, &[]);
+        assert_eq!(
+            found["1-3"],
+            vec![LogIssue::UsbConnectFailed { error: -71 }]
+        );
+        assert_eq!(
+            found["usb1-port3"],
+            vec![LogIssue::UsbConnectFailed { error: 0 }]
+        );
+        assert_eq!(found["usb2-port1"], vec![LogIssue::UsbOverCurrent]);
+        assert!(!found.contains_key("1-4"));
+        assert!(
+            found["1-3"][0]
+                .message()
+                .contains("the connection kept failing")
+        );
     }
 
     #[test]

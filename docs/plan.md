@@ -39,10 +39,23 @@ files fill gaps; malformed lines are skipped; real-file smoke test that loads
 
 **Done notes:**
 
-## Claude 2: USB scanner
+## Claude 2: USB scanner (done 2026-11-02, names integration waits for Copilot 1)
 
-Read `/sys/bus/usb/devices`, devices and interfaces (drivers bind per interface), hubs,
-root hubs. Uses `UsbNames` from Copilot 1.
+Done: devices + interfaces, any bound interface = working (vendor-specific interfaces
+used by apps, e.g. RGB/cooler controllers, aren't flagged), driver candidates per
+interface, USBGuard-blocked devices, categories from interface classes then from what
+the driver created, per-bus rules (`bus = "usb"`), devices that couldn't connect and
+over-current ports from the kernel log (`port_issues`).
+
+Left for after Copilot 1:
+- Wire `UsbNames` in: vendor name when the device gives none; prefer the database
+  product name when the device's own string is generic ("Controller",
+  "Wireless_Device", "USB Receiver").
+- Devices whose only bound interface is HID but that are really coolers or lighting
+  (NZXT Kraken, ASUS AURA) land in "Input devices": add data rules for category
+  overrides by vendor:product.
+- A device with only vendor-specific interfaces and no driver is `NoDriver`; if it's
+  actually app-driven, add a `bus = "usb"` vendor/device `no_driver_needed` rule.
 
 ## Claude 3: explain failures from the kernel log (done 2026-11-02)
 
