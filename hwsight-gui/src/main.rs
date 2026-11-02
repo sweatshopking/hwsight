@@ -319,14 +319,12 @@ fn snapshot_when_ready(window: slint::Weak<AppWindow>, path: std::path::PathBuf)
                         _ => continue,
                     };
                     let text: slint::SharedString = k.into();
-                    let _ =
-                        w.window()
-                            .try_dispatch_event(slint::platform::WindowEvent::KeyPressed {
-                                text: text.clone(),
-                            });
-                    let _ = w
-                        .window()
-                        .try_dispatch_event(slint::platform::WindowEvent::KeyReleased { text });
+                    let _ = w.window().dispatch_event_with_result(
+                        slint::platform::WindowEvent::KeyPressed { text: text.clone() },
+                    );
+                    let _ = w.window().dispatch_event_with_result(
+                        slint::platform::WindowEvent::KeyReleased { text },
+                    );
                 }
                 return;
             }
