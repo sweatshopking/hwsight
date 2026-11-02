@@ -72,7 +72,7 @@ Check Debian, Ubuntu, Fedora, and openSUSE package names in containers (dnf repo
 apt-file, zypper search --provides). Needs a few hundred MB of downloads: ask josh
 first (Wi-Fi only, shares bandwidth with Plex).
 
-## Claude 5: "driver attached but not working" checks
+## Claude 5: "driver attached but not working" checks (done 2026-11-02)
 
 A bound driver doesn't always mean a working device (e.g. Wi-Fi driver loaded but its
 firmware failed, so there's no network interface). Per device type, check the interface

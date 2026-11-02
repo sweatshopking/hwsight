@@ -11,16 +11,56 @@ use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
 pub struct Rules {
     pub version: String,
     pub source: DataSource,
-    no_driver_needed: Vec<NoDriverRule>,
+    set: RuleSet,
+}
+
+/// Which devices a rule applies to. Every given field must match.
+#[derive(Debug, Clone)]
+struct Matcher {
+    class: Option<u8>,
+    subclasses: Option<Vec<u8>>,
+    prog_ifs: Option<Vec<u8>>,
+    vendor: Option<u16>,
+    device: Option<u16>,
+}
+
+impl Matcher {
+    fn matches(&self, class_code: u32, vendor: u16, device: u16) -> bool {
+        let class = (class_code >> 16) as u8;
+        let subclass = (class_code >> 8) as u8;
+        let prog_if = class_code as u8;
+        self.class.is_none_or(|c| c == class)
+            && self
+                .subclasses
+                .as_ref()
+                .is_none_or(|s| s.contains(&subclass))
+            && self.prog_ifs.as_ref().is_none_or(|p| p.contains(&prog_if))
+            && self.vendor.is_none_or(|v| v == vendor)
+            && self.device.is_none_or(|d| d == device)
+    }
 }
 
 #[derive(Debug, Clone)]
 struct NoDriverRule {
-    class: Option<u8>,
-    subclasses: Option<Vec<u8>>,
-    vendor: Option<u16>,
-    device: Option<u16>,
+    matcher: Matcher,
     reason: String,
+}
+
+/// What a working driver should create for a device, e.g. a network interface.
+#[derive(Debug, Clone)]
+struct InterfaceRule {
+    matcher: Matcher,
+    /// Folder name prefix under the device in sysfs, e.g. `net`, `drm`, `ata`.
+    interface: String,
+    /// Plain-English name for it, e.g. "network connection".
+    what: String,
+}
+
+/// What a working driver creates, when it's missing.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExpectedInterface<'a> {
+    pub interface: &'a str,
+    pub what: &'a str,
 }
 
 /// Raw file layout. Hex IDs are strings so the file stays readable.
@@ -29,6 +69,8 @@ struct RulesFile {
     version: String,
     #[serde(default)]
     no_driver_needed: Vec<RawNoDriverRule>,
+    #[serde(default)]
+    expect_interface: Vec<RawInterfaceRule>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -36,15 +78,29 @@ struct RulesFile {
 struct RawNoDriverRule {
     class: Option<String>,
     subclasses: Option<Vec<String>>,
+    prog_ifs: Option<Vec<String>>,
     vendor: Option<String>,
     device: Option<String>,
     reason: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawInterfaceRule {
+    class: Option<String>,
+    subclasses: Option<Vec<String>>,
+    prog_ifs: Option<Vec<String>>,
+    vendor: Option<String>,
+    device: Option<String>,
+    interface: String,
+    what: String,
 }
 
 /// The parsed rule lists, without version info.
 #[derive(Debug, Clone)]
 struct RuleSet {
     no_driver_needed: Vec<NoDriverRule>,
+    expect_interface: Vec<InterfaceRule>,
 }
 
 impl DataFile for RuleSet {
@@ -57,14 +113,56 @@ impl DataFile for RuleSet {
         let no_driver_needed = raw
             .no_driver_needed
             .into_iter()
-            .map(compile_rule)
-            .collect::<Result<_, _>>()?;
-        Ok((raw.version, Self { no_driver_needed }))
+            .map(|r| {
+                Ok(NoDriverRule {
+                    matcher: compile_matcher(
+                        r.class,
+                        r.subclasses,
+                        r.prog_ifs,
+                        r.vendor,
+                        r.device,
+                    )?,
+                    reason: r.reason,
+                })
+            })
+            .collect::<Result<_, String>>()?;
+        let expect_interface = raw
+            .expect_interface
+            .into_iter()
+            .map(|r| {
+                let valid = !r.interface.is_empty()
+                    && r.interface
+                        .chars()
+                        .all(|c| c.is_ascii_alphanumeric() || c == '_');
+                if !valid {
+                    return Err(format!("bad interface name `{}`", r.interface));
+                }
+                Ok(InterfaceRule {
+                    matcher: compile_matcher(
+                        r.class,
+                        r.subclasses,
+                        r.prog_ifs,
+                        r.vendor,
+                        r.device,
+                    )?,
+                    interface: r.interface,
+                    what: r.what,
+                })
+            })
+            .collect::<Result<_, String>>()?;
+        Ok((
+            raw.version,
+            Self {
+                no_driver_needed,
+                expect_interface,
+            },
+        ))
     }
 
     fn empty() -> Self {
         Self {
             no_driver_needed: Vec::new(),
+            expect_interface: Vec::new(),
         }
     }
 }
@@ -86,49 +184,70 @@ impl Rules {
         Self {
             version: loaded.version,
             source: loaded.source,
-            no_driver_needed: loaded.data.no_driver_needed,
+            set: loaded.data,
         }
     }
 
     /// If this device normally needs no driver, the plain-English reason why.
     pub fn no_driver_needed(&self, class_code: u32, vendor: u16, device: u16) -> Option<&str> {
-        let class = (class_code >> 16) as u8;
-        let subclass = (class_code >> 8) as u8;
-        self.no_driver_needed
+        self.set
+            .no_driver_needed
             .iter()
-            .find(|r| {
-                r.class.is_none_or(|c| c == class)
-                    && r.subclasses.as_ref().is_none_or(|s| s.contains(&subclass))
-                    && r.vendor.is_none_or(|v| v == vendor)
-                    && r.device.is_none_or(|d| d == device)
-            })
+            .find(|r| r.matcher.matches(class_code, vendor, device))
             .map(|r| r.reason.as_str())
+    }
+
+    /// What a working driver should have created for this device, if we know.
+    pub fn expected_interface(
+        &self,
+        class_code: u32,
+        vendor: u16,
+        device: u16,
+    ) -> Option<ExpectedInterface<'_>> {
+        self.set
+            .expect_interface
+            .iter()
+            .find(|r| r.matcher.matches(class_code, vendor, device))
+            .map(|r| ExpectedInterface {
+                interface: &r.interface,
+                what: &r.what,
+            })
     }
 }
 
 /// A rule with a bad ID rejects the whole file, so a broken download falls back to the
 /// built-in rules instead of half-working.
-fn compile_rule(raw: RawNoDriverRule) -> Result<NoDriverRule, String> {
-    let rule = NoDriverRule {
-        class: raw.class.as_deref().map(hex_u8).transpose()?,
-        subclasses: raw
-            .subclasses
+fn compile_matcher(
+    class: Option<String>,
+    subclasses: Option<Vec<String>>,
+    prog_ifs: Option<Vec<String>>,
+    vendor: Option<String>,
+    device: Option<String>,
+) -> Result<Matcher, String> {
+    let m = Matcher {
+        class: class.as_deref().map(hex_u8).transpose()?,
+        subclasses: subclasses
             .map(|list| list.iter().map(|h| hex_u8(h)).collect())
             .transpose()?,
-        vendor: raw.vendor.as_deref().map(hex_u16).transpose()?,
-        device: raw.device.as_deref().map(hex_u16).transpose()?,
-        reason: raw.reason,
+        prog_ifs: prog_ifs
+            .map(|list| list.iter().map(|h| hex_u8(h)).collect())
+            .transpose()?,
+        vendor: vendor.as_deref().map(hex_u16).transpose()?,
+        device: device.as_deref().map(hex_u16).transpose()?,
     };
-    if rule.device.is_some() && rule.vendor.is_none() {
+    if m.device.is_some() && m.vendor.is_none() {
         return Err("a rule with `device` must also have `vendor`".into());
     }
-    if rule.subclasses.is_some() && rule.class.is_none() {
+    if m.prog_ifs.is_some() && m.subclasses.is_none() {
+        return Err("a rule with `prog_ifs` must also have `subclasses`".into());
+    }
+    if m.subclasses.is_some() && m.class.is_none() {
         return Err("a rule with `subclasses` must also have `class`".into());
     }
-    if rule.class.is_none() && rule.vendor.is_none() {
+    if m.class.is_none() && m.vendor.is_none() {
         return Err("a rule must match on `class` or `vendor`, not everything".into());
     }
-    Ok(rule)
+    Ok(m)
 }
 
 fn hex_u8(s: &str) -> Result<u8, String> {
@@ -222,13 +341,40 @@ mod tests {
 
     #[test]
     fn match_everything_rule_is_rejected() {
-        let raw = RawNoDriverRule {
-            class: None,
-            subclasses: None,
-            vendor: None,
-            device: None,
-            reason: "x".into(),
+        assert!(compile_matcher(None, None, None, None, None).is_err());
+        assert!(compile_matcher(None, None, None, None, Some("1234".into())).is_err());
+        assert!(
+            compile_matcher(Some("0c".into()), None, Some(vec!["30".into()]), None, None).is_err()
+        );
+        assert!(compile_matcher(Some("02".into()), None, None, None, None).is_ok());
+    }
+
+    #[test]
+    fn expected_interfaces_from_embedded_rules() {
+        let rules = Rules::embedded();
+        let iface = |class| {
+            rules
+                .expected_interface(class, 0x1234, 0x5678)
+                .map(|e| e.interface)
         };
-        assert!(compile_rule(raw).is_err());
+        assert_eq!(iface(0x020000), Some("net")); // Ethernet
+        assert_eq!(iface(0x028000), Some("net")); // Wi-Fi
+        assert_eq!(iface(0x030000), Some("drm"));
+        assert_eq!(iface(0x040300), Some("sound"));
+        assert_eq!(iface(0x010802), Some("nvme"));
+        assert_eq!(iface(0x010601), Some("ata"));
+        assert_eq!(iface(0x0c0330), Some("usb"));
+        assert_eq!(
+            iface(0x0c0340),
+            None,
+            "USB4/Thunderbolt hosts don't create USB buses"
+        );
+        assert_eq!(iface(0x060000), None);
+    }
+
+    #[test]
+    fn bad_interface_names_reject_the_file() {
+        let text = "schema = 1\nversion = \"2099.01.01\"\n[[expect_interface]]\nclass = \"02\"\ninterface = \"../x\"\nwhat = \"x\"\n";
+        assert!(data::parse_data::<RuleSet>(text).is_err());
     }
 }

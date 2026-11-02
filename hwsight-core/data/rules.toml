@@ -13,6 +13,7 @@ version = "2026.11.02"
 #   class       base class, 2 digits
 #   subclasses  list of subclasses, 2 digits each (omit to match the whole class)
 #   vendor      4-digit vendor ID
+#   prog_ifs    list of programming interfaces, 2 digits each (needs subclasses)
 #   device      4-digit device ID (needs vendor)
 
 [[no_driver_needed]]
@@ -36,3 +37,46 @@ reason = "Processors are handled directly by the kernel."
 [[no_driver_needed]]
 class = "13"
 reason = "This is a testing or debugging function that isn't used in normal operation."
+
+# What a working driver creates for each kind of device. If the driver is attached but
+# this is missing, the device isn't actually usable (often a firmware or setup failure).
+#
+# Match fields as above, plus:
+#   interface   folder name (or name prefix) the driver creates under the device in sysfs
+#   what        plain-English name for it, used in "no <what> was created"
+
+[[expect_interface]]
+class = "02"
+interface = "net"
+what = "network connection"
+
+[[expect_interface]]
+class = "03"
+interface = "drm"
+what = "display device"
+
+[[expect_interface]]
+class = "04"
+subclasses = ["03"]
+interface = "sound"
+what = "sound card"
+
+[[expect_interface]]
+class = "01"
+subclasses = ["08"]
+interface = "nvme"
+what = "drive"
+
+[[expect_interface]]
+class = "01"
+subclasses = ["06"]
+interface = "ata"
+what = "drive connection"
+
+# UHCI, OHCI, EHCI, and xHCI controllers. Not 40 (USB4/Thunderbolt hosts).
+[[expect_interface]]
+class = "0c"
+subclasses = ["03"]
+prog_ifs = ["00", "10", "20", "30"]
+interface = "usb"
+what = "set of USB ports"

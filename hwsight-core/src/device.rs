@@ -71,6 +71,9 @@ pub enum Status {
     /// A suitable driver is loaded, but it didn't take the device (often a failed start,
     /// missing firmware, or the device is turned off).
     DriverNotAttached,
+    /// A driver is attached, but it didn't finish setting the device up (for example a
+    /// network card with no network connection), often because firmware failed to load.
+    DriverNotReady,
     /// Every installed driver for this device is turned off by a setting.
     DriverBlocked,
     /// No installed driver supports this device.
@@ -94,6 +97,7 @@ impl Status {
             Self::NoDriverNeeded => "Working (no driver needed)",
             Self::DriverAvailableNotLoaded => "Driver installed but not loaded",
             Self::DriverNotAttached => "Driver loaded but not using this device",
+            Self::DriverNotReady => "Driver loaded, but the device isn't ready",
             Self::DriverBlocked => "Driver turned off by a setting",
             Self::NoDriver => "No driver",
             Self::ReservedForVirtualMachine => "Reserved for a virtual machine",
@@ -131,6 +135,8 @@ pub struct Device {
     /// harmless noise for working devices (drivers often try several firmware versions),
     /// so only treat these as the explanation when `status` is a problem.
     pub log_issues: Vec<LogIssue>,
+    /// For `DriverNotReady`: what the driver should have created, in plain English.
+    pub missing_interface: Option<String>,
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

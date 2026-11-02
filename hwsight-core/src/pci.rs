@@ -7,7 +7,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use crate::device::{Bus, Category, Device, bracketed, diagnose, short_vendor};
+use crate::device::{Bus, Category, Device, Status, bracketed, diagnose, short_vendor};
 use crate::modules::{AliasDb, Blocklist};
 use crate::pci_ids::PciNames;
 use crate::rules::Rules;
@@ -82,7 +82,18 @@ fn read_device(
     let needs_driver = rules
         .no_driver_needed(class_code, vendor_id, device_id)
         .is_none();
-    let status = diagnose(driver.as_deref(), &driver_candidates, needs_driver);
+    let mut status = diagnose(driver.as_deref(), &driver_candidates, needs_driver);
+
+    // A driver being attached isn't proof the device works: check it created what it
+    // should have (a network connection, a display device, ...).
+    let mut missing_interface = None;
+    if status == Status::Working
+        && let Some(expected) = rules.expected_interface(class_code, vendor_id, device_id)
+        && !has_child_starting_with(path, expected.interface)
+    {
+        status = Status::DriverNotReady;
+        missing_interface = Some(expected.what.to_owned());
+    }
 
     let display_name = display_name(
         product_name.as_deref(),
@@ -106,7 +117,16 @@ fn read_device(
         driver,
         driver_candidates,
         status,
+        missing_interface,
         log_issues: Vec::new(),
+    })
+}
+
+fn has_child_starting_with(dir: &Path, prefix: &str) -> bool {
+    fs::read_dir(dir).is_ok_and(|entries| {
+        entries
+            .flatten()
+            .any(|e| e.file_name().to_string_lossy().starts_with(prefix))
     })
 }
 
@@ -135,10 +155,10 @@ fn category(class: u8, subclass: u8, prog_if: u8) -> Category {
         (0x07, _) | (0x0c, 0x09) | (0x0f, _) => Category::Communication,
         (0x09, _) => Category::Input,
         (0x0b, _) => Category::Processors,
+        // USB4 host interfaces are USB class 0c03 with programming interface 40.
+        (0x0c, 0x03) if prog_if == 0x40 => Category::Thunderbolt,
         (0x0c, 0x03) => Category::UsbControllers,
         (0x0c, 0x0a) => Category::Thunderbolt,
-        // USB4 host routers report as "other serial bus" in some chips.
-        (0x0c, 0x80) if prog_if == 0x40 => Category::Thunderbolt,
         (0x0d, 0x11) => Category::Bluetooth,
         (0x0d, _) => Category::Network,
         (0x10, _) => Category::Security,
@@ -164,7 +184,6 @@ fn read_hex(dir: &Path, file: &str) -> Option<u32> {
 mod tests {
     use super::*;
     use crate::data::DataDirs;
-    use crate::device::Status;
     use std::os::unix::fs::symlink;
     use std::path::PathBuf;
 
@@ -258,6 +277,9 @@ mod tests {
         sys.add("0000:04:00.0", "ffee", "0001", "ff0000", None); // nothing knows it
         sys.add("0000:05:00.0", "8086", "a0f0", "028000", None); // driver blocked
         sys.add("0000:06:00.0", "10de", "2c05", "030000", Some("vfio-pci")); // VM passthrough
+        sys.add("0000:08:00.0", "14c3", "7961", "028000", Some("mt7921e")); // wifi, no network
+        // The working GPU's driver created its display device.
+        fs::create_dir_all(sys.devices.join("0000:01:00.0/drm/card1")).expect("mkdir");
 
         let alias = "\
 alias pci:v00008086d00002725sv*sd*bc*sc*i* iwlwifi
@@ -265,7 +287,14 @@ alias pci:v000010ECd00008125sv*sd*bc*sc*i* r8169
 alias pci:v00008086d0000A0F0sv*sd*bc*sc*i* btusb_fake
 ";
         let devices = sys.scan(alias, &["r8169"]);
-        assert_eq!(devices.len(), 7);
+        assert_eq!(devices.len(), 8);
+        let wifi = by_addr(&devices, "0000:08:00.0");
+        assert_eq!(wifi.status, Status::DriverNotReady);
+        assert_eq!(
+            wifi.missing_interface.as_deref(),
+            Some("network connection")
+        );
+        assert_eq!(wifi.driver.as_deref(), Some("mt7921e"));
         assert_eq!(
             by_addr(&devices, "0000:05:00.0").status,
             Status::DriverBlocked
@@ -352,6 +381,7 @@ alias pci:v00008086d0000A0F0sv*sd*bc*sc*i* btusb_fake
         assert_eq!(category(0x03, 0x00, 0x00), Category::Graphics);
         assert_eq!(category(0x04, 0x03, 0x00), Category::Sound);
         assert_eq!(category(0x0c, 0x03, 0x30), Category::UsbControllers);
+        assert_eq!(category(0x0c, 0x03, 0x40), Category::Thunderbolt);
         assert_eq!(category(0x0d, 0x11, 0x00), Category::Bluetooth);
         assert_eq!(category(0x02, 0x80, 0x00), Category::Network);
         assert_eq!(category(0x01, 0x08, 0x02), Category::Storage);

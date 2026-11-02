@@ -151,6 +151,12 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         }
         writeln!(out, "{detail}")?;
         if device.status.is_problem() {
+            if let Some(what) = &device.missing_interface {
+                writeln!(
+                    out,
+                    "      Why: The driver is loaded, but no {what} was created."
+                )?;
+            }
             for issue in &device.log_issues {
                 writeln!(out, "      Why: {}", issue.message())?;
                 if let LogIssue::MissingFirmware {
@@ -197,7 +203,9 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
 fn symbol(status: Status) -> &'static str {
     match status {
         Status::Working | Status::NoDriverNeeded => "✓",
-        Status::DriverAvailableNotLoaded | Status::DriverNotAttached => "!",
+        Status::DriverAvailableNotLoaded | Status::DriverNotAttached | Status::DriverNotReady => {
+            "!"
+        }
         Status::NoDriver | Status::DriverBlocked => "✗",
         Status::ReservedForVirtualMachine => "•",
     }
