@@ -213,7 +213,15 @@ fn validate(name: &str, version: &str, bytes: &[u8]) -> Result<(), String> {
 /// Load a data file exactly as a scan would and return its version. Used when checking
 /// downloads and by the release tool when building a manifest, so the two always agree.
 pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
-    let text = std::str::from_utf8(bytes).map_err(|_| format!("{name} isn't text"))?;
+    // The upstream ID lists aren't pure UTF-8 (usb.ids has a few Latin-1 bytes), and the
+    // scanner reads them leniently, so check them the same way. Our TOML files must be
+    // valid UTF-8.
+    let lenient = String::from_utf8_lossy(bytes);
+    let text: &str = if name.ends_with(".ids") {
+        &lenient
+    } else {
+        std::str::from_utf8(bytes).map_err(|_| format!("{name} isn't text"))?
+    };
     Ok(match name {
         "rules.toml" => data::parse_data::<crate::rules::RuleSet>(text)
             .map(|(v, _)| v)
@@ -524,6 +532,13 @@ mod tests {
             srv.fetched.borrow().is_empty(),
             "nothing downloaded when off"
         );
+    }
+
+    #[test]
+    fn id_lists_with_latin1_bytes_are_accepted() {
+        let ids = b"# Version: 2026.06.26\n1d6b  Linux Foundation\n\t0034  \xb4 and \"\n";
+        assert_eq!(file_version("usb.ids", ids).as_deref(), Ok("2026.06.26"));
+        assert!(file_version("rules.toml", b"schema = 1\n\xb4").is_err());
     }
 
     #[test]

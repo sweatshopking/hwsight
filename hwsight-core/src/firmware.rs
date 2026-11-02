@@ -122,6 +122,8 @@ impl FirmwarePackages {
             .filter(|e| file.starts_with(&e.path))
             .find_map(|e| keys.iter().find_map(|k| e.packages.get(k)))
             .map(String::as_str)
+            // "none": this release doesn't package it, so don't suggest anything.
+            .filter(|p| *p != "none")
     }
 
     /// Extra advice for this family, e.g. Debian's non-free-firmware section.
@@ -153,6 +155,12 @@ mod tests {
         assert_eq!(
             fw.package_for(file, &trixie),
             Some("firmware-nvidia-graphics")
+        );
+        // Not packaged on bookworm: no suggestion, rather than a package that doesn't exist.
+        assert_eq!(fw.package_for("xe/bmg_guc_70.bin", &bookworm), None);
+        assert_eq!(
+            fw.package_for("xe/bmg_guc_70.bin", &trixie),
+            Some("firmware-intel-graphics")
         );
     }
 
@@ -193,8 +201,11 @@ mod tests {
         );
         // A distro missing from a specific entry falls back to the general package.
         assert_eq!(
-            fw.package_for("amd/amd_sev_fam19h_model1xh.sbin", &distro(Family::Fedora)),
-            Some("linux-firmware")
+            fw.package_for(
+                "amd/amd_sev_fam19h_model1xh.sbin",
+                &distro(Family::OpenSuse)
+            ),
+            Some("kernel-firmware-all")
         );
         assert_eq!(
             fw.package_for("anything/new.bin", &distro(Family::OpenSuse)),

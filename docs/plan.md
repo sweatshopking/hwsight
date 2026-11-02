@@ -141,11 +141,22 @@ Why a driver didn't start; missing firmware mapped to a package per distro
 
 **Done notes:**
 
-## Claude 4: verify firmware.toml for other distros
+## Claude 4: verify firmware.toml for other distros (done 2026-11-02)
 
-Check Debian, Ubuntu, Fedora, and openSUSE package names in containers (dnf repoquery,
-apt-file, zypper search --provides). Needs a few hundred MB of downloads: ask josh
-first (Wi-Fi only, shares bandwidth with Plex).
+`tools/verify-firmware.py` asks each release's own file search (apt-file, dnf,
+pacman -F; openSUSE by downloading packages) which package provides each path, and
+checks hwsight's choice. Arch, Debian 12 and 13, Ubuntu 22.04 and 24.04, Fedora 43, and
+openSUSE Tumbleweed all pass. It found 23 wrong names, all fixed. Release-specific keys
+(`debian-bookworm`, `ubuntu-jammy`, `ubuntu-noble`) and `"none"` for firmware a release
+doesn't package. `tools/release-data.sh` refuses to publish if the check fails.
+
+## Claude 7: signed data updates (done 2026-11-02, waiting for the data repo)
+
+`update.rs`, `hwsight --update-data`, `tools/hwsight-data-tool`, `tools/release-data.sh`.
+Keys: `~/.local/share/hwsight-signing/{main,backup}.key` (backup to go offline).
+Left: josh creates the public `sweatshopking/hwsight-data` repo (local copy ready in
+`~/Projects/hwsight-data`), then run `tools/release-data.sh` and test
+`hwsight --update-data` end to end. Automatic daily check belongs in the GUI.
 
 ## Claude 5: "driver attached but not working" checks (done 2026-11-02)
 

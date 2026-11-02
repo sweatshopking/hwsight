@@ -121,13 +121,18 @@ TARGETS = {
 }
 
 
+# Targets whose search only covers the packages we name, so "nothing provides it" there
+# may just mean we didn't look in the right package.
+PARTIAL_SEARCH = {"opensuse-tw"}
+
+
 def lookup(entries: list[dict], file: str, keys: list[str]) -> str | None:
     """The same rule as FirmwarePackages::package_for."""
     for e in sorted(entries, key=lambda e: len(e["path"]), reverse=True):
         if file.startswith(e["path"]):
             for k in keys:
                 if k in e:
-                    return e[k]
+                    return None if e[k] == "none" else e[k]
     return None
 
 
@@ -187,7 +192,12 @@ def main() -> int:
                 continue
             providers = set(r["prov"].get(path, []))
             if not providers:
-                absent.append(path)
+                if target in PARTIAL_SEARCH:
+                    absent.append(path)
+                else:
+                    # Nothing in this release has it, so suggesting a package is wrong.
+                    print(f"  FAIL {target}: '{path}' -> {pkg}: not packaged in this release; set its key to \"none\"")
+                    bad += 1
                 continue
             if pkg in providers or providers & set(r["deps"].get(pkg, [])):
                 continue

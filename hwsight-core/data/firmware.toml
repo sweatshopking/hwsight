@@ -6,13 +6,17 @@
 # Each [[firmware]] entry matches firmware paths starting with `path` (a folder like
 # "rtl_nic/" or a file prefix like "iwlwifi-"). The longest matching path that has an
 # entry for the user's distro wins, so the `path = ""` entry is the fallback.
-# Family keys: arch, debian, ubuntu, fedora, opensuse. Unknown keys are ignored, so data
-# can add a family before the app knows it.
+# Family keys: arch, debian, ubuntu, fedora, opensuse. Where names differ between
+# releases, add a release key: `debian-bookworm`, `ubuntu-noble` (base codename, so Linux
+# Mint 22 uses ubuntu-noble), `fedora-43`. A release key beats the plain family key in
+# the same entry. Unknown keys are ignored, so data can add a family or release before
+# the app knows it. Generic `debian` names follow the current stable release (trixie).
+# The value "none" means that release doesn't package this firmware at all, so hwsight
+# suggests nothing rather than a package that doesn't exist.
 #
-# Verification status:
-#   arch      checked against installed packages (pacman -Qo), 2026-11-02
-#   debian, ubuntu, fedora, opensuse   from distro package listings, NOT yet checked in
-#             containers (see docs/plan.md). Keep entries we aren't sure of out.
+# Verification: tools/verify-firmware.py checks every entry against real packages in
+# containers (Debian 12 and 13, Ubuntu 22.04 and 24.04, Fedora, openSUSE Tumbleweed).
+# Arch was checked with pacman -Qo. Run the tool after every change.
 schema = 1
 version = "2026.11.02"
 
@@ -33,6 +37,7 @@ opensuse = "kernel-firmware-all"
 path = "amdgpu/"
 arch = "linux-firmware-amdgpu"
 debian = "firmware-amd-graphics"
+ubuntu-noble = "linux-firmware-amd-graphics"
 fedora = "amd-gpu-firmware"
 opensuse = "kernel-firmware-amdgpu"
 
@@ -40,25 +45,39 @@ opensuse = "kernel-firmware-amdgpu"
 path = "radeon/"
 arch = "linux-firmware-radeon"
 debian = "firmware-amd-graphics"
+ubuntu-noble = "linux-firmware-amd-graphics"
 fedora = "amd-gpu-firmware"
 opensuse = "kernel-firmware-radeon"
 
 [[firmware]]
 path = "amd/"
 arch = "linux-firmware-amd"
+debian = "amd64-microcode"
+ubuntu-noble = "amd64-microcode"
+fedora = "amd-ucode-firmware"
 
 [[firmware]]
 path = "amdnpu/"
 arch = "linux-firmware-amd"
+debian = "firmware-amd-graphics"
+debian-bookworm = "none"
+ubuntu-jammy = "none"
+fedora = "amd-gpu-firmware"
 
 [[firmware]]
 path = "amdtee/"
 arch = "linux-firmware-amd"
+debian = "amd64-microcode"
+ubuntu-jammy = "none"
+fedora = "amd-ucode-firmware"
 
 # NVIDIA (used by the open nouveau/nova drivers)
 [[firmware]]
 path = "nvidia/"
 arch = "linux-firmware-nvidia"
+debian = "firmware-nvidia-graphics"
+debian-bookworm = "firmware-misc-nonfree"
+ubuntu-noble = "linux-firmware-nvidia-graphics"
 fedora = "nvidia-gpu-firmware"
 opensuse = "kernel-firmware-nvidia"
 
@@ -66,30 +85,43 @@ opensuse = "kernel-firmware-nvidia"
 [[firmware]]
 path = "i915/"
 arch = "linux-firmware-intel"
+debian = "firmware-intel-graphics"
+debian-bookworm = "firmware-misc-nonfree"
+ubuntu-noble = "linux-firmware-intel-graphics"
 fedora = "intel-gpu-firmware"
 opensuse = "kernel-firmware-i915"
 
 [[firmware]]
 path = "xe/"
 arch = "linux-firmware-intel"
+debian = "firmware-intel-graphics"
+debian-bookworm = "none"
+ubuntu-jammy = "none"
+ubuntu-noble = "linux-firmware-intel-graphics"
+opensuse = "kernel-firmware-i915"
 fedora = "intel-gpu-firmware"
 
 [[firmware]]
 path = "iwlwifi-"
 arch = "linux-firmware-intel"
 debian = "firmware-iwlwifi"
+ubuntu-noble = "linux-firmware-intel-wireless"
 fedora = "iwlwifi-mvm-firmware"
 opensuse = "kernel-firmware-iwlwifi"
 
 [[firmware]]
 path = "intel/"
 arch = "linux-firmware-intel"
+debian = "firmware-intel-misc"
+debian-bookworm = "firmware-misc-nonfree"
+ubuntu-noble = "linux-firmware-intel-misc"
 opensuse = "kernel-firmware-intel"
 
 [[firmware]]
 path = "intel/sof"
 arch = "sof-firmware"
 debian = "firmware-sof-signed"
+ubuntu = "firmware-sof-signed"
 fedora = "alsa-sof-firmware"
 opensuse = "sof-firmware"
 
@@ -98,13 +130,15 @@ opensuse = "sof-firmware"
 path = "rtl_nic/"
 arch = "linux-firmware-realtek"
 debian = "firmware-realtek"
-fedora = "realtek-firmware"
+ubuntu-noble = "linux-firmware-realtek"
+# Fedora: rtl_nic is in the main linux-firmware package, not realtek-firmware.
 opensuse = "kernel-firmware-realtek"
 
 [[firmware]]
 path = "rtl_bt/"
 arch = "linux-firmware-realtek"
 debian = "firmware-realtek"
+ubuntu-noble = "linux-firmware-realtek"
 fedora = "realtek-firmware"
 opensuse = "kernel-firmware-realtek"
 
@@ -112,6 +146,7 @@ opensuse = "kernel-firmware-realtek"
 path = "rtlwifi/"
 arch = "linux-firmware-realtek"
 debian = "firmware-realtek"
+ubuntu-noble = "linux-firmware-realtek"
 fedora = "realtek-firmware"
 opensuse = "kernel-firmware-realtek"
 
@@ -119,6 +154,7 @@ opensuse = "kernel-firmware-realtek"
 path = "rtw88/"
 arch = "linux-firmware-realtek"
 debian = "firmware-realtek"
+ubuntu-noble = "linux-firmware-realtek"
 fedora = "realtek-firmware"
 opensuse = "kernel-firmware-realtek"
 
@@ -126,17 +162,25 @@ opensuse = "kernel-firmware-realtek"
 path = "rtw89/"
 arch = "linux-firmware-realtek"
 debian = "firmware-realtek"
+ubuntu-noble = "linux-firmware-realtek"
 fedora = "realtek-firmware"
 opensuse = "kernel-firmware-realtek"
 
 [[firmware]]
 path = "realtek/"
 arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+debian-bookworm = "none"
+ubuntu-jammy = "none"
+opensuse = "kernel-firmware-realtek"
 
 # MediaTek Wi-Fi and Bluetooth
 [[firmware]]
 path = "mediatek/"
 arch = "linux-firmware-mediatek"
+debian = "firmware-mediatek"
+debian-bookworm = "firmware-misc-nonfree"
+ubuntu-noble = "linux-firmware-mediatek"
 fedora = "mt7xxx-firmware"
 opensuse = "kernel-firmware-mediatek"
 
@@ -144,13 +188,15 @@ opensuse = "kernel-firmware-mediatek"
 [[firmware]]
 path = "ath9k_htc/"
 arch = "linux-firmware-atheros"
-debian = "firmware-atheros"
+debian = "firmware-ath9k-htc"
+ubuntu-noble = "linux-firmware-qualcomm-wireless"
 fedora = "atheros-firmware"
 
 [[firmware]]
 path = "ath10k/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+ubuntu-noble = "linux-firmware-qualcomm-wireless"
 fedora = "atheros-firmware"
 opensuse = "kernel-firmware-ath10k"
 
@@ -158,6 +204,7 @@ opensuse = "kernel-firmware-ath10k"
 path = "ath11k/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+ubuntu-noble = "linux-firmware-qualcomm-wireless"
 fedora = "atheros-firmware"
 opensuse = "kernel-firmware-ath11k"
 
@@ -165,6 +212,8 @@ opensuse = "kernel-firmware-ath11k"
 path = "ath12k/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+debian-bookworm = "none"
+ubuntu-noble = "linux-firmware-qualcomm-wireless"
 fedora = "atheros-firmware"
 opensuse = "kernel-firmware-ath12k"
 
@@ -172,16 +221,19 @@ opensuse = "kernel-firmware-ath12k"
 path = "ath6k/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+fedora = "atheros-firmware"
 
 [[firmware]]
 path = "ar3k/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+fedora = "atheros-firmware"
 
 [[firmware]]
 path = "qca/"
 arch = "linux-firmware-atheros"
 debian = "firmware-atheros"
+ubuntu-noble = "linux-firmware-qualcomm-wireless"
 fedora = "atheros-firmware"
 
 # Broadcom / Cypress Wi-Fi and network
@@ -189,6 +241,7 @@ fedora = "atheros-firmware"
 path = "brcm/"
 arch = "linux-firmware-broadcom"
 debian = "firmware-brcm80211"
+ubuntu-noble = "linux-firmware-broadcom-wireless"
 fedora = "brcmfmac-firmware"
 opensuse = "kernel-firmware-brcm"
 
@@ -196,15 +249,19 @@ opensuse = "kernel-firmware-brcm"
 path = "cypress/"
 arch = "linux-firmware-broadcom"
 debian = "firmware-brcm80211"
+ubuntu-noble = "linux-firmware-broadcom-wireless"
 fedora = "brcmfmac-firmware"
+opensuse = "kernel-firmware-brcm"
 
 [[firmware]]
 path = "bnx2/"
 arch = "linux-firmware-broadcom"
+debian = "firmware-bnx2"
 
 [[firmware]]
 path = "bnx2x/"
 arch = "linux-firmware-broadcom"
+debian = "firmware-bnx2x"
 
 [[firmware]]
 path = "tigon/"
@@ -214,18 +271,24 @@ arch = "linux-firmware-broadcom"
 [[firmware]]
 path = "cirrus/"
 arch = "linux-firmware-cirrus"
+debian = "firmware-cirrus"
+debian-bookworm = "none"
 fedora = "cirrus-audio-firmware"
 
 [[firmware]]
 path = "sdca/"
 arch = "linux-firmware-cirrus"
+debian = "none"
+ubuntu-jammy = "none"
 
 # Texas Instruments
 [[firmware]]
 path = "ti-connectivity/"
 arch = "linux-firmware-ti"
+debian = "firmware-ti-connectivity"
 fedora = "tiwilink-firmware"
 
 [[firmware]]
 path = "ti/"
 arch = "linux-firmware-ti"
+debian-bookworm = "firmware-ti-connectivity"
