@@ -2,6 +2,7 @@
 //!
 //! No UI code lives here, so the command line and graphical apps share one engine.
 
+pub mod app_update;
 pub mod data;
 pub mod descriptions;
 pub mod device;

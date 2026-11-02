@@ -608,3 +608,132 @@ commands are checked (driver/package names, install command shape, hardware ID);
 can never appear in a command; a step with an unsafe value is dropped, not shown. CLI
 prints numbered Fix lines; GUI shows numbered steps with copyable commands.
 Next: a "Fix it" button that runs the command through polkit after asking.
+
+## Claude 11: automatic app updater (core DONE 2026-11-03; front ends = Copilot 7 and 8)
+
+Owner's rule: every app gets an automatic updater. `hwsight-core/src/app_update.rs`
+(adapted from DriveDeck's, same author): `latest_release()` (GitHub API, drafts and
+pre-releases ignored, https assets only), `detect_install(exe, APPIMAGE env)` ->
+AppImage / Package (deb via apt-get, rpm via dnf, zypper, or rpm, all through pkexec) /
+Aur / Unmanaged, `asset_for`, `sum_for`, `install_update(release, install, current)` ->
+`Outcome` (Updated{version, restart}, Cancelled, UpToDate, UpdateElsewhere, Failed) with
+plain `message()`. Every download is checked against SHA256SUMS.txt. Behaviour wanted:
+AppImage updates itself silently (then "restart to use it"); deb/rpm get an "Update
+now" banner (one password prompt); AUR/source builds just say a new version is out.
+
+**Release file names (packaging MUST use exactly these):** `hwsight-<v>-x86_64.AppImage`,
+`hwsight-<v>-aarch64.AppImage`, `hwsight_<v>_amd64.deb`, `hwsight_<v>_arm64.deb`,
+`hwsight-<v>-<release>.x86_64.rpm`, `hwsight-<v>-<release>.aarch64.rpm`, plus
+`SHA256SUMS.txt` (`<sha256>  <file name>` per line). Tags `v<major>.<minor>.<patch>`.
+Not testable end to end until the first release exists (needs packaging).
+
+Next for Claude (Friday): review Copilot 7 and 8, then packaging (deb/rpm/AppImage on
+Ubuntu 22.04 / Fedora 41 bases, x86_64 + arm64, CI) with the names above, then a first
+release to test the updater for real, then laptop internals (I2C/ACPI/platform devices).
+
+## Copilot 7: `hwsight --update` and `--check-update`
+
+**Files you may change:** `hwsight-cli/src/main.rs` and this task's Done notes. Nothing else.
+
+**Steps (do all of them):**
+
+1. Add two options to `HELP`, in the same style as the others:
+   `--check-update   See whether a newer version of hwsight is out` and
+   `--update         Download and install the newest version of hwsight`.
+2. Add `fn check_update_text(result: Result<Option<hwsight_core::app_update::Release>, String>, current: &str) -> String`
+   returning exactly one of:
+   - newer release: `"hwsight {latest} is available (you have {current}). Run hwsight --update to install it."`
+   - same or older release, or `Ok(None)`: `"hwsight {current} is the newest version."`
+   - `Err(e)`: `"Couldn't check for updates: {e}"`
+   Use `hwsight_core::app_update::is_newer` for the comparison.
+3. `--check-update`: call `hwsight_core::app_update::latest_release()`, print
+   `check_update_text(...)` with `env!("CARGO_PKG_VERSION")`, exit 0 on success and 1 on
+   `Err`.
+4. `--update`: call `latest_release()`. On `Err(e)` print the same error text and exit 1.
+   On `Ok(None)` print the "newest version" text and exit 0. On `Ok(Some(release))`:
+   `let install = hwsight_core::app_update::detect_install(&std::env::current_exe()...,
+   std::env::var_os("APPIMAGE"))` (if `current_exe()` fails, print
+   `"Couldn't find where hwsight is installed."` and exit 1), then
+   `install_update(&release, &install, env!("CARGO_PKG_VERSION"))`, print
+   `outcome.message()`, exit 0 for `Updated`, `UpToDate`, `UpdateElsewhere`, `Cancelled`,
+   and 1 for `Failed`.
+5. Both options run on their own and then exit, like `--update-data` does now.
+
+**Tests (all required, in `main.rs`'s `mod tests`):**
+- `check_update_text_newer` (release "9.9.9" vs current "0.1.0")
+- `check_update_text_same_and_none` (same version, and `Ok(None)`)
+- `check_update_text_error`
+Build `Release` values directly: `Release { version: "9.9.9".into(), assets: vec![] }`.
+
+**Done when:**
+
+- [ ] steps 1 to 5 done; the three tests exist and pass
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
+
+## Copilot 8: update banner in the app
+
+**Only after Copilot 7 is reviewed.** Follow the "GUI batch" rules above (Theme only,
+components in `ui/components/`, `tools/check.sh`).
+
+**Files you may change:** new `hwsight-gui/src/app_updates.rs`, new
+`hwsight-gui/ui/components/update-banner.slint`, `hwsight-gui/src/main.rs`,
+`hwsight-gui/ui/app.slint`, this task's Done notes.
+
+**Steps (do all of them):**
+
+1. `src/app_updates.rs`: a pure function (no network) that decides what to show:
+   ```rust
+   pub enum Banner { Hidden, Offer { text: String }, Info { text: String }, AutoInstall }
+   pub fn banner_for(install: &Install, latest: &str, current: &str) -> Banner
+   ```
+   - not newer (`is_newer` false): `Hidden`
+   - `Install::AppImage(_)`: `AutoInstall` (it updates itself without asking)
+   - `Install::Package { .. }`: `Offer { text: "hwsight {latest} is available." }`
+   - `Install::Aur` / `Install::Unmanaged`: `Info { text: "hwsight {latest} is available. Update it with your package manager, or download it from the website." }`
+2. `ui/components/update-banner.slint`, `UpdateBanner`: `in property <string> text`,
+   `in property <bool> can-update`, `in property <bool> busy`, `in property <bool>
+   can-restart`, `callback update-now()`, `callback restart-now()`. Hidden (height 0,
+   not visible) when `text` is empty. Otherwise a card like `NotesBanner` but with a 1px
+   border in `Theme.accent-start.with-alpha(0.6)`: the text (`Theme.text`, word-wrap),
+   then on the right an `AccentButton` "Update now" (when `can-update && !busy`),
+   "Updating..." text in `Theme.text-muted` (when `busy`), or an `AccentButton`
+   "Restart" (when `can-restart`).
+3. `app.slint`: properties `update-text`, `update-can-update`, `update-busy`,
+   `update-can-restart` (all `in`), callbacks `update-now()` and `restart-now()`; place
+   the `UpdateBanner` directly under the header row.
+4. `main.rs`: on start, unless `HWSIGHT_NO_UPDATE` or `HWSIGHT_SNAPSHOT` is set, and
+   only if `update::check_due(app_update::default_state_file(), now, 1 day)` is true:
+   on a background thread call `latest_release()`, then `update::mark_checked` on the
+   state file whatever happened. If there's a release, run `banner_for` with
+   `detect_install(current_exe, APPIMAGE)`:
+   - `AutoInstall`: run `install_update` on that same thread; when it returns `Updated`,
+     show `outcome.message()` with `can-restart` true; on `Failed`, show
+     `outcome.message()` with nothing to click.
+   - `Offer`: show the text with `can-update` true.
+   - `Info`: show the text, nothing to click.
+   Send results to the window with `slint::invoke_from_event_loop` (like the scan does).
+5. `update-now`: set `busy`, run `install_update` on a background thread, then show
+   `outcome.message()`; `can-restart` true only for `Updated`; for `Cancelled` keep
+   `can-update` true so the user can try again.
+6. `restart-now`: start the `restart` path from `Outcome::Updated` with
+   `std::process::Command::new(path).spawn()`, then `slint::quit_event_loop()`. Keep the
+   path from the outcome (for example in an `Rc<RefCell<Option<PathBuf>>>`).
+
+**Tests (all required, in `app_updates.rs`):**
+- `hidden_when_not_newer`
+- `appimage_installs_automatically`
+- `packages_get_an_offer` (deb and rpm)
+- `aur_and_source_builds_get_info_only`
+
+**Done when:**
+
+- [ ] steps 1 to 6 done; the four tests exist and pass
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
