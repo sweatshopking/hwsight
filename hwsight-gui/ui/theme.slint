@@ -44,6 +44,12 @@ export global Theme {
 
 // ---------------------------------------------------------------------------------------
 // One device as the window shows it (filled in by src/model.rs).
+// One step towards fixing a problem: what to do, and a command to copy if there is one.
+export struct FixItem {
+    text: string,
+    command: string,
+}
+
 export struct DeviceItem {
     name: string,
     vendor: string,
@@ -57,8 +63,8 @@ export struct DeviceItem {
     bus: string,
     // Plain-English explanation of a problem, if any (may be several lines).
     why: string,
-    // A command that fixes it, if we know one.
-    fix: string,
+    // Steps to fix it, most specific first; empty when it works.
+    fixes: [FixItem],
     // Extra explanation, e.g. why no driver is needed.
     note: string,
     // What this kind of device does, in plain English.

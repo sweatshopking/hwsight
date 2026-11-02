@@ -597,3 +597,14 @@ USB devices matched by their interfaces (earlier interface wins ties), and a
 details panel and in `--json`. Specific entries so far: NZXT Kraken, ASUS AURA, Logi
 Bolt receiver, Xbox-style pads (USB ff/5d, ff/47). Good Copilot data-entry task later:
 more specific device entries, following the writing style in the file header.
+
+## Claude 10: "How to fix" steps (done 2026-11-03)
+
+Updatable `data/fixes.toml`: one template per situation (missing firmware, firmware
+installed since boot, driver timed out / I/O error / busy / failed, not loaded, blocked
+by a file or the kernel command line, not attached, not ready, no driver, USB blocked).
+`Fixes::suggest` builds `Device.fixes` (log-based steps first, then status). Values in
+commands are checked (driver/package names, install command shape, hardware ID); `{file}`
+can never appear in a command; a step with an unsafe value is dropped, not shown. CLI
+prints numbered Fix lines; GUI shows numbered steps with copyable commands.
+Next: a "Fix it" button that runs the command through polkit after asking.

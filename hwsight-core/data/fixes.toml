@@ -1,0 +1,65 @@
+# How to fix each kind of problem, in plain English, for people who aren't technical.
+#
+# Built into hwsight and replaceable by a newer downloaded copy. `schema` is the file
+# format version; `version` is the data release date (YYYY.MM.DD), newest wins.
+#
+# Each [fix.<situation>] has `text` (what to do) and optionally `command` (a command
+# the user can copy, or that a later version runs for them after asking). Placeholders:
+#   {module}       driver name, e.g. iwlwifi          (allowed in text and command)
+#   {package}      package name, e.g. firmware-realtek (allowed in text and command)
+#   {install}      the full install command for this distro (command only)
+#   {file}         a file path or firmware file name  (text only, never in a command)
+#   {hardware_id}  e.g. 10de:2c05                      (text and command)
+# Values put into commands are checked strictly by hwsight first.
+#
+# Writing style: say what to do, then why in a few words. One or two sentences.
+schema = 1
+version = "2026.11.03"
+
+# ---- From the kernel log (most specific; shown first) ----
+
+[fix.missing_firmware]
+text = "Install the package that contains the missing firmware ({package}), then restart the computer."
+command = "{install}"
+
+[fix.missing_firmware_unknown_package]
+text = "The driver needs the firmware file {file}, which isn't installed. Search your distro's packages for that file name, install it, then restart."
+
+[fix.firmware_installed_since_boot]
+text = "Restart the computer. The firmware it needs is installed now, but it was missing when the computer started."
+
+[fix.driver_timed_out]
+text = "The device didn't answer the driver in time. Restart the computer. If it's a card inside the computer, check it's pushed firmly into its slot and its power cable (if it has one) is connected."
+
+[fix.driver_io_error]
+text = "The device answered with errors. Restart the computer. If it keeps happening, the device or its connection may be faulty: try another port or slot if you can."
+
+[fix.driver_busy]
+text = "Another driver may already be using this device. Restarting the computer usually sorts this out."
+
+[fix.driver_failed]
+text = "The driver couldn't start the device. Restart the computer. If it keeps happening, search online for the device's hardware ID ({hardware_id}) together with \"Linux\"."
+
+# ---- From the device's status ----
+
+[fix.driver_not_loaded]
+text = "A driver for this device ({module}) is installed but isn't running. Start it now with this command. It normally starts by itself after a restart."
+command = "sudo modprobe {module}"
+
+[fix.driver_blocked_by_file]
+text = "The {module} driver is turned off by a setting in {file}. To turn it back on, remove the line that mentions {module} from that file, then restart. Settings like this are sometimes added on purpose, for example when installing another graphics driver."
+
+[fix.driver_blocked_on_kernel_command_line]
+text = "The {module} driver is turned off in your boot settings (the kernel command line). Remove \"{module}\" from the blacklist option there, then restart."
+
+[fix.driver_not_attached]
+text = "The {module} driver is running but didn't take this device. Restarting the computer often fixes this. If not, the reason is usually shown above."
+
+[fix.driver_not_ready]
+text = "The driver started but didn't finish setting the device up. Restart the computer. If that doesn't help, the reason is usually shown above (often missing firmware)."
+
+[fix.no_driver]
+text = "No driver installed on this computer supports this device. Search online for its hardware ID ({hardware_id}) together with \"Linux driver\". A later version of hwsight will suggest driver packages for many devices."
+
+[fix.usb_blocked]
+text = "This device was blocked by your USB security settings (such as USBGuard). If you trust it, allow it in those settings, then unplug it and plug it back in."

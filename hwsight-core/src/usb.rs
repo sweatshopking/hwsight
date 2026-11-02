@@ -195,6 +195,7 @@ fn read_device(
         log_issues: Vec::new(),
         note,
         description,
+        fixes: Vec::new(),
     })
 }
 

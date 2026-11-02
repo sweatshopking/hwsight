@@ -167,6 +167,9 @@ pub struct Device {
     pub note: Option<String>,
     /// What this kind of device does, in plain English (from descriptions.toml).
     pub description: Option<String>,
+    /// Steps to fix a problem, most specific first (from fixes.toml). Empty when the
+    /// device works.
+    pub fixes: Vec<crate::fixes::Fix>,
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

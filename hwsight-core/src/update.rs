@@ -56,6 +56,7 @@ const KNOWN_FILES: &[&str] = &[
     "rules.toml",
     "firmware.toml",
     "descriptions.toml",
+    "fixes.toml",
     "pci.ids",
     "usb.ids",
 ];
@@ -238,6 +239,9 @@ pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
         "descriptions.toml" => data::parse_data::<crate::descriptions::Table>(text)
             .map(|(v, _)| v)
             .map_err(|e| format!("{name}: {e:?}"))?,
+        "fixes.toml" => data::parse_data::<crate::fixes::Table>(text)
+            .map(|(v, _)| v)
+            .map_err(|e| format!("{name}: {e:?}"))?,
         "pci.ids" => {
             if !crate::pci_ids::looks_valid(text) {
                 return Err("pci.ids has no devices".into());
@@ -284,6 +288,7 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
     let rules = crate::rules::Rules::load(dirs).0.version;
     let firmware = crate::firmware::FirmwarePackages::load(dirs).0.version;
     let descriptions = crate::descriptions::Descriptions::load(dirs).0.version;
+    let fixes = crate::fixes::Fixes::load(dirs).0.version;
     let ids = |name: &str| {
         dirs.id_files(name)
             .iter()
@@ -297,6 +302,7 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
         "rules.toml" => Some(rules.clone()),
         "firmware.toml" => Some(firmware.clone()),
         "descriptions.toml" => Some(descriptions.clone()),
+        "fixes.toml" => Some(fixes.clone()),
         "pci.ids" => pci.clone(),
         "usb.ids" => usb.clone(),
         _ => None,

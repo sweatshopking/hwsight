@@ -142,6 +142,7 @@ fn read_device(
             .flatten(),
         log_issues: Vec::new(),
         description,
+        fixes: Vec::new(),
     })
 }
 

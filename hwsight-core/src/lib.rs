@@ -7,6 +7,7 @@ pub mod descriptions;
 pub mod device;
 pub mod distro;
 pub mod firmware;
+pub mod fixes;
 pub mod kernel_log;
 pub mod modules;
 mod pci;
@@ -25,6 +26,7 @@ pub use descriptions::Descriptions;
 pub use device::{Bus, Category, Device, Status, short_vendor};
 pub use distro::{Distro, Family};
 pub use firmware::FirmwarePackages;
+pub use fixes::{Fix, Fixes};
 pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
@@ -121,6 +123,7 @@ pub struct DataInfo {
     pub rules_version: String,
     pub firmware_version: String,
     pub descriptions_version: String,
+    pub fixes_version: String,
     /// `None` means the built-in copy.
     pub rules_path: Option<PathBuf>,
     /// `pci.ids` files used, newest first. The built-in database is always the fallback.
@@ -193,6 +196,8 @@ impl Scanner {
         let (firmware, problems) = FirmwarePackages::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (descriptions, problems) = Descriptions::load(&self.data_dirs);
+        notes.extend(problems.into_iter().map(ScanNote::from));
+        let (fixes, problems) = Fixes::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
@@ -289,6 +294,9 @@ impl Scanner {
                 }
             }
         }
+        for device in &mut devices {
+            device.fixes = fixes.suggest(device);
+        }
         // What's left is about USB ports with nothing working plugged in: devices that
         // couldn't connect never appear in the device list at all.
         let mut port_issues: Vec<PortIssue> = issues
@@ -323,6 +331,7 @@ impl Scanner {
             rules_version: rules.version.clone(),
             firmware_version: firmware.version.clone(),
             descriptions_version: descriptions.version.clone(),
+            fixes_version: fixes.version.clone(),
             rules_path: match &rules.source {
                 DataSource::Embedded => None,
                 DataSource::File(p) => Some(p.clone()),

@@ -3,7 +3,11 @@
 
 use hwsight_core::{Device, LogIssue, ScanReport, Status, short_vendor};
 
-use crate::{DeviceItem, Row};
+use std::rc::Rc;
+
+use slint::{ModelRc, VecModel};
+
+use crate::{DeviceItem, FixItem, Row};
 
 /// Everything the window needs from one scan.
 pub struct View {
@@ -126,18 +130,14 @@ fn device_item(d: &Device) -> DeviceItem {
         }
         why.extend(d.log_issues.iter().map(LogIssue::message));
     }
-    let fix = d
-        .log_issues
+    let fixes: Vec<FixItem> = d
+        .fixes
         .iter()
-        .find_map(|i| match i {
-            LogIssue::MissingFirmware {
-                install_command: Some(cmd),
-                installed_now: false,
-                ..
-            } if d.status.is_problem() => Some(cmd.clone()),
-            _ => None,
+        .map(|f| FixItem {
+            text: f.text.clone().into(),
+            command: f.command.clone().unwrap_or_default().into(),
         })
-        .unwrap_or_default();
+        .collect();
 
     DeviceItem {
         name: d.display_name.clone().into(),
@@ -160,7 +160,7 @@ fn device_item(d: &Device) -> DeviceItem {
         }
         .into(),
         why: why.join("\n").into(),
-        fix: fix.into(),
+        fixes: ModelRc::from(Rc::new(VecModel::from(fixes))),
         note: d.note.clone().unwrap_or_default().into(),
         description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
@@ -171,6 +171,7 @@ fn device_item(d: &Device) -> DeviceItem {
 mod tests {
     use super::*;
     use hwsight_core::{KernelLogInput, Scanner};
+    use slint::Model;
     use std::fs;
 
     /// A fake machine with a working GPU and a network card missing firmware.
@@ -257,10 +258,20 @@ mod tests {
         let nic = &v.devices[1];
         assert_eq!(nic.status_kind.as_str(), "warn");
         assert!(nic.why.contains("rtl_nic/rtl8125b-2.fw"));
-        assert_eq!(nic.fix.as_str(), "sudo pacman -S linux-firmware-realtek");
+        assert_eq!(
+            nic.fixes
+                .row_data(0)
+                .map(|f| f.command.to_string())
+                .as_deref(),
+            Some("sudo pacman -S linux-firmware-realtek")
+        );
+        assert!(
+            nic.fixes.row_count() >= 2,
+            "firmware step plus the status step"
+        );
         let gpu = &v.devices[0];
         assert_eq!(gpu.status_kind.as_str(), "ok");
-        assert!(gpu.why.is_empty() && gpu.fix.is_empty());
+        assert!(gpu.why.is_empty() && gpu.fixes.row_count() == 0);
     }
 
     #[test]

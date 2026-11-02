@@ -1,5 +1,5 @@
 import { ScrollView } from "std-widgets.slint";
-import { Theme, DeviceItem } from "../theme.slint";
+import { Theme, DeviceItem, FixItem } from "../theme.slint";
 import { StatusPill } from "status-pill.slint";
 
 export component DetailsPanel inherits Rectangle {
@@ -85,7 +85,7 @@ export component DetailsPanel inherits Rectangle {
                     }
                 }
             }
-            if root.device.fix != "" : Rectangle {
+            if root.device.fixes.length > 0 : Rectangle {
                 background: Theme.surface-raised;
                 border-radius: Theme.radius-small;
                 VerticalLayout {
@@ -97,22 +97,37 @@ export component DetailsPanel inherits Rectangle {
                         font-size: Theme.font-body;
                         font-weight: 700;
                     }
-                    Text {
-                        text: "Run this in a terminal:";
-                        color: Theme.text-muted;
-                        wrap: word-wrap;
-                    }
-                    Rectangle {
-                        background: Theme.background;
-                        border-radius: 6px;
+                    for fix[i] in root.device.fixes : VerticalLayout {
+                        spacing: 8px;
                         HorizontalLayout {
-                            padding: 10px;
-                            TextInput {
-                                text: root.device.fix;
-                                read-only: true;
-                                color: Theme.highlight;
-                                font-family: "monospace";
+                            spacing: 8px;
+                            // Number the steps only when there's more than one.
+                            if root.device.fixes.length > 1 : Text {
+                                text: (i + 1) + ".";
+                                color: Theme.text-muted;
+                                font-weight: 700;
+                                vertical-alignment: top;
+                            }
+                            Text {
+                                text: fix.text;
+                                color: Theme.text;
+                                wrap: word-wrap;
                                 horizontal-stretch: 1;
+                            }
+                        }
+                        if fix.command != "" : Rectangle {
+                            background: Theme.background;
+                            border-radius: 6px;
+                            HorizontalLayout {
+                                padding: 10px;
+                                TextInput {
+                                    text: fix.command;
+                                    read-only: true;
+                                    single-line: true;
+                                    color: Theme.highlight;
+                                    font-family: "monospace";
+                                    horizontal-stretch: 1;
+                                }
                             }
                         }
                     }

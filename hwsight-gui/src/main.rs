@@ -15,7 +15,7 @@ use slint::{ComponentHandle, ModelRc, SharedString, VecModel};
 mod ui {
     slint::include_modules!();
 }
-use ui::{AppWindow, DeviceItem, Row};
+use ui::{AppWindow, DeviceItem, FixItem, Row};
 
 fn main() -> Result<(), slint::PlatformError> {
     let window = AppWindow::new()?;
@@ -98,11 +98,12 @@ fn start_scan(window: slint::Weak<AppWindow>, devices: Arc<Mutex<Vec<hwsight_cor
     }
     std::thread::spawn(move || {
         let report = hwsight_core::scan();
-        let view = model::view(&report);
-        let scanned_devices = report.devices.clone();
-        // Slint models must be built on the UI thread, so send plain data across.
+        // Slint models (like each device's list of fix steps) can't cross threads, so
+        // only the plain report is sent; it's turned into window data on the UI thread.
         let _ = slint::invoke_from_event_loop(move || {
             let Some(w) = window.upgrade() else { return };
+            let view = model::view(&report);
+            let scanned_devices = report.devices;
             let device_count = view.devices.len() as i32;
             if let Ok(mut stored_devices) = devices.lock() {
                 *stored_devices = scanned_devices;

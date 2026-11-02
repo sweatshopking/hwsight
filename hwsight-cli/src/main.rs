@@ -4,7 +4,7 @@
 use std::io::{self, IsTerminal, Write};
 use std::process::ExitCode;
 
-use hwsight_core::{Category, LogIssue, ScanReport, Status, short_vendor};
+use hwsight_core::{Category, ScanReport, Status, short_vendor};
 
 const HELP: &str = "\
 hwsight: see every device in your computer and whether it's working
@@ -190,13 +190,21 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
                     paint("Why:", "\x1b[1m", color),
                     issue.message()
                 )?;
-                if let LogIssue::MissingFirmware {
-                    install_command: Some(cmd),
-                    installed_now: false,
-                    ..
-                } = issue
-                {
-                    writeln!(out, "      {} {cmd}", paint("Fix:", "\x1b[1m", color))?;
+            }
+            for (n, fix) in device.fixes.iter().enumerate() {
+                let label = if device.fixes.len() == 1 {
+                    "Fix:".to_owned()
+                } else {
+                    format!("Fix {}:", n + 1)
+                };
+                writeln!(
+                    out,
+                    "      {} {}",
+                    paint(&label, "\x1b[1m", color),
+                    fix.text
+                )?;
+                if let Some(cmd) = &fix.command {
+                    writeln!(out, "             {cmd}")?;
                 }
             }
         }
