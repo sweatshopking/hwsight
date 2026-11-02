@@ -331,12 +331,18 @@ impl Fetch for HttpFetch {
             .into();
         let url = format!("{}/{name}", self.base_url.trim_end_matches('/'));
         let mut response = agent.get(&url).call().map_err(|e| e.to_string())?;
-        response
+        // ureq rejects a body that reaches its limit exactly, so give it one byte of room
+        // and enforce our own limit here.
+        let bytes = response
             .body_mut()
             .with_config()
-            .limit(max_bytes)
+            .limit(max_bytes.saturating_add(1))
             .read_to_vec()
-            .map_err(|e| e.to_string())
+            .map_err(|e| e.to_string())?;
+        if bytes.len() as u64 > max_bytes {
+            return Err(format!("{name} is bigger than expected"));
+        }
+        Ok(bytes)
     }
 }
 

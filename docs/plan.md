@@ -154,9 +154,10 @@ doesn't package. `tools/release-data.sh` refuses to publish if the check fails.
 
 `update.rs`, `hwsight --update-data`, `tools/hwsight-data-tool`, `tools/release-data.sh`.
 Keys: `~/.local/share/hwsight-signing/{main,backup}.key` (backup to go offline).
-Left: josh creates the public `sweatshopking/hwsight-data` repo (local copy ready in
-`~/Projects/hwsight-data`), then run `tools/release-data.sh` and test
-`hwsight --update-data` end to end. Automatic daily check belongs in the GUI.
+Live: https://github.com/sweatshopking/hwsight-data, first release data-2026.11.02.
+End-to-end tested 2026-11-03 (downloads only newer files; second run "up to date"; scan
+uses the download first). Found and fixed an exact-size limit bug in the HTTPS fetch.
+Automatic daily check belongs in the GUI.
 
 ## Claude 5: "driver attached but not working" checks (done 2026-11-02)
 
