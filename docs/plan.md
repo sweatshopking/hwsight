@@ -788,3 +788,89 @@ components in `ui/components/`, `tools/check.sh`).
 
   ALL CHECKS PASSED
   ```
+
+## Copilot 9: more "What it does" descriptions
+
+**Files you may change:** `hwsight-core/data/descriptions.toml` (add entries only; do
+not change or remove existing ones), `hwsight-core/src/descriptions.rs` (tests only),
+this task's Done notes. This task is allowed to edit `hwsight-core/data/`.
+
+**Steps (do all of them):**
+
+1. Read the header of `descriptions.toml`: follow its writing style exactly (one or two
+   short plain sentences, what it's for in everyday terms, no jargon unless explained,
+   no brand names, no emoji).
+2. Add a `[[describe]]` entry (PCI, the default bus) for each of these class/subclass
+   pairs: 01/00 (SCSI), 01/01 (IDE), 01/04 (RAID), 01/05 (ATA), 01/07 (SAS),
+   01/80 (other storage), 03/02 (3D controller: laptop second GPUs), 04/00 (video
+   capture), 04/01 (older sound cards), 07/00 (serial port), 07/01 (parallel port),
+   07/03 (modem), 08/05 (SD card reader), 0c/00 (FireWire), 0c/06 (InfiniBand),
+   0c/80 (other serial bus), 0d/80 (other wireless), 11/80 (signal processing:
+   usually power or performance helpers), 13/00 (debug function).
+3. Add `bus = "usb"` entries for USB classes: 0f (personal healthcare), 10 (audio/video
+   device), 11 (billboard: shown by USB-C docks and adapters when a mode isn't
+   supported), dc (diagnostic), ef (miscellaneous), fe with subclass 01 (firmware
+   update mode, DFU).
+4. Check every class/subclass code against the class list at the end of
+   `/usr/share/hwdata/pci.ids` and `/usr/share/hwdata/usb.ids` (lines starting `C `).
+   Do not add any code that isn't listed there. Write in Done notes which file line
+   confirmed each code (for example `pci.ids: C 01 / 05 ATA controller`).
+5. Bump `version` at the top of `descriptions.toml` to today's date (YYYY.MM.DD).
+
+**Tests (all required, in `descriptions.rs`):**
+- `every_new_pci_entry_matches` : for each class/subclass in step 2, `describe(Bus::Pci,
+  &[code], 0, 0, Category::Other)` returns text that is not the category fallback.
+- `every_new_usb_entry_matches` : the same for step 3 with `Bus::Usb`.
+
+**Done when:**
+
+- [ ] all entries from steps 2 and 3 added in the file's style; each code confirmed in Done notes
+- [ ] both tests exist and pass
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
+
+## Copilot 10: keyboard shortcuts in the app
+
+**Only after Copilot 9 is reviewed.** Follow the "GUI batch" rules above.
+
+**Files you may change:** `hwsight-gui/ui/app.slint`,
+`hwsight-gui/ui/components/search-box.slint`, `hwsight-gui/src/model.rs`,
+`hwsight-gui/src/main.rs`, this task's Done notes.
+
+**Steps (do all of them):**
+
+1. In `model.rs` add `pub fn next_device(rows: &[Row], selected: i32, step: i32) -> i32`:
+   the device index of the next (`step` = 1) or previous (`step` = -1) *device* row
+   after the row showing `selected`, skipping headings. If nothing is selected, Down
+   picks the first device row and Up the last. At either end it stays where it is.
+   With no device rows it returns -1.
+2. Expose it to the window: `callback move-selection(int)` in `app.slint` (argument is
+   the step); in `main.rs` handle it by reading the current `rows`, calling
+   `next_device`, and setting `selected`.
+3. Keyboard handling in `app.slint` with a `FocusScope` around the window content:
+   Up / Down call `move-selection(-1 / 1)`; F5 calls `refresh()` (only when not
+   scanning); Ctrl+F focuses the search box (add a `public function focus-search()` to
+   `SearchBox` that focuses its input); Escape in the search box clears `query`.
+   Arrow keys must still work for typing inside the search box (only handle them when
+   the search box doesn't have focus).
+4. When the selection moves with the keyboard, scroll the list so the selected row is
+   visible (`ListView` viewport: adjust `viewport-y` so the row's top is inside the
+   visible area; rows are 40px for headings and 52px for devices).
+
+**Tests (all required, in `model.rs`):**
+- `next_device_skips_headings`
+- `next_device_from_nothing_selected`
+- `next_device_stays_at_the_ends`
+- `next_device_with_no_devices`
+
+**Done when:**
+
+- [ ] steps 1 to 4 done; the four tests exist and pass
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
