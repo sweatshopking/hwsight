@@ -98,14 +98,25 @@ pub fn read_system_log() -> Option<(LogSource, Vec<String>)> {
     // keeps the amount we read small.
     let journal = ["-k", "-b", "-q", "--no-pager", "-o", "cat", "-p", "warning"];
     if let Some(lines) = run_for_lines("journalctl", &journal) {
-        return Some((LogSource::Journal, lines));
+        if !lines.is_empty() {
+            return Some((LogSource::Journal, lines));
+        }
+        // No warnings could mean a healthy system or no permission to read the log.
+        // Every booted kernel has logged something, so one line of any level proves access.
+        let probe = ["-k", "-b", "-q", "--no-pager", "-o", "cat", "-n", "1"];
+        if run_for_lines("journalctl", &probe).is_some_and(|l| !l.is_empty()) {
+            return Some((LogSource::Journal, lines));
+        }
     }
     // dmesg has no reliable way to filter by level on every version, so read it all.
-    run_for_lines("dmesg", &[]).map(|lines| (LogSource::Dmesg, lines))
+    // Readable dmesg output is never empty, so empty means no permission.
+    run_for_lines("dmesg", &[])
+        .filter(|lines| !lines.is_empty())
+        .map(|lines| (LogSource::Dmesg, lines))
 }
 
-/// Run a command and return its output lines, or `None` if it fails, prints nothing,
-/// or takes longer than a few seconds (a huge journal must never hang the app).
+/// Run a command and return its output lines, or `None` if it fails or takes longer
+/// than a few seconds (a huge journal must never hang the app).
 fn run_for_lines(program: &str, args: &[&str]) -> Option<Vec<String>> {
     const TIMEOUT: Duration = Duration::from_secs(5);
     let mut child = Command::new(program)
@@ -139,14 +150,13 @@ fn run_for_lines(program: &str, args: &[&str]) -> Option<Vec<String>> {
     if !status.success() {
         return None;
     }
-    let lines: Vec<String> = String::from_utf8_lossy(&output)
-        .lines()
-        .map(strip_dmesg_timestamp)
-        .map(str::to_owned)
-        .collect();
-    // An empty journal usually means "no permission" rather than "no messages": a booted
-    // kernel always logs some warnings.
-    (!lines.is_empty()).then_some(lines)
+    Some(
+        String::from_utf8_lossy(&output)
+            .lines()
+            .map(strip_dmesg_timestamp)
+            .map(str::to_owned)
+            .collect(),
+    )
 }
 
 /// dmesg lines start with `[    1.234567] `.
