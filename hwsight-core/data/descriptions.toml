@@ -14,7 +14,7 @@
 # Writing style: one or two short sentences, starting with what it's for in everyday
 # terms. No jargon unless it's explained, no brand names, no emoji.
 schema = 1
-version = "2026.11.03"
+version = "2026.11.04"
 
 # Fallbacks, one per category (keys match hwsight's categories).
 [category]
@@ -116,6 +116,101 @@ class = "0d"
 subclasses = ["11"]
 text = "Adds Bluetooth, for wireless headphones, controllers, keyboards, and more."
 
+[[describe]]
+class = "01"
+subclasses = ["00"]
+text = "Connects older storage drives and other devices that use the SCSI standard."
+
+[[describe]]
+class = "01"
+subclasses = ["01"]
+text = "Connects older hard drives and other storage devices that use the IDE standard."
+
+[[describe]]
+class = "01"
+subclasses = ["04"]
+text = "Combines several storage drives so they can work together for speed or protection."
+
+[[describe]]
+class = "01"
+subclasses = ["05"]
+text = "Connects storage drives that use the ATA standard."
+
+[[describe]]
+class = "01"
+subclasses = ["07"]
+text = "Connects storage drives that use the SAS standard."
+
+[[describe]]
+class = "01"
+subclasses = ["80"]
+text = "Connects a storage device that does not use a more specific standard."
+
+[[describe]]
+class = "03"
+subclasses = ["02"]
+text = "A second graphics processor that can help draw games, videos, and other pictures."
+
+[[describe]]
+class = "04"
+subclasses = ["00"]
+text = "Captures video from a camera, television signal, or another video source."
+
+[[describe]]
+class = "04"
+subclasses = ["01"]
+text = "An older sound card that plays and records sound."
+
+[[describe]]
+class = "07"
+subclasses = ["00"]
+text = "Connects older devices through a serial port, one bit at a time."
+
+[[describe]]
+class = "07"
+subclasses = ["01"]
+text = "Connects older printers and other devices through a parallel port."
+
+[[describe]]
+class = "07"
+subclasses = ["03"]
+text = "Connects to the internet or another computer through a modem."
+
+[[describe]]
+class = "08"
+subclasses = ["05"]
+text = "Reads memory cards through an SD card slot."
+
+[[describe]]
+class = "0c"
+subclasses = ["00"]
+text = "Connects older FireWire devices, such as cameras and storage drives."
+
+[[describe]]
+class = "0c"
+subclasses = ["06"]
+text = "Connects high-speed networks used by servers and other specialised computers."
+
+[[describe]]
+class = "0c"
+subclasses = ["80"]
+text = "Connects devices through another type of serial bus."
+
+[[describe]]
+class = "0d"
+subclasses = ["80"]
+text = "Connects a wireless device that does not use a more specific wireless standard."
+
+[[describe]]
+class = "11"
+subclasses = ["80"]
+text = "Helps the computer manage power or improve performance."
+
+[[describe]]
+class = "13"
+subclasses = ["00"]
+text = "A special-purpose device used to inspect or test the computer."
+
 # ---------------------------------------------------------------------------------------
 # USB devices (plugged in, or connected inside the computer over USB)
 
@@ -168,6 +263,37 @@ text = "Reads smart cards, like ID, bank, or security cards."
 bus = "usb"
 class = "0e"
 text = "A webcam or video capture device."
+
+[[describe]]
+bus = "usb"
+class = "0f"
+text = "Connects a personal healthcare device, such as a blood pressure monitor."
+
+[[describe]]
+bus = "usb"
+class = "10"
+text = "Plays or records sound and video over USB."
+
+[[describe]]
+bus = "usb"
+class = "11"
+text = "Reports that a USB-C dock or adapter cannot use one of its connection modes."
+
+[[describe]]
+bus = "usb"
+class = "dc"
+text = "A USB device used to inspect or test another device."
+
+[[describe]]
+bus = "usb"
+class = "ef"
+text = "A USB device with a special purpose that does not fit another group."
+
+[[describe]]
+bus = "usb"
+class = "fe"
+subclasses = ["01"]
+text = "A USB device in firmware update mode."
 
 [[describe]]
 bus = "usb"

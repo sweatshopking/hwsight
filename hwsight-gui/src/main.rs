@@ -10,7 +10,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use slint::{ComponentHandle, ModelRc, SharedString, VecModel};
+use slint::{ComponentHandle, Model, ModelRc, SharedString, VecModel};
 
 // Code generated from ui/*.slint. Our no-unwrap rule is for our code; the generator
 // uses unwrap internally, so the rule is relaxed for this module only.
@@ -41,6 +41,19 @@ fn main() -> Result<(), slint::PlatformError> {
     let filter_window = window.as_weak();
     let filter_devices = devices.clone();
     window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
+    let selection_window = window.as_weak();
+    window.on_move_selection(move |step| {
+        let Some(w) = selection_window.upgrade() else {
+            return;
+        };
+        let model = w.get_rows();
+        let rows: Vec<Row> = (0..model.row_count())
+            .filter_map(|index| model.row_data(index))
+            .collect();
+        let selected = model::next_device(&rows, w.get_selected(), step);
+        w.set_selected(selected);
+        scroll_to_selected(&w, &rows, selected);
+    });
     start_scan(window.as_weak(), devices.clone());
     check_for_data_update(window.as_weak(), devices);
     check_for_app_update(window.as_weak(), update_state.clone());
@@ -213,6 +226,32 @@ fn check_for_app_update(window: slint::Weak<AppWindow>, state: Arc<Mutex<UpdateS
     });
 }
 
+fn scroll_to_selected(window: &AppWindow, rows: &[Row], selected: i32) {
+    let Some(index) = rows
+        .iter()
+        .position(|row| !row.is_header && row.device == selected)
+    else {
+        return;
+    };
+    // Slint scroll positions are negative when scrolled down: content-y = -offset.
+    let top: i32 = rows
+        .iter()
+        .take(index)
+        .map(|row| if row.is_header { 40 } else { 52 })
+        .sum();
+    let row_height = 52;
+    let offset = -window.get_list_viewport_y() as i32;
+    let visible = window.get_list_height() as i32;
+    let next = if top < offset {
+        top
+    } else if top + row_height > offset + visible {
+        top + row_height - visible
+    } else {
+        offset
+    };
+    window.set_list_viewport_y(-(next.max(0) as f32));
+}
+
 /// At most once a day, quietly download newer device data in the background. If
 /// anything new was installed, scan again so it's used straight away. Never blocks the
 /// window and never asks anything; problems just mean we try again tomorrow.
@@ -261,12 +300,34 @@ fn check_for_data_update(
 
 fn snapshot_when_ready(window: slint::Weak<AppWindow>, path: std::path::PathBuf) {
     let timer = Box::leak(Box::new(slint::Timer::default()));
+    let keys_sent = std::cell::Cell::new(false);
     timer.start(
         slint::TimerMode::Repeated,
         std::time::Duration::from_millis(300),
         move || {
             let Some(w) = window.upgrade() else { return };
             if w.get_scanning() {
+                return;
+            }
+            // HWSIGHT_KEYS=down,down,up presses those keys (once), then the picture is
+            // taken on the next tick so it shows the result.
+            if !keys_sent.replace(true) && std::env::var_os("HWSIGHT_KEYS").is_some() {
+                for key in std::env::var("HWSIGHT_KEYS").unwrap_or_default().split(',') {
+                    let k = match key.trim() {
+                        "down" => slint::platform::Key::DownArrow,
+                        "up" => slint::platform::Key::UpArrow,
+                        _ => continue,
+                    };
+                    let text: slint::SharedString = k.into();
+                    let _ =
+                        w.window()
+                            .try_dispatch_event(slint::platform::WindowEvent::KeyPressed {
+                                text: text.clone(),
+                            });
+                    let _ = w
+                        .window()
+                        .try_dispatch_event(slint::platform::WindowEvent::KeyReleased { text });
+                }
                 return;
             }
             let result = w

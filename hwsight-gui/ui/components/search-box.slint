@@ -4,6 +4,7 @@ import { Theme } from "../theme.slint";
 // frame inside ours), with a placeholder shown while it's empty.
 export component SearchBox inherits Rectangle {
     in-out property <string> text;
+    out property <bool> input-focused: input.has-focus;
     height: 36px;
     background: Theme.surface-raised;
     border-radius: 18px;
@@ -36,7 +37,18 @@ export component SearchBox inherits Rectangle {
                 color: Theme.text;
                 font-size: Theme.font-body;
                 vertical-alignment: center;
+                key-pressed(event) => {
+                    if event.text == Key.Escape {
+                        root.text = "";
+                        return accept;
+                    }
+                    return reject;
+                }
             }
         }
+    }
+
+    public function focus-search() {
+        input.focus();
     }
 }

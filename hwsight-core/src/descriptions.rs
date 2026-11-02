@@ -229,4 +229,57 @@ mod tests {
             "schema = 1\nversion = \"2099.01.01\"\n[[describe]]\nclass = \"03\"\ntext = \" \"\n";
         assert!(data::parse_data::<Table>(text).is_err());
     }
+
+    #[test]
+    fn every_new_pci_entry_matches() {
+        let d = Descriptions::embedded();
+        for (class, subclass) in [
+            (0x01, 0x00),
+            (0x01, 0x01),
+            (0x01, 0x04),
+            (0x01, 0x05),
+            (0x01, 0x07),
+            (0x01, 0x80),
+            (0x03, 0x02),
+            (0x04, 0x00),
+            (0x04, 0x01),
+            (0x07, 0x00),
+            (0x07, 0x01),
+            (0x07, 0x03),
+            (0x08, 0x05),
+            (0x0c, 0x00),
+            (0x0c, 0x06),
+            (0x0c, 0x80),
+            (0x0d, 0x80),
+            (0x11, 0x80),
+            (0x13, 0x00),
+        ] {
+            let code = (class << 16) | (subclass << 8);
+            assert!(
+                d.describe(Bus::Pci, &[code], 0, 0, Category::Other)
+                    .is_some_and(|text| !text.contains("doesn't fit the usual groups")),
+                "no specific PCI description for {class:02x}/{subclass:02x}"
+            );
+        }
+    }
+
+    #[test]
+    fn every_new_usb_entry_matches() {
+        let d = Descriptions::embedded();
+        for (class, subclass) in [
+            (0x0f, 0x00),
+            (0x10, 0x00),
+            (0x11, 0x00),
+            (0xdc, 0x00),
+            (0xef, 0x00),
+            (0xfe, 0x01),
+        ] {
+            let code = (class << 16) | (subclass << 8);
+            assert!(
+                d.describe(Bus::Usb, &[code], 0, 0, Category::Other)
+                    .is_some_and(|text| !text.contains("doesn't fit the usual groups")),
+                "no specific USB description for {class:02x}/{subclass:02x}"
+            );
+        }
+    }
 }

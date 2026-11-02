@@ -824,13 +824,39 @@ this task's Done notes. This task is allowed to edit `hwsight-core/data/`.
 
 **Done when:**
 
-- [ ] all entries from steps 2 and 3 added in the file's style; each code confirmed in Done notes
-- [ ] both tests exist and pass
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] all entries from steps 2 and 3 added in the file's style; each code confirmed in Done notes
+- [x] both tests exist and pass
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): accepted. Entries in the right style; codes and cited
+  pci.ids/usb.ids lines spot-checked and correct. Version bumped by Claude to 2026.11.04
+  (a release earlier today already used 2026.11.03, which Copilot couldn't know).
+  Design limit noted: date versions allow one data release per file per day.
+- Step 1: done in `hwsight-core/data/descriptions.toml` - followed the existing short, plain-English, no-brand writing style.
+- Step 2: done in `hwsight-core/data/descriptions.toml` - added all 19 requested PCI class/subclass descriptions.
+- Step 3: done in `hwsight-core/data/descriptions.toml` - added all 6 requested USB class descriptions.
+- Step 4: done in `/usr/share/hwdata/pci.ids` and `/usr/share/hwdata/usb.ids` - confirmed PCI `01/00` at line 43042, `01/01` at 43048, `01/04` at 43059, `01/05` at 43061, `01/07` at 43068, `01/80` at 43077, `03/02` at 43095, `04/00` at 43098, `04/01` at 43099, `07/00` at 43132, `07/01` at 43140, `07/03` at 43147, `08/05` at 43176, `0c/00` at 43204, `0c/06` at 43219, `0c/80` at 43227, `0d/80` at 43238, `11/80` at 43255, and `13/00` at 43259; confirmed USB `0f` at line 24089, `10` at 24090, `11` at 24094, `dc` at 24107, `ef` at 24119, and `fe/01` at 24129-24130.
+- Step 5: done in `hwsight-core/data/descriptions.toml` - version was already today's date, `2026.11.03`.
+- `every_new_pci_entry_matches` and `every_new_usb_entry_matches` pass.
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```
 
 ## Copilot 10: keyboard shortcuts in the app
 
@@ -868,9 +894,35 @@ this task's Done notes. This task is allowed to edit `hwsight-core/data/`.
 
 **Done when:**
 
-- [ ] steps 1 to 4 done; the four tests exist and pass
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] steps 1 to 4 done; the four tests exist and pass
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): accepted with fixes. next_device logic and tests correct.
+  Fixed: scrolling went the wrong way (Slint content-y is negative when scrolled down);
+  shortcuts had no focus when the window opened (forward-focus added) and clicking a
+  device after searching left focus in the search box (rows now return focus).
+  Verified with real key presses via the new HWSIGHT_KEYS=down,up snapshot aid.
+- Step 1: done in `hwsight-gui/src/model.rs` - added `next_device` navigation that skips headings, handles no selection, clamps at both ends, and returns -1 with no devices.
+- Step 2: done in `hwsight-gui/ui/app.slint` and `hwsight-gui/src/main.rs` - added the move-selection callback and Rust-side row navigation.
+- Step 3: done in `hwsight-gui/ui/app.slint` and `hwsight-gui/ui/components/search-box.slint` - added FocusScope shortcuts for Up, Down, F5, Ctrl+F, and Escape search clearing with focus-aware arrow handling.
+- Step 4: done in `hwsight-gui/ui/app.slint` and `hwsight-gui/src/main.rs` - bound the ListView content position and scrolls the selected device into view.
+- `next_device_skips_headings`, `next_device_from_nothing_selected`, `next_device_stays_at_the_ends`, and `next_device_with_no_devices` pass.
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```

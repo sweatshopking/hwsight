@@ -110,6 +110,30 @@ pub fn filter_rows(devices: &[Device], query: &str, only_problems: bool) -> Vec<
     rows
 }
 
+pub fn next_device(rows: &[Row], selected: i32, step: i32) -> i32 {
+    let devices: Vec<i32> = rows
+        .iter()
+        .filter(|row| !row.is_header)
+        .map(|row| row.device)
+        .collect();
+    if devices.is_empty() {
+        return -1;
+    }
+    let Some(current) = devices.iter().position(|&device| device == selected) else {
+        return if step < 0 {
+            devices[devices.len() - 1]
+        } else {
+            devices[0]
+        };
+    };
+    let next = if step < 0 {
+        current.saturating_sub(1)
+    } else {
+        (current + 1).min(devices.len() - 1)
+    };
+    devices[next]
+}
+
 /// "ok", "warn", "error", or "neutral": picks the status colour in the UI.
 pub fn status_kind(status: Status) -> &'static str {
     match status {
@@ -387,5 +411,100 @@ mod tests {
         let report = report();
         let v = view(&report);
         assert_eq!(v.rows, filter_rows(&report.devices, "", false));
+    }
+
+    #[test]
+    fn next_device_skips_headings() {
+        let rows = vec![
+            Row {
+                is_header: true,
+                header_text: "Graphics".into(),
+                header_count: 2,
+                device: -1,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 3,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 7,
+            },
+            Row {
+                is_header: true,
+                header_text: "Network".into(),
+                header_count: 1,
+                device: -1,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 9,
+            },
+        ];
+        assert_eq!(next_device(&rows, 3, 1), 7);
+        assert_eq!(next_device(&rows, 7, -1), 3);
+    }
+
+    #[test]
+    fn next_device_from_nothing_selected() {
+        let rows = vec![
+            Row {
+                is_header: true,
+                header_text: "Graphics".into(),
+                header_count: 2,
+                device: -1,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 3,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 7,
+            },
+        ];
+        assert_eq!(next_device(&rows, -1, 1), 3);
+        assert_eq!(next_device(&rows, -1, -1), 7);
+    }
+
+    #[test]
+    fn next_device_stays_at_the_ends() {
+        let rows = vec![
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 3,
+            },
+            Row {
+                is_header: false,
+                header_text: Default::default(),
+                header_count: 0,
+                device: 7,
+            },
+        ];
+        assert_eq!(next_device(&rows, 3, -1), 3);
+        assert_eq!(next_device(&rows, 7, 1), 7);
+    }
+
+    #[test]
+    fn next_device_with_no_devices() {
+        let rows = vec![Row {
+            is_header: true,
+            header_text: "Graphics".into(),
+            header_count: 0,
+            device: -1,
+        }];
+        assert_eq!(next_device(&rows, -1, 1), -1);
     }
 }

@@ -51,6 +51,8 @@ export component AppWindow inherits Window {
     in property <bool> update-can-update;
     in property <bool> update-busy;
     in property <bool> update-can-restart;
+    in-out property <length> list-viewport-y;
+    out property <length> list-height: device-list.height;
     in-out property <string> query;
     in-out property <bool> only-problems;
 
@@ -59,21 +61,46 @@ export component AppWindow inherits Window {
 
     callback refresh();
     callback filter-changed();
+    callback move-selection(int);
     callback update-now();
     callback restart-now();
 
     changed query => { root.filter-changed(); }
     changed only-problems => { root.filter-changed(); }
 
-    VerticalLayout {
-        padding: Theme.padding;
-        spacing: Theme.gap;
+    // Keyboard shortcuts get focus when the window opens, so they work straight away.
+    forward-focus: keys;
 
-        // Each item sits in a centred VerticalLayout so it keeps its own size instead of
-        // stretching to fill the row.
-        HorizontalLayout {
-            height: 56px;
-            spacing: 16px;
+    keys := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.UpArrow && !search.input-focused {
+                root.move-selection(-1);
+                return accept;
+            }
+            if event.text == Key.DownArrow && !search.input-focused {
+                root.move-selection(1);
+                return accept;
+            }
+            if event.text == Key.F5 && !root.scanning {
+                root.refresh();
+                return accept;
+            }
+            if event.text == Key.F && event.modifiers.control {
+                search.focus-search();
+                return accept;
+            }
+            return reject;
+        }
+
+        VerticalLayout {
+            padding: Theme.padding;
+            spacing: Theme.gap;
+
+            // Each item sits in a centred VerticalLayout so it keeps its own size instead of
+            // stretching to fill the row.
+            HorizontalLayout {
+                height: 56px;
+                spacing: 16px;
             // Text can't be filled with a gradient (the renderer draws nothing), so the
             // accent gradient goes on a small bar beside the name.
             HorizontalLayout {
@@ -124,23 +151,23 @@ export component AppWindow inherits Window {
                     clicked => { root.refresh(); }
                 }
             }
-        }
-        UpdateBanner {
-            text: root.update-text;
-            can-update: root.update-can-update;
-            busy: root.update-busy;
-            can-restart: root.update-can-restart;
-            update-now => { root.update-now(); }
-            restart-now => { root.restart-now(); }
-        }
+            }
+            UpdateBanner {
+                text: root.update-text;
+                can-update: root.update-can-update;
+                busy: root.update-busy;
+                can-restart: root.update-can-restart;
+                update-now => { root.update-now(); }
+                restart-now => { root.restart-now(); }
+            }
 
-        HorizontalLayout {
-            spacing: Theme.gap;
-            Rectangle {
-                background: Theme.surface;
-                border-radius: Theme.radius;
-                horizontal-stretch: 2;
-                min-width: 340px;
+            HorizontalLayout {
+                spacing: Theme.gap;
+                Rectangle {
+                    background: Theme.surface;
+                    border-radius: Theme.radius;
+                    horizontal-stretch: 2;
+                    min-width: 340px;
                 // Shown over the empty list when a search or filter matches nothing.
                 // (Inside the list's loop it could never appear: no rows, no loop.)
                 if root.rows.length == 0 && !root.scanning : Text {
@@ -153,66 +180,73 @@ export component AppWindow inherits Window {
                     horizontal-alignment: center;
                     vertical-alignment: center;
                 }
-                VerticalLayout {
-                    padding: 8px;
-                    spacing: 8px;
-                    HorizontalLayout {
-                        spacing: Theme.gap;
-                        padding-left: 6px;
-                        padding-right: 6px;
-                        padding-top: 4px;
-                        SearchBox {
-                            text <=> root.query;
-                            horizontal-stretch: 1;
-                        }
-                        Switch {
-                            text: "Only problems";
-                            checked <=> root.only-problems;
-                        }
-                    }
-                    ListView {
-                        // Each item needs its own height: children placed with `if`
-                        // don't size their parent, so without it every row is 0px tall.
-                        for row in root.rows: Rectangle {
-                            height: row.is-header ? 40px : 52px;
-                            if row.is-header : CategoryHeader {
-                                width: parent.width;
-                                text: row.header-text;
-                                count: row.header-count;
+                    VerticalLayout {
+                        padding: 8px;
+                        spacing: 8px;
+                        HorizontalLayout {
+                            spacing: Theme.gap;
+                            padding-left: 6px;
+                            padding-right: 6px;
+                            padding-top: 4px;
+                            search := SearchBox {
+                                text <=> root.query;
+                                horizontal-stretch: 1;
                             }
-                            if !row.is-header : DeviceRow {
-                                width: parent.width;
-                                device: root.devices[row.device];
-                                selected: root.selected == row.device;
-                                clicked => { root.selected = row.device; }
+                            Switch {
+                                text: "Only problems";
+                                checked <=> root.only-problems;
+                            }
+                        }
+                        device-list := ListView {
+                            content-y <=> root.list-viewport-y;
+                            // Each item needs its own height: children placed with `if`
+                            // don't size their parent, so without it every row is 0px tall.
+                            for row in root.rows: Rectangle {
+                                height: row.is-header ? 40px : 52px;
+                                if row.is-header : CategoryHeader {
+                                    width: parent.width;
+                                    text: row.header-text;
+                                    count: row.header-count;
+                                }
+                                if !row.is-header : DeviceRow {
+                                    width: parent.width;
+                                    device: root.devices[row.device];
+                                    selected: root.selected == row.device;
+                                    clicked => {
+                                        root.selected = row.device;
+                                        // Back to the shortcuts, e.g. after typing a search.
+                                        keys.focus();
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                DetailsPanel {
+                    device: root.selected >= 0 ? root.devices[root.selected] : {
+                        name: "",
+                        vendor: "",
+                        category: "",
+                        status-kind: "neutral",
+                        status-text: "",
+                        driver: "",
+                        hardware-id: "",
+                        address: "",
+                        bus: "",
+                        why: "",
+                        fixes: [],
+                        note: "",
+                        description: "",
+                        unrecognized: false
+                    };
+                    has-device: root.selected >= 0;
+                    horizontal-stretch: 3;
+                }
             }
-            DetailsPanel {
-                device: root.selected >= 0 ? root.devices[root.selected] : {
-                    name: "",
-                    vendor: "",
-                    category: "",
-                    status-kind: "neutral",
-                    status-text: "",
-                    driver: "",
-                    hardware-id: "",
-                    address: "",
-                    bus: "",
-                    why: "",
-                    fixes: [],
-                    note: "",
-                    description: "",
-                    unrecognized: false
-                };
-                has-device: root.selected >= 0;
-                horizontal-stretch: 3;
+            NotesBanner {
+                notes: root.notes;
             }
-        }
-        NotesBanner {
-            notes: root.notes;
         }
     }
+
 }
