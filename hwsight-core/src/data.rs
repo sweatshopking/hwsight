@@ -101,3 +101,140 @@ fn same_file(a: &Path, b: &Path) -> bool {
         _ => false,
     }
 }
+
+// ---------------------------------------------------------------------------------------
+// Versioned hwsight data files (rules.toml, firmware.toml, ...).
+//
+// Every file has `schema` (format version) and `version` (release date, YYYY.MM.DD).
+// A copy is built into the program; a newer valid copy in a data folder replaces it as a
+// whole (newer files are complete supersets, so no merging). Broken files and files for
+// a newer hwsight are skipped and reported, never used half-way.
+
+/// Where a data file in use came from.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DataSource {
+    Embedded,
+    File(PathBuf),
+}
+
+/// Why a data file wasn't used.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DataProblem {
+    /// Written for a newer hwsight; the user should update the app.
+    NewerSchema { path: PathBuf, schema: u32 },
+    /// Unreadable or broken.
+    Invalid { path: PathBuf, error: String },
+}
+
+/// A hwsight data file type.
+pub(crate) trait DataFile: Sized {
+    /// File name in the data folders, e.g. `rules.toml`.
+    const FILE_NAME: &'static str;
+    /// The format version this build understands.
+    const SCHEMA: u32;
+    /// The built-in copy.
+    const EMBEDDED: &'static str;
+    /// Parse the whole file (schema already checked). Return its `version` and contents.
+    fn parse_body(text: &str) -> Result<(String, Self), String>;
+    /// Used only if the built-in copy is somehow broken: run without data, don't crash.
+    fn empty() -> Self;
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct Loaded<T> {
+    pub data: T,
+    pub version: String,
+    pub source: DataSource,
+}
+
+#[derive(Debug)]
+pub(crate) enum ParseError {
+    NewerSchema(u32),
+    Invalid(String),
+}
+
+pub(crate) fn parse_data<T: DataFile>(text: &str) -> Result<(String, T), ParseError> {
+    // Check the schema first, so a newer file is reported as "newer" even if its other
+    // fields have changed shape.
+    #[derive(serde::Deserialize)]
+    struct SchemaOnly {
+        schema: u32,
+    }
+    let schema = toml::from_str::<SchemaOnly>(text)
+        .map_err(|e| ParseError::Invalid(e.to_string()))?
+        .schema;
+    if schema > T::SCHEMA {
+        return Err(ParseError::NewerSchema(schema));
+    }
+    if schema < T::SCHEMA {
+        return Err(ParseError::Invalid(format!("old format (schema {schema})")));
+    }
+    let (version, data) = T::parse_body(text).map_err(ParseError::Invalid)?;
+    if !is_date_version(&version) {
+        // Versions are compared as text to pick the newest, which needs one fixed format.
+        return Err(ParseError::Invalid(format!(
+            "version `{version}` should look like 2026.11.02"
+        )));
+    }
+    Ok((version, data))
+}
+
+pub(crate) fn embedded<T: DataFile>() -> Loaded<T> {
+    match parse_data::<T>(T::EMBEDDED) {
+        Ok((version, data)) => Loaded {
+            data,
+            version,
+            source: DataSource::Embedded,
+        },
+        // Tests check every built-in file, so this can't happen in a release.
+        Err(_) => Loaded {
+            data: T::empty(),
+            version: String::new(),
+            source: DataSource::Embedded,
+        },
+    }
+}
+
+/// The newest valid copy from the data folders or the built-in one, plus skipped files.
+pub(crate) fn load_newest<T: DataFile>(dirs: &DataDirs) -> (Loaded<T>, Vec<DataProblem>) {
+    let mut best = embedded::<T>();
+    let mut problems = Vec::new();
+    for path in dirs.hwsight_files(T::FILE_NAME) {
+        let text = match std::fs::read_to_string(&path) {
+            Ok(text) => text,
+            Err(e) => {
+                problems.push(DataProblem::Invalid {
+                    path,
+                    error: e.to_string(),
+                });
+                continue;
+            }
+        };
+        match parse_data::<T>(&text) {
+            Ok((version, data)) if version > best.version => {
+                best = Loaded {
+                    data,
+                    version,
+                    source: DataSource::File(path),
+                };
+            }
+            Ok(_) => {}
+            Err(ParseError::NewerSchema(schema)) => {
+                problems.push(DataProblem::NewerSchema { path, schema });
+            }
+            Err(ParseError::Invalid(error)) => problems.push(DataProblem::Invalid { path, error }),
+        }
+    }
+    (best, problems)
+}
+
+/// `YYYY.MM.DD`, the format shared by every hwsight data file and `pci.ids`.
+pub(crate) fn is_date_version(v: &str) -> bool {
+    let b = v.as_bytes();
+    b.len() == 10
+        && b[4] == b'.'
+        && b[7] == b'.'
+        && b.iter()
+            .enumerate()
+            .all(|(i, c)| i == 4 || i == 7 || c.is_ascii_digit())
+}

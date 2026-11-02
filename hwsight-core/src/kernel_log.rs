@@ -26,6 +26,10 @@ pub enum LogIssue {
         error: i32,
         /// The file exists now (installed since boot), so a restart may fix it.
         installed_now: bool,
+        /// The package that provides it on this distro, when known.
+        package: Option<String>,
+        /// How to install that package here, for showing to the user.
+        install_command: Option<String>,
     },
     /// The driver tried to start the device and gave up.
     DriverFailed { driver: String, error: i32 },
@@ -41,6 +45,14 @@ impl LogIssue {
             } => format!(
                 "Firmware file {file} was missing when the computer started, but it's installed \
                  now. Restarting should fix this."
+            ),
+            Self::MissingFirmware {
+                file,
+                package: Some(package),
+                ..
+            } => format!(
+                "The driver needs a firmware file that isn't installed: {file}. \
+                 It comes in the {package} package."
             ),
             Self::MissingFirmware { file, .. } => {
                 format!("The driver needs a firmware file that isn't installed: {file}")
@@ -135,7 +147,8 @@ pub fn issues_by_device(
     firmware_dirs: &[PathBuf],
 ) -> HashMap<String, Vec<LogIssue>> {
     let mut found: HashMap<String, Vec<LogIssue>> = HashMap::new();
-    for line in lines {
+    // Saved dmesg output keeps its timestamps; journal lines have none.
+    for line in lines.iter().map(|l| strip_dmesg_timestamp(l)) {
         let Some((device, issue)) = parse_line(line, firmware_dirs) else {
             continue;
         };
@@ -203,6 +216,8 @@ fn missing_firmware(file: &str, error: i32, firmware_dirs: &[PathBuf]) -> LogIss
         file: file.to_owned(),
         error,
         installed_now: firmware_installed(file, firmware_dirs),
+        package: None,
+        install_command: None,
     }
 }
 
@@ -305,6 +320,8 @@ usb 1-2: new high-speed USB device number 3 using xhci_hcd
                     file: "rtl_nic/rtl8125b-2.fw".into(),
                     error: -2,
                     installed_now: false,
+                    package: None,
+                    install_command: None,
                 },
                 LogIssue::DriverFailed {
                     driver: "r8169".into(),
@@ -350,6 +367,21 @@ usb 1-2: new high-speed USB device number 3 using xhci_hcd
             "../../etc/passwd",
             &[tmp.path().to_path_buf()]
         ));
+    }
+
+    #[test]
+    fn saved_dmesg_lines_are_understood() {
+        let log = lines(
+            "[    2.104512] r8169 0000:07:00.0: probe with driver r8169 failed with error -110",
+        );
+        let found = issues_by_device(&log, &[]);
+        assert_eq!(
+            found["0000:07:00.0"],
+            vec![LogIssue::DriverFailed {
+                driver: "r8169".into(),
+                error: -110
+            }]
+        );
     }
 
     #[test]

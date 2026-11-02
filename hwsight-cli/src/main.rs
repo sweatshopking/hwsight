@@ -4,7 +4,7 @@
 use std::io::{self, Write};
 use std::process::ExitCode;
 
-use hwsight_core::{Category, ScanReport, Status, short_vendor};
+use hwsight_core::{Category, LogIssue, ScanReport, Status, short_vendor};
 
 const HELP: &str = "\
 hwsight: see every device in your computer and whether it's working
@@ -15,11 +15,15 @@ Options:
   --problems   Only show devices that have a problem
   --json       Print everything as JSON (for bug reports and scripts)
   --ids        Also show hardware IDs and bus addresses
+  --kernel-log FILE
+               Explain problems using this saved kernel log (from `journalctl -k -b`
+               or `dmesg`) instead of reading this computer's log
   -h, --help   Show this help
   -V, --version
 ";
 
 struct Options {
+    kernel_log: Option<std::path::PathBuf>,
     json: bool,
     problems_only: bool,
     show_ids: bool,
@@ -27,12 +31,21 @@ struct Options {
 
 fn main() -> ExitCode {
     let mut opts = Options {
+        kernel_log: None,
         json: false,
         problems_only: false,
         show_ids: false,
     };
-    for arg in std::env::args().skip(1) {
+    let mut args = std::env::args().skip(1);
+    while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--kernel-log" => match args.next() {
+                Some(path) => opts.kernel_log = Some(path.into()),
+                None => {
+                    eprintln!("hwsight: --kernel-log needs a file name");
+                    return ExitCode::from(2);
+                }
+            },
             "--json" => opts.json = true,
             "--problems" => opts.problems_only = true,
             "--ids" => opts.show_ids = true,
@@ -51,7 +64,23 @@ fn main() -> ExitCode {
         }
     }
 
-    let report = hwsight_core::scan();
+    let mut scanner = hwsight_core::Scanner::system();
+    if let Some(path) = &opts.kernel_log {
+        match std::fs::read(path) {
+            Ok(bytes) => {
+                let lines = String::from_utf8_lossy(&bytes)
+                    .lines()
+                    .map(str::to_owned)
+                    .collect();
+                scanner.kernel_log = hwsight_core::KernelLogInput::Lines(lines);
+            }
+            Err(e) => {
+                eprintln!("hwsight: can't read {}: {e}", path.display());
+                return ExitCode::FAILURE;
+            }
+        }
+    }
+    let report = scanner.scan();
     let result = if opts.json {
         print_json(&report)
     } else {
@@ -124,6 +153,14 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         if device.status.is_problem() {
             for issue in &device.log_issues {
                 writeln!(out, "      Why: {}", issue.message())?;
+                if let LogIssue::MissingFirmware {
+                    install_command: Some(cmd),
+                    installed_now: false,
+                    ..
+                } = issue
+                {
+                    writeln!(out, "      Fix: {cmd}")?;
+                }
             }
         }
         if opts.show_ids {
@@ -147,6 +184,9 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         (false, 0) => writeln!(out, "{} devices, no problems found.", report.devices.len())?,
         (false, 1) => writeln!(out, "{} devices, 1 problem.", report.devices.len())?,
         (false, n) => writeln!(out, "{} devices, {n} problems.", report.devices.len())?,
+    }
+    if let Some(note) = &report.firmware_note {
+        writeln!(out, "Note: {note}")?;
     }
     for note in &report.notes {
         writeln!(out, "Note: {}", note.message())?;

@@ -1,0 +1,231 @@
+# Which package provides a firmware file, per distro family.
+#
+# Built into hwsight and replaceable by a newer downloaded copy. `schema` is the file
+# format version; `version` is the data release date (YYYY.MM.DD), newest wins.
+#
+# Each [[firmware]] entry matches firmware paths starting with `path` (a folder like
+# "rtl_nic/" or a file prefix like "iwlwifi-"). The longest matching path that has an
+# entry for the user's distro wins, so the `path = ""` entry is the fallback.
+# Family keys: arch, debian, ubuntu, fedora, opensuse. Unknown keys are ignored, so data
+# can add a family before the app knows it.
+#
+# Verification status:
+#   arch      checked against installed packages (pacman -Qo), 2026-11-02
+#   debian, ubuntu, fedora, opensuse   from distro package listings, NOT yet checked in
+#             containers (see docs/plan.md). Keep entries we aren't sure of out.
+schema = 1
+version = "2026.11.02"
+
+[notes]
+debian = "Debian keeps most firmware in the \"non-free-firmware\" section. It must be turned on in your software sources before these packages can be installed."
+
+# Fallback for anything not listed below.
+[[firmware]]
+path = ""
+arch = "linux-firmware"
+ubuntu = "linux-firmware"
+debian = "firmware-misc-nonfree"
+fedora = "linux-firmware"
+opensuse = "kernel-firmware-all"
+
+# AMD graphics
+[[firmware]]
+path = "amdgpu/"
+arch = "linux-firmware-amdgpu"
+debian = "firmware-amd-graphics"
+fedora = "amd-gpu-firmware"
+opensuse = "kernel-firmware-amdgpu"
+
+[[firmware]]
+path = "radeon/"
+arch = "linux-firmware-radeon"
+debian = "firmware-amd-graphics"
+fedora = "amd-gpu-firmware"
+opensuse = "kernel-firmware-radeon"
+
+[[firmware]]
+path = "amd/"
+arch = "linux-firmware-amd"
+
+[[firmware]]
+path = "amdnpu/"
+arch = "linux-firmware-amd"
+
+[[firmware]]
+path = "amdtee/"
+arch = "linux-firmware-amd"
+
+# NVIDIA (used by the open nouveau/nova drivers)
+[[firmware]]
+path = "nvidia/"
+arch = "linux-firmware-nvidia"
+fedora = "nvidia-gpu-firmware"
+opensuse = "kernel-firmware-nvidia"
+
+# Intel graphics, Wi-Fi, Bluetooth, and other Intel parts
+[[firmware]]
+path = "i915/"
+arch = "linux-firmware-intel"
+fedora = "intel-gpu-firmware"
+opensuse = "kernel-firmware-i915"
+
+[[firmware]]
+path = "xe/"
+arch = "linux-firmware-intel"
+fedora = "intel-gpu-firmware"
+
+[[firmware]]
+path = "iwlwifi-"
+arch = "linux-firmware-intel"
+debian = "firmware-iwlwifi"
+fedora = "iwlwifi-mvm-firmware"
+opensuse = "kernel-firmware-iwlwifi"
+
+[[firmware]]
+path = "intel/"
+arch = "linux-firmware-intel"
+opensuse = "kernel-firmware-intel"
+
+[[firmware]]
+path = "intel/sof"
+arch = "sof-firmware"
+debian = "firmware-sof-signed"
+fedora = "alsa-sof-firmware"
+opensuse = "sof-firmware"
+
+# Realtek network, Wi-Fi, and Bluetooth
+[[firmware]]
+path = "rtl_nic/"
+arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+fedora = "realtek-firmware"
+opensuse = "kernel-firmware-realtek"
+
+[[firmware]]
+path = "rtl_bt/"
+arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+fedora = "realtek-firmware"
+opensuse = "kernel-firmware-realtek"
+
+[[firmware]]
+path = "rtlwifi/"
+arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+fedora = "realtek-firmware"
+opensuse = "kernel-firmware-realtek"
+
+[[firmware]]
+path = "rtw88/"
+arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+fedora = "realtek-firmware"
+opensuse = "kernel-firmware-realtek"
+
+[[firmware]]
+path = "rtw89/"
+arch = "linux-firmware-realtek"
+debian = "firmware-realtek"
+fedora = "realtek-firmware"
+opensuse = "kernel-firmware-realtek"
+
+[[firmware]]
+path = "realtek/"
+arch = "linux-firmware-realtek"
+
+# MediaTek Wi-Fi and Bluetooth
+[[firmware]]
+path = "mediatek/"
+arch = "linux-firmware-mediatek"
+fedora = "mt7xxx-firmware"
+opensuse = "kernel-firmware-mediatek"
+
+# Qualcomm Atheros Wi-Fi and Bluetooth
+[[firmware]]
+path = "ath9k_htc/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+fedora = "atheros-firmware"
+
+[[firmware]]
+path = "ath10k/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+fedora = "atheros-firmware"
+opensuse = "kernel-firmware-ath10k"
+
+[[firmware]]
+path = "ath11k/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+fedora = "atheros-firmware"
+opensuse = "kernel-firmware-ath11k"
+
+[[firmware]]
+path = "ath12k/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+fedora = "atheros-firmware"
+opensuse = "kernel-firmware-ath12k"
+
+[[firmware]]
+path = "ath6k/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+
+[[firmware]]
+path = "ar3k/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+
+[[firmware]]
+path = "qca/"
+arch = "linux-firmware-atheros"
+debian = "firmware-atheros"
+fedora = "atheros-firmware"
+
+# Broadcom / Cypress Wi-Fi and network
+[[firmware]]
+path = "brcm/"
+arch = "linux-firmware-broadcom"
+debian = "firmware-brcm80211"
+fedora = "brcmfmac-firmware"
+opensuse = "kernel-firmware-brcm"
+
+[[firmware]]
+path = "cypress/"
+arch = "linux-firmware-broadcom"
+debian = "firmware-brcm80211"
+fedora = "brcmfmac-firmware"
+
+[[firmware]]
+path = "bnx2/"
+arch = "linux-firmware-broadcom"
+
+[[firmware]]
+path = "bnx2x/"
+arch = "linux-firmware-broadcom"
+
+[[firmware]]
+path = "tigon/"
+arch = "linux-firmware-broadcom"
+
+# Cirrus Logic audio (common in laptops)
+[[firmware]]
+path = "cirrus/"
+arch = "linux-firmware-cirrus"
+fedora = "cirrus-audio-firmware"
+
+[[firmware]]
+path = "sdca/"
+arch = "linux-firmware-cirrus"
+
+# Texas Instruments
+[[firmware]]
+path = "ti-connectivity/"
+arch = "linux-firmware-ti"
+fedora = "tiwilink-firmware"
+
+[[firmware]]
+path = "ti/"
+arch = "linux-firmware-ti"

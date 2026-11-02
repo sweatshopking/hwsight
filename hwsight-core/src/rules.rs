@@ -3,24 +3,9 @@
 //! A copy is built into the program. A newer valid copy in a data folder replaces it as a
 //! whole (newer data files are always complete supersets, so no merging is needed).
 
-use std::fs;
-use std::path::{Path, PathBuf};
-
 use serde::Deserialize;
 
-use crate::data::DataDirs;
-
-/// The rules file format this version of hwsight understands.
-pub const RULES_SCHEMA: u32 = 1;
-
-const EMBEDDED_RULES: &str = include_str!("../data/rules.toml");
-
-/// Where the rules in use came from.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DataSource {
-    Embedded,
-    File(PathBuf),
-}
+use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
 
 #[derive(Debug, Clone)]
 pub struct Rules {
@@ -41,7 +26,6 @@ struct NoDriverRule {
 /// Raw file layout. Hex IDs are strings so the file stays readable.
 #[derive(Debug, Deserialize)]
 struct RulesFile {
-    schema: u32,
     version: String,
     #[serde(default)]
     no_driver_needed: Vec<RawNoDriverRule>,
@@ -57,43 +41,53 @@ struct RawNoDriverRule {
     reason: String,
 }
 
-/// Why a rules file wasn't used.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RulesProblem {
-    /// Written for a newer hwsight; the user should update the app.
-    NewerSchema { path: PathBuf, schema: u32 },
-    /// Unreadable or broken.
-    Invalid { path: PathBuf, error: String },
+/// The parsed rule lists, without version info.
+#[derive(Debug, Clone)]
+struct RuleSet {
+    no_driver_needed: Vec<NoDriverRule>,
+}
+
+impl DataFile for RuleSet {
+    const FILE_NAME: &'static str = "rules.toml";
+    const SCHEMA: u32 = 1;
+    const EMBEDDED: &'static str = include_str!("../data/rules.toml");
+
+    fn parse_body(text: &str) -> Result<(String, Self), String> {
+        let raw: RulesFile = toml::from_str(text).map_err(|e| e.to_string())?;
+        let no_driver_needed = raw
+            .no_driver_needed
+            .into_iter()
+            .map(compile_rule)
+            .collect::<Result<_, _>>()?;
+        Ok((raw.version, Self { no_driver_needed }))
+    }
+
+    fn empty() -> Self {
+        Self {
+            no_driver_needed: Vec::new(),
+        }
+    }
 }
 
 impl Rules {
     /// The rules built into the program.
     pub fn embedded() -> Self {
-        match parse(EMBEDDED_RULES, DataSource::Embedded) {
-            Ok(rules) => rules,
-            // The embedded file is checked by a test, so this can't happen in a release.
-            // Still, never panic: run with no rules rather than not at all.
-            Err(_) => Self {
-                version: String::new(),
-                source: DataSource::Embedded,
-                no_driver_needed: Vec::new(),
-            },
-        }
+        Self::from_loaded(data::embedded::<RuleSet>())
     }
 
     /// The newest valid rules from the data folders or the built-in copy, plus any
     /// files that were skipped and why.
-    pub fn load(dirs: &DataDirs) -> (Self, Vec<RulesProblem>) {
-        let mut best = Self::embedded();
-        let mut problems = Vec::new();
-        for path in dirs.hwsight_files("rules.toml") {
-            match load_file(&path) {
-                Ok(rules) if rules.version > best.version => best = rules,
-                Ok(_) => {}
-                Err(problem) => problems.push(problem),
-            }
+    pub fn load(dirs: &DataDirs) -> (Self, Vec<DataProblem>) {
+        let (loaded, problems) = data::load_newest::<RuleSet>(dirs);
+        (Self::from_loaded(loaded), problems)
+    }
+
+    fn from_loaded(loaded: data::Loaded<RuleSet>) -> Self {
+        Self {
+            version: loaded.version,
+            source: loaded.source,
+            no_driver_needed: loaded.data.no_driver_needed,
         }
-        (best, problems)
     }
 
     /// If this device normally needs no driver, the plain-English reason why.
@@ -110,66 +104,6 @@ impl Rules {
             })
             .map(|r| r.reason.as_str())
     }
-}
-
-fn load_file(path: &Path) -> Result<Rules, RulesProblem> {
-    let invalid = |error: String| RulesProblem::Invalid {
-        path: path.to_path_buf(),
-        error,
-    };
-    let text = fs::read_to_string(path).map_err(|e| invalid(e.to_string()))?;
-    parse(&text, DataSource::File(path.to_path_buf())).map_err(|e| match e {
-        ParseError::NewerSchema(schema) => RulesProblem::NewerSchema {
-            path: path.to_path_buf(),
-            schema,
-        },
-        ParseError::Invalid(error) => invalid(error),
-    })
-}
-
-#[derive(Debug)]
-enum ParseError {
-    NewerSchema(u32),
-    Invalid(String),
-}
-
-fn parse(text: &str, source: DataSource) -> Result<Rules, ParseError> {
-    // Check the schema first, so a newer file is reported as "newer" even if its other
-    // fields have changed shape.
-    #[derive(Deserialize)]
-    struct SchemaOnly {
-        schema: u32,
-    }
-    let schema = toml::from_str::<SchemaOnly>(text)
-        .map_err(|e| ParseError::Invalid(e.to_string()))?
-        .schema;
-    if schema > RULES_SCHEMA {
-        return Err(ParseError::NewerSchema(schema));
-    }
-    if schema < RULES_SCHEMA {
-        return Err(ParseError::Invalid(format!("old format (schema {schema})")));
-    }
-
-    let raw: RulesFile = toml::from_str(text).map_err(|e| ParseError::Invalid(e.to_string()))?;
-    debug_assert_eq!(raw.schema, schema);
-    if !is_date_version(&raw.version) {
-        // Versions are compared as text to pick the newest, which only works for one format.
-        return Err(ParseError::Invalid(format!(
-            "version `{}` should look like 2026.11.02",
-            raw.version
-        )));
-    }
-    let no_driver_needed = raw
-        .no_driver_needed
-        .into_iter()
-        .map(compile_rule)
-        .collect::<Result<_, _>>()
-        .map_err(ParseError::Invalid)?;
-    Ok(Rules {
-        version: raw.version,
-        source,
-        no_driver_needed,
-    })
 }
 
 /// A rule with a bad ID rejects the whole file, so a broken download falls back to the
@@ -197,17 +131,6 @@ fn compile_rule(raw: RawNoDriverRule) -> Result<NoDriverRule, String> {
     Ok(rule)
 }
 
-/// `YYYY.MM.DD`, the format shared by every hwsight data file and `pci.ids`.
-pub(crate) fn is_date_version(v: &str) -> bool {
-    let b = v.as_bytes();
-    b.len() == 10
-        && b[4] == b'.'
-        && b[7] == b'.'
-        && b.iter()
-            .enumerate()
-            .all(|(i, c)| i == 4 || i == 7 || c.is_ascii_digit())
-}
-
 fn hex_u8(s: &str) -> Result<u8, String> {
     if s.len() != 2 {
         return Err(format!("`{s}` should be 2 hex digits"));
@@ -225,10 +148,16 @@ fn hex_u16(s: &str) -> Result<u16, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::path::Path;
 
     #[test]
     fn embedded_rules_are_valid() {
-        let rules = parse(EMBEDDED_RULES, DataSource::Embedded).expect("embedded rules parse");
+        assert!(
+            data::parse_data::<RuleSet>(RuleSet::EMBEDDED).is_ok(),
+            "embedded rules parse"
+        );
+        let rules = Rules::embedded();
         assert!(!rules.version.is_empty());
         // Host bridge: no driver needed. VGA controller: needs one.
         assert!(rules.no_driver_needed(0x060000, 0x1022, 0x14d8).is_some());
@@ -275,7 +204,7 @@ mod tests {
         assert_eq!(rules.source, DataSource::Embedded);
         assert!(matches!(
             problems.as_slice(),
-            [RulesProblem::NewerSchema { schema: 2, .. }]
+            [DataProblem::NewerSchema { schema: 2, .. }]
         ));
     }
 
@@ -288,10 +217,7 @@ mod tests {
         );
         let (rules, problems) = Rules::load(&DataDirs::only(tmp.path()));
         assert_eq!(rules.source, DataSource::Embedded);
-        assert!(matches!(
-            problems.as_slice(),
-            [RulesProblem::Invalid { .. }]
-        ));
+        assert!(matches!(problems.as_slice(), [DataProblem::Invalid { .. }]));
     }
 
     #[test]

@@ -4,6 +4,8 @@
 
 pub mod data;
 pub mod device;
+pub mod distro;
+pub mod firmware;
 pub mod kernel_log;
 pub mod modules;
 mod pci;
@@ -14,12 +16,14 @@ use std::path::PathBuf;
 
 use serde::Serialize;
 
-pub use data::DataDirs;
+pub use data::{DataDirs, DataProblem, DataSource};
 pub use device::{Bus, Category, Device, Status, short_vendor};
+pub use distro::{Distro, Family};
+pub use firmware::FirmwarePackages;
 pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
-pub use rules::{DataSource, Rules, RulesProblem};
+pub use rules::Rules;
 
 /// Everything a scan found, plus anything that limited it.
 #[derive(Debug, Serialize)]
@@ -29,6 +33,9 @@ pub struct ScanReport {
     pub data: DataInfo,
     /// Where problem explanations were read from; `None` if the log wasn't readable.
     pub kernel_log: Option<LogSource>,
+    pub distro: Distro,
+    /// Distro-specific advice for installing firmware, e.g. enabling a repository.
+    pub firmware_note: Option<String>,
 }
 
 /// Something the user (or a bug report) should know about the scan itself.
@@ -68,10 +75,20 @@ impl ScanNote {
     }
 }
 
+impl From<DataProblem> for ScanNote {
+    fn from(problem: DataProblem) -> Self {
+        match problem {
+            DataProblem::NewerSchema { path, schema } => Self::DataNeedsNewerApp { path, schema },
+            DataProblem::Invalid { path, error } => Self::DataInvalid { path, error },
+        }
+    }
+}
+
 /// Which data versions the scan used, so users and bug reports can see how fresh it is.
 #[derive(Debug, Serialize)]
 pub struct DataInfo {
     pub rules_version: String,
+    pub firmware_version: String,
     /// `None` means the built-in copy.
     pub rules_path: Option<PathBuf>,
     /// `pci.ids` files used, newest first. The built-in database is always the fallback.
@@ -101,6 +118,7 @@ pub struct Scanner {
     pub kernel_log: KernelLogInput,
     /// Folders the kernel loads firmware from.
     pub firmware_dirs: Vec<PathBuf>,
+    pub distro: Distro,
 }
 
 /// Where to get kernel log lines.
@@ -125,6 +143,7 @@ impl Scanner {
             kernel_cmdline: PathBuf::from("/proc/cmdline"),
             kernel_log: KernelLogInput::System,
             firmware_dirs: kernel_log::firmware_dirs(),
+            distro: Distro::detect(),
         }
     }
 
@@ -135,11 +154,14 @@ impl Scanner {
 
         let (rules, problems) = Rules::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(|p| match p {
-            RulesProblem::NewerSchema { path, schema } => {
+            DataProblem::NewerSchema { path, schema } => {
                 ScanNote::DataNeedsNewerApp { path, schema }
             }
-            RulesProblem::Invalid { path, error } => ScanNote::DataInvalid { path, error },
+            DataProblem::Invalid { path, error } => ScanNote::DataInvalid { path, error },
         }));
+
+        let (firmware, problems) = FirmwarePackages::load(&self.data_dirs);
+        notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
         let aliases = self
@@ -182,13 +204,44 @@ impl Scanner {
         };
         let mut issues = kernel_log::issues_by_device(&log_lines, &self.firmware_dirs);
         for device in &mut devices {
-            if let Some(found) = issues.remove(&device.address) {
+            if let Some(mut found) = issues.remove(&device.address) {
+                for issue in &mut found {
+                    if let LogIssue::MissingFirmware {
+                        file,
+                        package,
+                        install_command,
+                        ..
+                    } = issue
+                    {
+                        *package = firmware
+                            .package_for(file, self.distro.family)
+                            .map(str::to_owned);
+                        *install_command = package.as_deref().and_then(|p| {
+                            self.distro.family.install_command(p, self.distro.immutable)
+                        });
+                    }
+                }
                 device.log_issues = found;
             }
         }
+        let firmware_note = devices
+            .iter()
+            .flat_map(|d| &d.log_issues)
+            .any(|i| {
+                matches!(
+                    i,
+                    LogIssue::MissingFirmware {
+                        package: Some(_),
+                        ..
+                    }
+                )
+            })
+            .then(|| firmware.note(self.distro.family).map(str::to_owned))
+            .flatten();
 
         let data = DataInfo {
             rules_version: rules.version.clone(),
+            firmware_version: firmware.version.clone(),
             rules_path: match &rules.source {
                 DataSource::Embedded => None,
                 DataSource::File(p) => Some(p.clone()),
@@ -208,6 +261,8 @@ impl Scanner {
             notes,
             data,
             kernel_log: log_source,
+            distro: self.distro.clone(),
+            firmware_note,
         }
     }
 }
@@ -262,6 +317,7 @@ mod tests {
                 "r8169 0000:07:00.0: probe with driver r8169 failed with error -2".into(),
             ]),
             firmware_dirs: vec![root.join("firmware")],
+            distro: Distro::from_os_release("ID=debian\n", false),
         };
         let report = scanner.scan();
         assert!(report.notes.is_empty(), "{:?}", report.notes);
@@ -271,10 +327,22 @@ mod tests {
         assert_eq!(nic.status, Status::DriverNotAttached);
         assert_eq!(nic.category, Category::Network);
         assert_eq!(nic.log_issues.len(), 2);
-        assert!(
-            nic.log_issues[0]
-                .message()
-                .contains("rtl_nic/rtl8125b-2.fw")
+        assert_eq!(
+            nic.log_issues[0].message(),
+            "The driver needs a firmware file that isn't installed: rtl_nic/rtl8125b-2.fw. \
+             It comes in the firmware-realtek package."
         );
+        assert!(matches!(
+            &nic.log_issues[0],
+            LogIssue::MissingFirmware { package: Some(p), install_command: Some(c), .. }
+                if p == "firmware-realtek" && c == "sudo apt install firmware-realtek"
+        ));
+        assert!(
+            report
+                .firmware_note
+                .as_deref()
+                .is_some_and(|n| n.contains("non-free-firmware"))
+        );
+        assert_eq!(report.distro.family, Family::Debian);
     }
 }

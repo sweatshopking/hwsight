@@ -9,7 +9,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::data::DataDirs;
-use crate::rules::is_date_version;
+use crate::data::is_date_version;
 
 /// Name lookups for PCI IDs.
 #[derive(Debug)]
