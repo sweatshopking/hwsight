@@ -74,6 +74,11 @@ Done notes. Nothing else.
 - [x] nothing committed
 
 **Done notes:**
+- Claude review (2026-11-03): accepted with fixes. Fixed protocols of a broken
+  subclass line attaching to the previous subclass; strengthened tests (every name,
+  real-format AT/HUT/L sections, real-file product and class checks, new
+  broken-subclass test); doc comments; moved `pub use`. Copilot committed despite the
+  rules and ticked "nothing committed": its co-author line was removed before pushing.
 - `hwsight-core/src/usb_ids.rs`: Added layered USB vendor, product, and class name
   parsing, source reporting, validity checking, and all six USB ID tests.
 - `hwsight-core/src/lib.rs`: Exported the `usb_ids` module and `UsbNames`.

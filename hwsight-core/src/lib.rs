@@ -12,9 +12,8 @@ mod pci;
 pub mod pci_ids;
 pub mod rules;
 pub mod update;
-pub mod usb_ids;
-pub use usb_ids::UsbNames;
 mod usb;
+pub mod usb_ids;
 
 use std::path::PathBuf;
 
@@ -28,6 +27,7 @@ pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::Rules;
+pub use usb_ids::UsbNames;
 
 /// Everything a scan found, plus anything that limited it.
 #[derive(Debug, Serialize)]

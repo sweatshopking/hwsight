@@ -1,4 +1,7 @@
 //! Human-readable names for USB vendors, products, and classes.
+//!
+//! Loaded the same way as PCI names: every `usb.ids` found, newest first, with older
+//! files filling gaps. See `pci_ids.rs`.
 
 use std::collections::HashMap;
 use std::fs;
@@ -50,14 +53,18 @@ impl UsbNames {
             .collect()
     }
 
+    /// The vendor's name, e.g. `046d` -> "Logitech, Inc.".
     pub fn vendor(&self, vid: u16) -> Option<String> {
         self.find(|db| db.vendors.get(&vid).cloned())
     }
 
+    /// The product's name, e.g. `046d:c52b` -> "Unifying Receiver".
     pub fn product(&self, vid: u16, pid: u16) -> Option<String> {
         self.find(|db| db.products.get(&(vid, pid)).cloned())
     }
 
+    /// The most specific name known for an interface class: protocol, else subclass,
+    /// else class.
     pub fn class(&self, class: u8, subclass: u8, protocol: u8) -> Option<String> {
         self.find(|db| db.protocols.get(&(class, subclass, protocol)).cloned())
             .or_else(|| self.find(|db| db.subclasses.get(&(class, subclass)).cloned()))
@@ -83,6 +90,7 @@ fn load_layer(path: &Path) -> Option<IdsLayer> {
     })
 }
 
+/// Whether text parses as a `usb.ids` file with at least one vendor.
 pub(crate) fn looks_valid(text: &str) -> bool {
     !UsbIdsDb::parse(text).vendors.is_empty()
 }
@@ -156,6 +164,9 @@ impl UsbIdsDb {
                     }
                 }
                 Section::Classes if depth == 1 => {
+                    // A broken subclass line must not leave its protocols attached to the
+                    // previous subclass.
+                    subclass = None;
                     if let (Some(cid), Some((sid, name))) = (
                         class,
                         split_id(body).and_then(|(id, name)| parse_byte(id).map(|id| (id, name))),
@@ -233,10 +244,17 @@ C 03  Human Interface Device
 
     #[test]
     fn parses_vendors_and_products() {
-        let names = UsbNames::from_files(&[]);
         let db = UsbIdsDb::parse(SAMPLE);
         assert_eq!(db.vendors.len(), 2);
-        assert_eq!(names.vendor(0x1d6b), None);
+        assert_eq!(db.products.len(), 4);
+        assert_eq!(
+            db.vendors.get(&0x046d).map(String::as_str),
+            Some("Logitech, Inc.")
+        );
+        assert_eq!(
+            db.products.get(&(0x046d, 0xc534)).map(String::as_str),
+            Some("Unifying Receiver")
+        );
         assert_eq!(
             db.vendors.get(&0x1d6b).map(String::as_str),
             Some("Linux Foundation")
@@ -282,10 +300,14 @@ C 03  Human Interface Device
 
     #[test]
     fn other_sections_are_ignored() {
+        // Same shape as the real file: top-level "AT 0101  ..." lines, and indented
+        // usages under "HUT" and dialects under "L".
         let db = UsbIdsDb::parse(
             "1d6b  Linux Foundation\n\t0001  Root hub\n\
 C 03  Human Interface Device\n\t01  Boot Interface\n\t\t01  Keyboard\n\
-AT\n\t0001  Attribute\nHID\n\t0002  HID item\nHUT\n\t0003  Usage\nL\n\t0004  Language\n",
+AT 0101  USB Streaming\nHID 01  HID\nR 00  Not Specified\n\
+HUT 01  Generic Desktop Controls\n\t001  Pointer\n\t002  Mouse\n\
+L 0001  Arabic\n\t01  Saudi Arabia\n\t02  Iraq\n",
         );
         assert_eq!(db.vendors.len(), 1);
         assert_eq!(db.products.len(), 1);
@@ -329,5 +351,24 @@ AT\n\t0001  Attribute\nHID\n\t0002  HID item\nHUT\n\t0003  Usage\nL\n\t0004  Lan
         }
         let names = UsbNames::from_files(&[path.to_path_buf()]);
         assert_eq!(names.vendor(0x1d6b).as_deref(), Some("Linux Foundation"));
+        assert_eq!(
+            names.product(0x1d6b, 0x0002).as_deref(),
+            Some("2.0 root hub")
+        );
+        assert_eq!(names.class(0x03, 0x00, 0x01).as_deref(), Some("Keyboard"));
+        assert_eq!(
+            names.class(0x09, 0x00, 0x00).as_deref(),
+            Some("Full speed (or root) hub")
+        );
+        assert!(names.sources()[0].version.is_some());
+    }
+
+    #[test]
+    fn broken_subclass_line_drops_its_protocols() {
+        let db = UsbIdsDb::parse(
+            "1d6b  Linux Foundation\nC 03  HID\n\t01  Boot\n\t\t01  Keyboard\n\tzz  Broken\n\t\t02  Mouse\n",
+        );
+        assert_eq!(db.protocols.len(), 1);
+        assert_eq!(db.protocols.get(&(3, 1, 2)), None);
     }
 }
