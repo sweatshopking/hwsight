@@ -16,32 +16,7 @@ pub struct View {
 
 pub fn view(report: &ScanReport) -> View {
     let devices: Vec<DeviceItem> = report.devices.iter().map(device_item).collect();
-
-    // Devices arrive sorted by category, so a heading goes before each new category.
-    let mut rows = Vec::new();
-    let mut i = 0;
-    while i < report.devices.len() {
-        let category = report.devices[i].category;
-        let count = report.devices[i..]
-            .iter()
-            .take_while(|d| d.category == category)
-            .count();
-        rows.push(Row {
-            is_header: true,
-            header_text: category.label().into(),
-            header_count: count as i32,
-            device: -1,
-        });
-        for index in i..i + count {
-            rows.push(Row {
-                is_header: false,
-                header_text: Default::default(),
-                header_count: 0,
-                device: index as i32,
-            });
-        }
-        i += count;
-    }
+    let rows = filter_rows(&report.devices, "", false);
 
     let problems = report
         .devices
@@ -72,6 +47,63 @@ pub fn view(report: &ScanReport) -> View {
         problem_count: problems as i32,
         notes,
     }
+}
+
+/// List rows (a heading per category, then its devices) for the devices that match.
+/// Every word of `query` must appear, ignoring case, in the name, maker, category,
+/// hardware ID, or driver. `Row.device` always indexes the full `devices` list.
+pub fn filter_rows(devices: &[Device], query: &str, only_problems: bool) -> Vec<Row> {
+    let words: Vec<String> = query.split_whitespace().map(str::to_lowercase).collect();
+    let mut rows: Vec<Row> = Vec::new();
+    let mut category: Option<hwsight_core::Category> = None;
+    let mut category_start = 0;
+    let mut category_count = 0;
+
+    for (index, device) in devices.iter().enumerate() {
+        let fields = [
+            device.display_name.to_lowercase(),
+            device
+                .vendor_name
+                .as_deref()
+                .unwrap_or_default()
+                .to_lowercase(),
+            device.category.label().to_lowercase(),
+            device.hardware_id.to_lowercase(),
+            device.driver.as_deref().unwrap_or_default().to_lowercase(),
+        ];
+        let matches = (!only_problems || device.status.is_problem())
+            && words
+                .iter()
+                .all(|word| fields.iter().any(|field| field.contains(word)));
+        if !matches {
+            continue;
+        }
+        if category != Some(device.category) {
+            if category.is_some() {
+                rows[category_start].header_count = category_count;
+            }
+            category = Some(device.category);
+            category_start = rows.len();
+            category_count = 0;
+            rows.push(Row {
+                is_header: true,
+                header_text: device.category.label().into(),
+                header_count: 0,
+                device: -1,
+            });
+        }
+        rows.push(Row {
+            is_header: false,
+            header_text: Default::default(),
+            header_count: 0,
+            device: index as i32,
+        });
+        category_count += 1;
+    }
+    if category.is_some() {
+        rows[category_start].header_count = category_count;
+    }
+    rows
 }
 
 /// "ok", "warn", "error", or "neutral": picks the status colour in the UI.
@@ -244,5 +276,104 @@ mod tests {
         ] {
             assert_eq!(status_kind(status), kind, "{status:?}");
         }
+    }
+
+    #[test]
+    fn empty_query_matches_everything() {
+        let report = report();
+        let rows = filter_rows(&report.devices, "", false);
+        assert_eq!(rows.len(), 4);
+    }
+
+    /// Each word must be matched through the field under test only.
+    #[test]
+    fn each_field_is_searched_on_its_own() {
+        let report = report();
+        let mut devices = report.devices.clone();
+        devices[0].display_name = "Video card".into();
+        devices[0].vendor_name = Some("NVIDIA Corporation".into());
+        devices[0].driver = Some("nvidia".into());
+        devices[1].display_name = "Wired port".into();
+        devices[1].vendor_name = Some("Realtek".into());
+        devices[1].driver = Some("r8169".into());
+        let only = |q: &str| -> Vec<i32> {
+            filter_rows(&devices, q, false)
+                .iter()
+                .filter(|r| !r.is_header)
+                .map(|r| r.device)
+                .collect()
+        };
+        assert_eq!(only("corporation"), [0]); // maker only
+        assert_eq!(only("GRAPHICS"), [0]); // category only, any case
+        assert_eq!(only("10de:2c05"), [0]); // hardware ID only
+        assert_eq!(only("r8169"), [1]); // driver only
+        assert_eq!(only("realtek wired"), [1]); // both words, different fields
+        assert_eq!(only("realtek video"), Vec::<i32>::new()); // words on different devices
+        assert_eq!(only("   "), [0, 1]); // blank query matches everything
+    }
+
+    #[test]
+    fn counts_only_matching_devices_in_a_shared_category() {
+        let report = report();
+        let mut devices = report.devices.clone();
+        let mut second_gpu = devices[0].clone();
+        second_gpu.display_name = "Other GPU".into();
+        devices.insert(1, second_gpu);
+        let all = filter_rows(&devices, "", false);
+        assert_eq!(all[0].header_count, 2);
+        let some = filter_rows(&devices, "other", false);
+        assert_eq!(some.len(), 2);
+        assert_eq!(some[0].header_count, 1);
+        assert_eq!(some[1].device, 1);
+    }
+
+    #[test]
+    fn words_match_any_field_ignoring_case() {
+        let report = report();
+        let mut devices = report.devices.clone();
+        devices[0].display_name = "NVIDIA graphics".into();
+        devices[0].vendor_name = Some("NVIDIA".into());
+        devices[0].driver = Some("nvidia".into());
+        devices[1].vendor_name = Some("Realtek".into());
+        devices[1].display_name = "RTL8125 network controller".into();
+        devices[1].driver = Some("r8169".into());
+        assert_eq!(filter_rows(&devices, "nvidia", false)[1].device, 0);
+        assert_eq!(filter_rows(&devices, "realtek 8125", false)[1].device, 1);
+        assert_eq!(filter_rows(&devices, "graphics", false)[1].device, 0);
+        assert_eq!(filter_rows(&devices, "GRAPHICS", false)[1].device, 0);
+        assert_eq!(filter_rows(&devices, "10de:2c05", false)[1].device, 0);
+        assert_eq!(filter_rows(&devices, "r8169", false)[1].device, 1);
+    }
+
+    #[test]
+    fn only_problems_hides_working_devices() {
+        let report = report();
+        let rows = filter_rows(&report.devices, "", true);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[1].device, 1);
+    }
+
+    #[test]
+    fn headings_only_for_categories_with_matches_and_counts_are_right() {
+        let report = report();
+        let rows = filter_rows(&report.devices, "nvidia", false);
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].header_text, "Graphics");
+        assert_eq!(rows[0].header_count, 1);
+    }
+
+    #[test]
+    fn row_indexes_point_into_the_full_list() {
+        let report = report();
+        let rows = filter_rows(&report.devices, "network", false);
+        assert_eq!(rows[1].device, 1);
+        assert!(rows[1].device < report.devices.len() as i32);
+    }
+
+    #[test]
+    fn view_uses_filter_rows() {
+        let report = report();
+        let v = view(&report);
+        assert_eq!(v.rows, filter_rows(&report.devices, "", false));
     }
 }

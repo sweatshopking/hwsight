@@ -2,7 +2,10 @@
 
 mod model;
 
-use std::rc::Rc;
+use std::{
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 use slint::{ComponentHandle, ModelRc, SharedString, VecModel};
 
@@ -16,10 +19,15 @@ use ui::{AppWindow, DeviceItem, Row};
 
 fn main() -> Result<(), slint::PlatformError> {
     let window = AppWindow::new()?;
+    let devices = Arc::new(Mutex::new(Vec::new()));
 
     let weak = window.as_weak();
-    window.on_refresh(move || start_scan(weak.clone()));
-    start_scan(window.as_weak());
+    let scan_devices = devices.clone();
+    window.on_refresh(move || start_scan(weak.clone(), scan_devices.clone()));
+    let filter_window = window.as_weak();
+    let filter_devices = devices.clone();
+    window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
+    start_scan(window.as_weak(), devices);
 
     // Developer aid for reviews: HWSIGHT_SNAPSHOT=out.ppm saves a picture of the window
     // after the first scan and quits; HWSIGHT_SELECT=<n> selects device n first. This
@@ -72,8 +80,16 @@ fn write_ppm(path: &std::path::Path, width: u32, height: u32, rgba: &[u8]) -> Re
     std::fs::write(path, out).map_err(|e| e.to_string())
 }
 
+/// Rebuild the list rows from the last scan using the current search and toggle.
+fn apply_filter(window: &slint::Weak<AppWindow>, devices: &Arc<Mutex<Vec<hwsight_core::Device>>>) {
+    let Some(w) = window.upgrade() else { return };
+    let Ok(devices) = devices.lock() else { return };
+    let rows = model::filter_rows(&devices, w.get_query().as_str(), w.get_only_problems());
+    w.set_rows(ModelRc::from(Rc::new(VecModel::from(rows))));
+}
+
 /// Scan on a background thread so the window stays responsive, then show the result.
-fn start_scan(window: slint::Weak<AppWindow>) {
+fn start_scan(window: slint::Weak<AppWindow>, devices: Arc<Mutex<Vec<hwsight_core::Device>>>) {
     if let Some(w) = window.upgrade() {
         if w.get_scanning() {
             return;
@@ -83,10 +99,14 @@ fn start_scan(window: slint::Weak<AppWindow>) {
     std::thread::spawn(move || {
         let report = hwsight_core::scan();
         let view = model::view(&report);
+        let scanned_devices = report.devices.clone();
         // Slint models must be built on the UI thread, so send plain data across.
         let _ = slint::invoke_from_event_loop(move || {
             let Some(w) = window.upgrade() else { return };
             let device_count = view.devices.len() as i32;
+            if let Ok(mut stored_devices) = devices.lock() {
+                *stored_devices = scanned_devices;
+            }
             w.set_devices(ModelRc::from(Rc::new(VecModel::from(view.devices))));
             w.set_rows(ModelRc::from(Rc::new(VecModel::from(view.rows))));
             w.set_summary(view.summary.into());
@@ -96,6 +116,7 @@ fn start_scan(window: slint::Weak<AppWindow>) {
             if w.get_selected() >= device_count {
                 w.set_selected(-1);
             }
+            apply_filter(&window, &devices);
             w.set_scanning(false);
         });
     });

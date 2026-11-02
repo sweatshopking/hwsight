@@ -1,0 +1,42 @@
+import { Theme } from "../theme.slint";
+
+// A rounded search field. A plain TextInput is used (not LineEdit, which draws its own
+// frame inside ours), with a placeholder shown while it's empty.
+export component SearchBox inherits Rectangle {
+    in-out property <string> text;
+    height: 36px;
+    background: Theme.surface-raised;
+    border-radius: 18px;
+    border-width: 1px;
+    border-color: input.has-focus ? Theme.accent-start : Theme.border;
+    animate border-color { duration: 120ms; }
+
+    TouchArea {
+        mouse-cursor: MouseCursor.text;
+        clicked => { input.focus(); }
+    }
+
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 14px;
+        Rectangle {
+            if root.text == "" : Text {
+                width: parent.width;
+                height: parent.height;
+                text: "Search devices";
+                color: Theme.text-faint;
+                font-size: Theme.font-body;
+                vertical-alignment: center;
+            }
+            input := TextInput {
+                width: parent.width;
+                height: parent.height;
+                text <=> root.text;
+                single-line: true;
+                color: Theme.text;
+                font-size: Theme.font-body;
+                vertical-alignment: center;
+            }
+        }
+    }
+}

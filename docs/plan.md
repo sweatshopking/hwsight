@@ -544,12 +544,43 @@ Done notes.
 
 **Done when:**
 
-- [ ] steps 1 to 6 done, all six tests exist and pass
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] Done notes filled in; nothing pushed, no co-author line
+- [x] steps 1 to 6 done, all six tests exist and pass
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): accepted with fixes; filter logic correct and process
+  followed. Fixed: "Nothing matches." was inside the list loop, so it could never show
+  (now an overlay on the empty list); the search box wrapped a framed LineEdit (double
+  outline, unthemed placeholder), now a plain TextInput with a Theme placeholder; search
+  and switch moved into the device panel as specified; a doc comment had moved onto the
+  wrong function. Tests strengthened: each field matched on its own, words spread over
+  different devices, and partial matches inside a shared category.
+
+Step 1: done in `hwsight-gui/src/model.rs` - Added case-insensitive, multi-word device filtering with problem filtering, category headings, counts, and full-list indexes.
+Step 2: done in `hwsight-gui/src/model.rs` - Refactored `view()` to build rows through `filter_rows`.
+Step 3: done in `hwsight-gui/src/main.rs` - Retained the latest scan devices in shared state for filter-only updates.
+Step 4: done in `hwsight-gui/src/main.rs` and `hwsight-gui/ui/app.slint` - Added query and problem-toggle properties, filter callback wiring, and re-filtering after scans.
+Step 5: done in `hwsight-gui/ui/components/search-box.slint` and `hwsight-gui/ui/app.slint` - Added the themed search box and Only problems switch above the device list.
+Step 6: done in `hwsight-gui/ui/app.slint` - Added the centered Nothing matches empty-results message.
+
+`tools/check.sh` output:
+```text
+PASS  cargo fmt --check
+PASS  cargo clippy (no warnings)
+PASS  cargo test
+PASS  GUI builds
+PASS  GUI opens and stays open
+PASS  no hex colours in components
+PASS  Theme and DeviceItem defined only in ui/theme.slint
+PASS  components never import app.slint
+PASS  no colours passed into components as properties (use Theme)
+PASS  no built-in elements redefined
+PASS  every list item sets a height
+
+ALL CHECKS PASSED
+```
 
 ## Claude 8: GUI skeleton (done 2026-11-03)
 
