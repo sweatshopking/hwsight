@@ -79,6 +79,8 @@ struct RulesFile {
     no_driver_needed: Vec<RawNoDriverRule>,
     #[serde(default)]
     expect_interface: Vec<RawInterfaceRule>,
+    #[serde(default)]
+    usb_generic_names: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -111,6 +113,8 @@ struct RawInterfaceRule {
 pub(crate) struct RuleSet {
     no_driver_needed: Vec<NoDriverRule>,
     expect_interface: Vec<InterfaceRule>,
+    /// Normalised (see `normalize_name`) product names too vague to show on their own.
+    usb_generic_names: Vec<String>,
 }
 
 impl DataFile for RuleSet {
@@ -162,11 +166,18 @@ impl DataFile for RuleSet {
                 })
             })
             .collect::<Result<_, String>>()?;
+        let usb_generic_names = raw
+            .usb_generic_names
+            .iter()
+            .map(|n| normalize_name(n))
+            .filter(|n| !n.is_empty())
+            .collect();
         Ok((
             raw.version,
             Self {
                 no_driver_needed,
                 expect_interface,
+                usb_generic_names,
             },
         ))
     }
@@ -175,6 +186,7 @@ impl DataFile for RuleSet {
         Self {
             no_driver_needed: Vec::new(),
             expect_interface: Vec::new(),
+            usb_generic_names: Vec::new(),
         }
     }
 }
@@ -215,6 +227,13 @@ impl Rules {
             .map(|r| r.reason.as_str())
     }
 
+    /// Whether a name a USB device reports about itself is too vague to show on its own,
+    /// like "Controller" or "Wireless_Device".
+    pub fn is_generic_usb_name(&self, name: &str) -> bool {
+        let name = normalize_name(name);
+        name.is_empty() || self.set.usb_generic_names.contains(&name)
+    }
+
     /// What a working driver should have created for this device, if we know.
     pub fn expected_interface(
         &self,
@@ -231,6 +250,16 @@ impl Rules {
                 what: &r.what,
             })
     }
+}
+
+/// Lowercase, with `_` and `-` as spaces and runs of spaces collapsed, so
+/// "Wireless_Device" and "wireless  device" compare equal.
+fn normalize_name(name: &str) -> String {
+    name.to_lowercase()
+        .replace(['_', '-'], " ")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// A rule with a bad ID rejects the whole file, so a broken download falls back to the
@@ -444,6 +473,17 @@ mod tests {
             "USB4/Thunderbolt hosts don't create USB buses"
         );
         assert_eq!(iface(0x060000), None);
+    }
+
+    #[test]
+    fn generic_usb_names() {
+        let rules = Rules::embedded();
+        assert!(rules.is_generic_usb_name("Wireless_Device"));
+        assert!(rules.is_generic_usb_name("  USB   Receiver "));
+        assert!(rules.is_generic_usb_name("Controller"));
+        assert!(rules.is_generic_usb_name(""));
+        assert!(!rules.is_generic_usb_name("Lenovo Performance Camera"));
+        assert!(!rules.is_generic_usb_name("AURA LED Controller"));
     }
 
     #[test]

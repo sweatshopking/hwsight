@@ -15,6 +15,7 @@ use std::path::Path;
 use crate::device::{Bus, Category, Device, Status, diagnose, short_vendor};
 use crate::modules::{AliasDb, Blocklist, DriverCandidate};
 use crate::rules::Rules;
+use crate::usb_ids::UsbNames;
 
 /// The Linux Foundation's vendor ID, used by the virtual "root hubs" inside every USB
 /// controller. Those are already listed as the controller itself, so we skip them.
@@ -35,6 +36,7 @@ struct Interface {
 /// Read every USB device under `devices_dir` (normally `/sys/bus/usb/devices`).
 pub(crate) fn scan(
     devices_dir: &Path,
+    names: &UsbNames,
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
@@ -54,7 +56,7 @@ pub(crate) fn scan(
             continue;
         }
         let path = fs::canonicalize(entry.path()).unwrap_or_else(|_| entry.path());
-        if let Some(device) = read_device(&path, name, aliases, blocklist, rules) {
+        if let Some(device) = read_device(&path, name, names, aliases, blocklist, rules) {
             devices.push(device);
         }
     }
@@ -64,6 +66,7 @@ pub(crate) fn scan(
 fn read_device(
     path: &Path,
     address: String,
+    names: &UsbNames,
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
@@ -135,8 +138,26 @@ fn read_device(
     };
 
     let category = category(device_class, &interfaces);
-    let vendor_name = manufacturer.clone();
-    let display_name = display_name(product.as_deref(), manufacturer.as_deref(), category);
+
+    // Prefer what the device says about itself: some devices borrow another maker's IDs
+    // (many game pads report as an Xbox 360 controller), so the database can be wrong
+    // about them. Use the database when the device's own name is missing or too vague.
+    let own_product = product.clone().filter(|p| !rules.is_generic_usb_name(p));
+    let db_product = names.product(vendor_id, product_id);
+    let vendor_name = manufacturer
+        .clone()
+        .filter(|m| !rules.is_generic_usb_name(m))
+        .or_else(|| names.vendor(vendor_id));
+    let class_name = interfaces
+        .first()
+        .and_then(|i| names.class(i.class, i.subclass, i.protocol));
+    let display_name = display_name(
+        own_product.as_deref().or(db_product.as_deref()),
+        product.is_some(),
+        vendor_name.as_deref(),
+        category,
+    );
+    let unrecognized = own_product.is_none() && db_product.is_none();
 
     Some(Device {
         bus: Bus::Usb,
@@ -144,13 +165,12 @@ fn read_device(
         sysfs_path: path.to_path_buf(),
         display_name,
         vendor_name,
-        product_name: product.clone(),
+        product_name: own_product.or(db_product),
         model_name: None,
-        class_name: None,
+        class_name,
         category,
         hardware_id: format!("{vendor_id:04x}:{product_id:04x}"),
-        // Names come from the device itself; the ID database only fills gaps later.
-        unrecognized: product.is_none(),
+        unrecognized,
         modalias: interfaces.first().and_then(|i| i.modalias.clone()),
         driver,
         driver_candidates: candidates,
@@ -246,17 +266,30 @@ fn category(device_class: u8, interfaces: &[Interface]) -> Category {
 }
 
 /// The device's own product name, or a description built from what we know.
-fn display_name(product: Option<&str>, manufacturer: Option<&str>, category: Category) -> String {
+/// The best name: a specific product name if we have one; otherwise a description
+/// from the maker and the kind of device. "Unknown" only when the device gave no name
+/// at all (a vague one like "Controller" still tells us it identified itself).
+fn display_name(
+    product: Option<&str>,
+    gave_a_name: bool,
+    vendor: Option<&str>,
+    category: Category,
+) -> String {
     if let Some(product) = product {
         return product.to_owned();
     }
     let kind = match category {
-        Category::Other => "USB device".to_owned(),
-        other => format!("USB {}", other.singular()),
+        Category::Other => "USB device",
+        other => other.singular(),
     };
-    match manufacturer {
-        Some(m) => format!("Unknown {} {kind}", short_vendor(m)),
-        None => format!("Unknown {kind}"),
+    let described = match vendor {
+        Some(v) => format!("{} {kind}", short_vendor(v)),
+        None => format!("USB {kind}").replace("USB USB", "USB"),
+    };
+    if gave_a_name {
+        described
+    } else {
+        format!("Unknown {described}")
     }
 }
 
@@ -378,7 +411,15 @@ mod tests {
             let db = AliasDb::load(&modules, &modules, "usb:");
             let rules = Rules::load(&DataDirs::only(Path::new("/nonexistent"))).0;
             let blocklist = Blocklist::load(&[], Some(cmdline));
-            scan(&self.root, db.as_ref(), &blocklist, &rules).expect("scan")
+            let ids = self.root.parent().expect("parent").join("usb.ids");
+            fs::write(
+                &ids,
+                "# Version: 2026.01.01\n045e  Microsoft Corp.\n\t028e  Xbox360 Controller\n\
+                 0bda  Realtek Semiconductor Corp.\nC 03  Human Interface Device\n\t00  No Subclass\n",
+            )
+            .expect("write");
+            let names = UsbNames::from_files(&[ids]);
+            scan(&self.root, &names, db.as_ref(), &blocklist, &rules).expect("scan")
         }
     }
 
@@ -437,19 +478,35 @@ mod tests {
         assert_eq!(aura.driver.as_deref(), Some("usbhid"));
         assert_eq!(aura.category, Category::Input);
         assert_eq!(aura.display_name, "AURA LED Controller");
+        assert_eq!(aura.class_name, None); // first interface is vendor-specific (ff)
 
         let bt = find(&devices, "1-5");
         assert_eq!(bt.status, Status::Working);
         assert_eq!(bt.category, Category::Bluetooth);
+        // "Wireless_Device" is vague and the database has no name: describe it.
+        assert_eq!(bt.display_name, "Maker Bluetooth device");
+        assert!(bt.unrecognized);
 
         let pad = find(&devices, "5-2");
         assert_eq!(pad.status, Status::Working);
         assert_eq!(pad.category, Category::Input);
+        // "Controller" is too vague, so the database name is used; the maker the
+        // device reported is kept (it borrows Microsoft's IDs).
+        assert_eq!(pad.display_name, "Xbox360 Controller");
+        assert_eq!(pad.vendor_name.as_deref(), Some("Maker Inc."));
+        assert!(!pad.unrecognized);
 
         let wifi = find(&devices, "1-3");
         assert_eq!(wifi.status, Status::NoDriver);
         assert!(wifi.unrecognized);
-        assert_eq!(wifi.display_name, "Unknown USB device");
+        assert_eq!(
+            wifi.display_name,
+            "Unknown Realtek Semiconductor USB device"
+        );
+        assert_eq!(
+            wifi.vendor_name.as_deref(),
+            Some("Realtek Semiconductor Corp.")
+        );
         assert_eq!(wifi.hardware_id, "0bda:b812");
 
         let blocked = find(&devices, "1-4");
@@ -473,10 +530,39 @@ mod tests {
     }
 
     #[test]
+    fn names_when_nothing_specific_is_known() {
+        assert_eq!(
+            display_name(None, false, None, Category::Other),
+            "Unknown USB device"
+        );
+        assert_eq!(
+            display_name(None, true, None, Category::Other),
+            "USB device"
+        );
+        assert_eq!(
+            display_name(None, true, None, Category::Camera),
+            "USB camera"
+        );
+        assert_eq!(
+            display_name(None, true, Some("MediaTek Inc."), Category::Bluetooth),
+            "MediaTek Bluetooth device"
+        );
+        assert_eq!(
+            display_name(None, false, Some("Logitech, Inc."), Category::Input),
+            "Unknown Logitech input device"
+        );
+        assert_eq!(
+            display_name(Some("Logi Bolt Receiver"), true, None, Category::Input),
+            "Logi Bolt Receiver"
+        );
+    }
+
+    #[test]
     fn missing_usb_folder_is_empty() {
         let rules = Rules::embedded();
         let devices = scan(
             Path::new("/nonexistent/usb"),
+            &UsbNames::embedded(),
             None,
             &Blocklist::default(),
             &rules,

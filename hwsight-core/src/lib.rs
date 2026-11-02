@@ -111,6 +111,8 @@ pub struct DataInfo {
     pub rules_path: Option<PathBuf>,
     /// `pci.ids` files used, newest first. The built-in database is always the fallback.
     pub pci_ids: Vec<IdsSourceInfo>,
+    /// `usb.ids` files used, newest first.
+    pub usb_ids: Vec<IdsSourceInfo>,
 }
 
 #[derive(Debug, Serialize)]
@@ -205,7 +207,14 @@ impl Scanner {
                 error: e.to_string(),
             }),
         }
-        match usb::scan(&self.usb_devices, usb_aliases.as_ref(), &blocklist, &rules) {
+        let usb_names = UsbNames::load(&self.data_dirs);
+        match usb::scan(
+            &self.usb_devices,
+            &usb_names,
+            usb_aliases.as_ref(),
+            &blocklist,
+            &rules,
+        ) {
             Ok(found) => devices.extend(found),
             Err(e) => notes.push(ScanNote::UsbUnreadable {
                 error: e.to_string(),
@@ -300,6 +309,14 @@ impl Scanner {
                 DataSource::File(p) => Some(p.clone()),
             },
             pci_ids: names
+                .sources()
+                .into_iter()
+                .map(|s| IdsSourceInfo {
+                    path: s.path,
+                    version: s.version,
+                })
+                .collect(),
+            usb_ids: usb_names
                 .sources()
                 .into_iter()
                 .map(|s| IdsSourceInfo {

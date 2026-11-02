@@ -4,7 +4,32 @@
 # `schema` is the file format version: bump it only for changes old hwsight versions
 # can't read. `version` is the release date of this data (YYYY.MM.DD); newest wins.
 schema = 1
-version = "2026.11.02"
+version = "2026.11.03"
+
+# Names USB devices report about themselves that are too vague to show on their own.
+# When a device's own product name is one of these, hwsight uses the device database's
+# name instead, or describes the device ("MediaTek Bluetooth device"). Compared ignoring
+# case, with "_" and "-" treated as spaces.
+usb_generic_names = [
+    "Controller", "Game Controller", "Gamepad", "Joystick",
+    "Wireless Device", "Wireless Receiver", "Receiver", "USB Receiver",
+    "2.4G Receiver", "2.4G Wireless Receiver", "Nano Receiver",
+    "USB Device", "USB Composite Device", "Composite Device", "Generic", "Unknown",
+    "Default String", "To Be Filled By O.E.M.",
+    "USB Hub", "USB2.0 Hub", "USB 2.0 Hub", "USB3.0 Hub", "USB 3.0 Hub", "Hub",
+    "Keyboard", "USB Keyboard", "Gaming Keyboard", "Wireless Keyboard",
+    "Mouse", "USB Mouse", "USB Optical Mouse", "Optical Mouse", "Gaming Mouse",
+    "Wireless Mouse",
+    "USB Audio", "USB Audio Device", "USB Audio and HID", "Audio", "Headset",
+    "Camera", "USB Camera", "Webcam", "HD Webcam", "USB2.0 HD UVC WebCam",
+    "Bluetooth Radio", "Bluetooth", "Bluetooth Adapter", "Wireless_Device",
+    "Mass Storage", "USB Mass Storage Device", "Mass Storage Device", "Flash Disk",
+    "USB Flash Disk", "USB Disk", "Disk", "Card Reader", "USB2.0-CRW",
+    "Serial", "USB Serial", "USB-Serial Controller",
+]
+
+# Keep top-level keys like the one above before the first [[table]]: anything
+# after a table header belongs to that table.
 
 # Devices that normally work with no driver attached. Without these rules hwsight would
 # raise false alarms about parts of every motherboard.
