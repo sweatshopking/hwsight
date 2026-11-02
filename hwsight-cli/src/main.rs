@@ -1,7 +1,7 @@
 //! hwsight command line: lists devices and their status. Mainly for testing the core and
 //! for bug reports (`--json`).
 
-use std::io::{self, Write};
+use std::io::{self, IsTerminal, Write};
 use std::process::ExitCode;
 
 use hwsight_core::{Category, LogIssue, ScanReport, Status, short_vendor};
@@ -14,6 +14,7 @@ Usage: hwsight [OPTIONS]
 Options:
   --problems   Only show devices that have a problem
   --json       Print everything as JSON (for bug reports and scripts)
+  --no-color   Never use color in terminal output
   --ids        Also show hardware IDs and bus addresses
   --kernel-log FILE
                Explain problems using this saved kernel log (from `journalctl -k -b`
@@ -28,6 +29,7 @@ Options:
 struct Options {
     kernel_log: Option<std::path::PathBuf>,
     json: bool,
+    no_color: bool,
     problems_only: bool,
     show_ids: bool,
 }
@@ -36,6 +38,7 @@ fn main() -> ExitCode {
     let mut opts = Options {
         kernel_log: None,
         json: false,
+        no_color: false,
         problems_only: false,
         show_ids: false,
     };
@@ -50,6 +53,7 @@ fn main() -> ExitCode {
                 }
             },
             "--json" => opts.json = true,
+            "--no-color" => opts.no_color = true,
             "--problems" => opts.problems_only = true,
             "--ids" => opts.show_ids = true,
             "-h" | "--help" => {
@@ -85,10 +89,15 @@ fn main() -> ExitCode {
         }
     }
     let report = scanner.scan();
+    let color = use_color(
+        io::stdout().is_terminal(),
+        std::env::var("NO_COLOR").ok().as_deref(),
+        opts.no_color,
+    );
     let result = if opts.json {
         print_json(&report)
     } else {
-        print_text(&report, &opts)
+        print_text(&report, &opts, color)
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -107,7 +116,7 @@ fn print_json(report: &ScanReport) -> io::Result<()> {
     writeln!(out)
 }
 
-fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
+fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()> {
     let mut out = io::stdout().lock();
     let shown: Vec<_> = report
         .devices
@@ -121,10 +130,22 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
             if current.is_some() {
                 writeln!(out)?;
             }
-            writeln!(out, "{}", device.category.label())?;
+            writeln!(out, "{}", paint(device.category.label(), "\x1b[1m", color))?;
             current = Some(device.category);
         }
-        let mut line = format!("  {} {}", symbol(device.status), device.display_name);
+        let status_code = match device.status {
+            Status::Working => "\x1b[32m",
+            Status::NoDriverNeeded | Status::ReservedForVirtualMachine => "\x1b[2m",
+            Status::DriverAvailableNotLoaded
+            | Status::DriverNotAttached
+            | Status::DriverNotReady => "\x1b[33m",
+            Status::NoDriver | Status::DriverBlocked => "\x1b[31m",
+        };
+        let mut line = format!(
+            "  {} {}",
+            paint(symbol(device.status), status_code, color),
+            device.display_name
+        );
         if let Some(vendor) = &device.vendor_name {
             line.push_str(&format!("  ({})", short_vendor(vendor)));
         }
@@ -158,18 +179,24 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
             if let Some(what) = &device.missing_interface {
                 writeln!(
                     out,
-                    "      Why: The driver is loaded, but no {what} was created."
+                    "      {} The driver is loaded, but no {what} was created.",
+                    paint("Why:", "\x1b[1m", color)
                 )?;
             }
             for issue in &device.log_issues {
-                writeln!(out, "      Why: {}", issue.message())?;
+                writeln!(
+                    out,
+                    "      {} {}",
+                    paint("Why:", "\x1b[1m", color),
+                    issue.message()
+                )?;
                 if let LogIssue::MissingFirmware {
                     install_command: Some(cmd),
                     installed_now: false,
                     ..
                 } = issue
                 {
-                    writeln!(out, "      Fix: {cmd}")?;
+                    writeln!(out, "      {} {cmd}", paint("Fix:", "\x1b[1m", color))?;
                 }
             }
         }
@@ -187,10 +214,15 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         if !shown.is_empty() {
             writeln!(out)?;
         }
-        writeln!(out, "USB ports")?;
+        writeln!(out, "{}", paint("USB ports", "\x1b[1m", color))?;
         for p in &report.port_issues {
-            writeln!(out, "  ✗ {}", p.port)?;
-            writeln!(out, "      Why: {}", p.issue.message())?;
+            writeln!(out, "  {} {}", paint("✗", "\x1b[31m", color), p.port)?;
+            writeln!(
+                out,
+                "      {} {}",
+                paint("Why:", "\x1b[1m", color),
+                p.issue.message()
+            )?;
         }
     }
 
@@ -229,6 +261,18 @@ fn symbol(status: Status) -> &'static str {
     }
 }
 
+fn use_color(is_terminal: bool, no_color_env: Option<&str>, flag_off: bool) -> bool {
+    is_terminal && no_color_env.is_none_or(str::is_empty) && !flag_off
+}
+
+fn paint(text: &str, code: &str, on: bool) -> String {
+    if on {
+        format!("{code}{text}\x1b[0m")
+    } else {
+        text.to_owned()
+    }
+}
+
 fn update_data() -> ExitCode {
     let dirs = hwsight_core::DataDirs::standard();
     let Some(dest) = dirs.download.clone() else {
@@ -260,5 +304,41 @@ fn update_data() -> ExitCode {
             eprintln!("hwsight: {}", e.message());
             ExitCode::FAILURE
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn color_rules() {
+        for (is_terminal, no_color_env, flag_off, expected) in [
+            (false, None, false, false),
+            (false, None, true, false),
+            (false, Some("1"), false, false),
+            (false, Some("1"), true, false),
+            (true, None, false, true),
+            (true, None, true, false),
+            (true, Some("1"), false, false),
+            (true, Some("1"), true, false),
+        ] {
+            assert_eq!(
+                use_color(is_terminal, no_color_env, flag_off),
+                expected,
+                "terminal={is_terminal}, env={no_color_env:?}, flag={flag_off}"
+            );
+        }
+        assert!(use_color(true, Some(""), false));
+    }
+
+    #[test]
+    fn paint_off_is_plain() {
+        assert_eq!(paint("hello", "\x1b[32m", false), "hello");
+    }
+
+    #[test]
+    fn paint_on_wraps_and_resets() {
+        assert_eq!(paint("hello", "\x1b[32m", true), "\x1b[32mhello\x1b[0m");
     }
 }
