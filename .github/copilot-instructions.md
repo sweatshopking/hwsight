@@ -70,3 +70,7 @@ These are requirements, not suggestions. A task that breaks any of them is not d
 - `data.rs`: data folders, and the shared loader for versioned data files.
 - `update.rs`: signed data updates. `distro.rs`: distro detection.
 - `hwsight-cli/src/main.rs`: the `hwsight` command.
+- `hwsight-gui/`: the Slint app. `ui/app.slint` holds `Theme` (all colours, sizes, fonts)
+  and the window; components go in `ui/components/`. `src/model.rs` turns a scan report
+  into UI data (tested); `src/main.rs` runs scans on a background thread. GUI tasks have
+  extra rules at the top of the "GUI batch" section in `docs/plan.md`.

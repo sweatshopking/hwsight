@@ -214,3 +214,244 @@ protocols ourselves (thousands of devices, real risk of bricking controllers). I
    - Known-quirky controllers as data (`rgb.toml`, updatable), e.g. Gigabyte RGB Fusion 2
      USB (ITE 048d:5702, on the owner's LVbox B650M board) that changed colour once and
      then ignored further commands with OpenRGB.
+
+---
+
+# GUI batch (2026-11-03)
+
+The skeleton is in `hwsight-gui/` (Claude). The Copilot tasks below build the window on
+top of it, **one at a time, in order**: each depends on the one before.
+
+Rules for every GUI task, in addition to `.github/copilot-instructions.md`:
+
+- **Every colour, size, radius, gap, and font size comes from `Theme`** in
+  `ui/app.slint` (for example `Theme.surface`, `Theme.radius`, `Theme.font-body`). Never
+  write a hex colour or a pixel size for these in a component. Fixed sizes the task gives
+  in px (like a row height) are fine.
+- Put each component in its own file under `hwsight-gui/ui/components/` and `import` it
+  into `ui/app.slint`. Components must not read `AppWindow` properties directly: pass
+  data in through `in` properties and report clicks through callbacks.
+- Text a user reads follows the plain-words rule. No emoji, no icons from fonts.
+- Long text must never overflow: use `overflow: elide;` on single lines and
+  `wrap: word-wrap;` on paragraphs.
+- Besides the three usual checks, run the app and confirm it opens and stays open:
+  `cargo build -p hwsight-gui && timeout 6 target/debug/hwsight-gui; echo $?` must print
+  `124` (still running when the timeout closed it). Any other number means it crashed.
+
+## Copilot 3: device list
+
+**Files you may change:** new `hwsight-gui/ui/components/status-dot.slint`,
+`category-header.slint`, `device-row.slint`; the layout part of `hwsight-gui/ui/app.slint`
+(below the `// ---- Placeholder layout` comment only); this task's Done notes.
+
+**Steps (do all of them):**
+
+1. `StatusDot`: `in property <string> kind` ("ok", "warn", "error", "neutral"). A circle
+   10px wide, filled with `Theme.ok` / `Theme.warn` / `Theme.error` / `Theme.neutral`. For
+   "warn" and "error" add a glow: `drop-shadow-blur: 8px;` with `drop-shadow-color` set to
+   the same colour with `.with-alpha(0.6)`.
+2. `CategoryHeader`: `in property <string> text`, `in property <int> count`. Height 40px.
+   The text in `Theme.font-small`, weight 700, `Theme.text-muted`, uppercase (use the
+   text as given; the Rust side may pass it mixed-case, so convert with
+   `text.to-uppercase()`), letter-spacing 1px, aligned to the bottom with 8px below it.
+   On the right, a pill showing the count: height 18px, horizontal padding 8px, radius
+   9px, background `Theme.surface-raised`, text `Theme.font-small` in `Theme.text-faint`.
+3. `DeviceRow`: `in property <DeviceItem> device`, `in property <bool> selected`,
+   `callback clicked()`. Height 52px, radius `Theme.radius-small`.
+   - Background: `Theme.surface-raised` when selected, `Theme.surface-hover` when the
+     mouse is over it (use a `TouchArea` and its `has-hover`), otherwise transparent.
+     Animate the background change over 120ms (`animate background { duration: 120ms; }`).
+   - When selected, a bar on the left edge: 3px wide, full height minus 12px, centred,
+     radius 2px, filled with
+     `@linear-gradient(180deg, Theme.accent-start 0%, Theme.accent-end 100%)`.
+   - Left padding 14px: a `StatusDot` for `device.status-kind`, then 12px gap, then two
+     lines of text stacked:
+     line 1: `device.name`, `Theme.font-body`, weight 600, `Theme.text`, elided;
+     line 2: `device.vendor` and `device.status-text` joined by "  ·  " (if vendor is
+     empty show only the status text), `Theme.font-small`, `Theme.text-muted`, elided.
+     When `status-kind` is "warn" or "error", line 2 uses `Theme.warn` / `Theme.error`.
+   - Clicking anywhere on the row calls `clicked()`.
+4. In `app.slint`, replace the placeholder `ScrollView` list with a left panel:
+   a `Rectangle` with background `Theme.surface`, radius `Theme.radius`,
+   `horizontal-stretch: 2`, `min-width: 340px`, containing a `ListView` (from
+   `std-widgets.slint`) over `root.rows` with 8px padding inside the panel. Each row shows
+   a `CategoryHeader` when `row.is-header`, otherwise a `DeviceRow` for
+   `root.devices[row.device]` with `selected: root.selected == row.device`, and
+   `clicked => { root.selected = row.device; }`.
+5. To the right of the panel (same `HorizontalLayout`, `spacing: Theme.gap`), add a
+   placeholder `Rectangle` with background `Theme.surface`, radius `Theme.radius`,
+   `horizontal-stretch: 3`, and a centred `Text` "Select a device to see its details" in
+   `Theme.text-faint`. Copilot 4 replaces it. Keep the existing header row as it is.
+
+**Done when:**
+
+- [ ] the three component files exist and are used by `app.slint`
+- [ ] no hex colours or `Theme`-covered sizes written inside the components
+- [ ] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` all
+      pass with zero warnings; the app-opens check prints `124`
+- [ ] Done notes filled in (files, what each does, final `test result:` lines)
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
+
+## Copilot 4: details panel
+
+**Only after Copilot 3 is reviewed.**
+
+**Files you may change:** new `hwsight-gui/ui/components/details-panel.slint`,
+`status-pill.slint`; the right-hand placeholder in `hwsight-gui/ui/app.slint`; this
+task's Done notes.
+
+**Steps (do all of them):**
+
+1. `StatusPill`: `in property <string> kind`, `in property <string> text`. Height 26px,
+   horizontal padding 12px, radius 13px. Background is the kind's colour (`Theme.ok`,
+   `Theme.warn`, `Theme.error`, `Theme.neutral`) `.with-alpha(0.18)`; a 1px border in the
+   same colour `.with-alpha(0.5)`; text `Theme.font-small`, weight 600, in the full colour.
+   A `StatusDot` (from Copilot 3) 8px before the text.
+2. `DetailsPanel`: `in property <DeviceItem> device`, `in property <bool> has-device`.
+   Background `Theme.surface`, radius `Theme.radius`, padding 24px, contents in a
+   `ScrollView` so long explanations scroll.
+   - When `has-device` is false: only a centred `Text` "Select a device to see its
+     details" in `Theme.text-faint`.
+   - Otherwise, top to bottom, `spacing: Theme.gap`:
+     a. `device.name`, `Theme.font-hero`, weight 700, `Theme.text`, word-wrapped.
+     b. `device.vendor` in `Theme.text-muted` (hidden when empty).
+     c. A `StatusPill` for `device.status-kind` / `device.status-text`.
+     d. **What's wrong** card (only when `device.why` is not empty): background is the
+        status colour `.with-alpha(0.10)`, 1px border in the status colour
+        `.with-alpha(0.35)`, radius `Theme.radius-small`, padding 16px. Title "What's
+        wrong" (`Theme.font-body`, weight 700, `Theme.text`), then `device.why`
+        word-wrapped in `Theme.text`.
+     e. **How to fix** card (only when `device.fix` is not empty): background
+        `Theme.surface-raised`, radius `Theme.radius-small`, padding 16px. Title "How to
+        fix" (weight 700), the sentence "Run this in a terminal:" in `Theme.text-muted`,
+        then the command in a read-only `TextInput` (so it can be selected and copied)
+        with `font-family: "monospace";`, `Theme.highlight` colour, on a
+        `Theme.background` rectangle with radius 6px and padding 10px.
+     f. `device.note` in `Theme.text-muted`, word-wrapped (hidden when empty).
+     g. A **Details** section: title "Details" (`Theme.font-small`, weight 700,
+        uppercase, letter-spacing 1px, `Theme.text-muted`), then a `GridLayout` with two
+        columns (label in `Theme.text-muted`, value in `Theme.text`, values selectable
+        via read-only `TextInput`): "Type" = `device.category`; "Driver" =
+        `device.driver`, or "None" when empty; "Hardware ID" = `device.hardware-id`;
+        "Connection" = `device.bus`; "Address" = `device.address`.
+     h. When `device.unrecognized` is true, under the grid in `Theme.text-faint`:
+        "This device isn't in the device database yet. Its hardware ID above can be
+        searched for online."
+3. In `app.slint`, replace the right-hand placeholder with
+   `DetailsPanel { device: root.selected >= 0 ? root.devices[root.selected] : { };
+   has-device: root.selected >= 0; horizontal-stretch: 3; }` (adapt the empty-struct
+   syntax if the compiler needs it).
+
+**Done when:**
+
+- [ ] both components exist; the panel shows every item a to h exactly as described
+- [ ] no hex colours or `Theme`-covered sizes inside the components
+- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] Done notes filled in; nothing pushed, no co-author line
+
+**Done notes:**
+
+## Copilot 5: header, refresh button, notes
+
+**Only after Copilot 4 is reviewed.**
+
+**Files you may change:** new `hwsight-gui/ui/components/accent-button.slint`,
+`notes-banner.slint`; the header row and bottom of the layout in
+`hwsight-gui/ui/app.slint`; this task's Done notes.
+
+**Steps (do all of them):**
+
+1. `AccentButton`: `in property <string> text`, `in property <bool> enabled: true`,
+   `callback clicked()`. Height 36px, horizontal padding 18px, radius 18px, background
+   `@linear-gradient(90deg, Theme.accent-start 0%, Theme.accent-end 100%)`, text
+   `Theme.font-body`, weight 600, white. On hover: `drop-shadow-blur: 14px;`
+   `drop-shadow-color: Theme.accent-glow;` (animate 150ms). When not enabled: opacity
+   0.45, no hover effect, clicks ignored.
+2. Header row (replace the existing one in `app.slint`), height 56px:
+   - "hwsight" in `Theme.font-hero`, weight 800, coloured with
+     `@linear-gradient(90deg, Theme.accent-start 0%, Theme.accent-end 100%)`.
+   - 16px gap, then the summary: while `root.scanning`, "Scanning your hardware..." in
+     `Theme.text-muted`; otherwise a `StatusPill` (Copilot 4) with kind "ok" and text
+     "No problems found" when `root.problem-count == 0`, else kind "warn" and text
+     `root.summary`.
+   - A flexible spacer, then `AccentButton { text: root.scanning ? "Scanning..." :
+     "Scan again"; enabled: !root.scanning; clicked => { root.refresh(); } }`.
+3. `NotesBanner`: `in property <[string]> notes`. Hidden (height 0, not visible) when
+   empty. Otherwise a card: background `Theme.surface-raised`, 1px border `Theme.border`,
+   radius `Theme.radius-small`, padding 12px 16px; title "Good to know" (`Theme.font-small`,
+   weight 700, `Theme.text-muted`); each note on its own line, word-wrapped, `Theme.text`,
+   `Theme.font-small`, 6px between notes. Place it under the two panels in `app.slint`.
+
+**Done when:**
+
+- [ ] both components exist; header and notes look exactly as described
+- [ ] no hex colours or `Theme`-covered sizes inside the components (white text in
+      `AccentButton` is allowed)
+- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] Done notes filled in; nothing pushed, no co-author line
+
+**Done notes:**
+
+## Copilot 6: search and "only problems" filter
+
+**Only after Copilot 5 is reviewed.**
+
+**Files you may change:** `hwsight-gui/src/model.rs`, `hwsight-gui/src/main.rs`, new
+`hwsight-gui/ui/components/search-box.slint`, `hwsight-gui/ui/app.slint`, this task's
+Done notes.
+
+**Steps (do all of them):**
+
+1. In `model.rs`, add `pub fn filter_rows(devices: &[hwsight_core::Device], query: &str,
+   only_problems: bool) -> Vec<Row>`: the same heading-plus-devices rows as `view()`
+   builds, but only for devices that match. A device matches when (`only_problems` is
+   false or `device.status.is_problem()`) and the query matches. The query matches when
+   it is empty after trimming, or every whitespace-separated word of it appears,
+   ignoring case, in at least one of: display name, vendor name, category label,
+   hardware ID, driver. A category heading appears only if at least one of its devices
+   matches, and its `header_count` is the number of matching devices. `Row.device` keeps
+   indexing the full device list (so the details panel still works).
+2. Refactor `view()` to build its rows with `filter_rows(&report.devices, "", false)`, so
+   there is one implementation.
+3. Keep the last scan's devices in `main.rs` (for example in an
+   `Rc<RefCell<Vec<hwsight_core::Device>>>` updated when a scan finishes) so the filter
+   can be re-run without scanning again.
+4. In `app.slint` add `in-out property <string> query;`, `in-out property <bool>
+   only-problems;`, and `callback filter-changed();`. Call `filter-changed()` when
+   either changes. In `main.rs`, handle it by rebuilding rows with `filter_rows` and
+   setting `rows`. After a new scan, apply the current query and toggle too.
+5. `SearchBox` component: `in-out property <string> text`, `callback edited()`. Height
+   36px, radius 18px, background `Theme.surface-raised`, 1px border `Theme.border`
+   (`Theme.accent-start` while focused), horizontal padding 14px, placeholder
+   "Search devices" in `Theme.text-faint` when empty. Put it at the top of the left
+   panel, above the list, followed by a `Switch` (std-widgets) labelled "Only problems"
+   bound to `only-problems`.
+6. When the filter leaves no rows, the list area shows "Nothing matches." in
+   `Theme.text-faint`, centred.
+
+**Tests (all required, in `model.rs`):**
+
+- `empty_query_matches_everything`
+- `words_match_any_field_ignoring_case`: e.g. "nvidia" matches by vendor, "realtek
+  8125" matches only the device with both words, "GRAPHICS" matches by category,
+  "10de:2c05" matches by hardware ID, "r8169" matches by driver.
+- `only_problems_hides_working_devices`
+- `headings_only_for_categories_with_matches_and_counts_are_right`
+- `row_indexes_point_into_the_full_list`
+- `view_uses_filter_rows` (view's rows equal `filter_rows(.., "", false)`)
+
+**Done when:**
+
+- [ ] steps 1 to 6 done, all six tests exist and pass
+- [ ] the three checks pass with zero warnings; the app-opens check prints `124`
+- [ ] Done notes filled in; nothing pushed, no co-author line
+
+**Done notes:**
+
+## Claude 8: GUI skeleton (done 2026-11-03)
+
+`hwsight-gui` crate, Theme tokens, background scans, `model::view` with tests. Next for
+Claude after the Copilot GUI tasks: "match my desktop" theme from `~/.config/kdeglobals`,
+theme switching, packaging (deb/rpm/AppImage on old bases), daily data update check.
