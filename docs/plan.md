@@ -90,3 +90,24 @@ first (Wi-Fi only, shares bandwidth with Plex).
 A bound driver doesn't always mean a working device (e.g. Wi-Fi driver loaded but its
 firmware failed, so there's no network interface). Per device type, check the interface
 the driver should create (`net/`, `sound/`, `drm/`, `nvme/`...), as data in rules.toml.
+
+## Claude 6: RGB and LED diagnosis and control (planned, owner asked 2026-11-02)
+
+RGB on Linux is hit or miss because every maker uses its own protocol. Don't write
+protocols ourselves (thousands of devices, real risk of bricking controllers). Instead:
+
+1. **Kernel LEDs** (`/sys/class/leds`): keyboard backlights, laptop lights, controller
+   LEDs (e.g. `xpad0`), lock-key lights. Standard, no extra software. Brightness via
+   UPower's D-Bus API where it applies (no root), otherwise polkit.
+2. **OpenRGB** (GPL-2.0, supports most RGB hardware): talk to its SDK server over its
+   network protocol (port 6742, separate program, so no licence mixing). Basic control:
+   list devices, set a colour/mode, turn off. Check a Rust client crate's licence first.
+3. **Diagnosis, the part nobody does:** why RGB isn't detected or won't change.
+   - OpenRGB not installed / SDK server not running.
+   - Missing udev rules (`60-openrgb.rules`), so normal users can't reach the device.
+   - `i2c-dev` not loaded, user can't open `/dev/i2c-*` (RAM and motherboard RGB on SMBus).
+   - Boards whose firmware blocks SMBus access (`acpi_enforce_resources=lax` advice,
+     explained carefully, never applied automatically).
+   - Other software holding the device (liquidctl, OpenRazer, vendor tools in Wine).
+   - Known-quirky controllers as data (`rgb.toml`, updatable), e.g. ITE 048d:5702 that
+     changes colour once then ignores further commands (seen on owner's previous board).
