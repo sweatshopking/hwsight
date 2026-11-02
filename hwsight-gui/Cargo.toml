@@ -1,0 +1,25 @@
+[package]
+name = "hwsight-gui"
+description = "hwsight: a friendly Device Manager for Linux (graphical app)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "hwsight-gui"
+path = "src/main.rs"
+
+[dependencies]
+hwsight-core = { path = "../hwsight-core" }
+slint = { version = "1.18.1", default-features = false, features = ["std", "backend-winit", "renderer-femtovg", "renderer-software", "accessibility", "compat-1-2"] }
+
+[build-dependencies]
+slint-build = "1.18.1"
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tempfile = "3.27.0"

@@ -1,0 +1,153 @@
+// hwsight main window.
+//
+// Layout (left to right): device list grouped by category | details of the selected
+// device. A header shows the summary and a refresh button. Everything visual reads its
+// colours, sizes, and fonts from `Theme`, so themes can be swapped without touching
+// components.
+
+import { ScrollView, Button } from "std-widgets.slint";
+
+// ---------------------------------------------------------------------------------------
+// Theme tokens. The default values are the "Sweet" dark theme: deep navy surfaces,
+// purple-to-pink accents, soft glows. Other themes set these from Rust.
+export global Theme {
+    // Surfaces, darkest to lightest.
+    in-out property <color> background: #161925;
+    in-out property <color> surface: #1e2132;
+    in-out property <color> surface-raised: #262a40;
+    in-out property <color> surface-hover: #2f3450;
+    in-out property <color> border: #343a5a;
+
+    // Text.
+    in-out property <color> text: #e6e6f0;
+    in-out property <color> text-muted: #9aa0c0;
+    in-out property <color> text-faint: #6b7194;
+
+    // Accent gradient (purple to pink) and a cool highlight.
+    in-out property <color> accent-start: #c74ded;
+    in-out property <color> accent-end: #ff4d9d;
+    in-out property <color> accent-glow: #c74ded80;
+    in-out property <color> highlight: #00c1e4;
+
+    // Status colours.
+    in-out property <color> ok: #3fd18b;
+    in-out property <color> warn: #ffb347;
+    in-out property <color> error: #ff5c7a;
+    in-out property <color> neutral: #7a80a6;
+
+    // Shape and spacing.
+    in-out property <length> radius: 12px;
+    in-out property <length> radius-small: 8px;
+    in-out property <length> gap: 12px;
+    in-out property <length> padding: 16px;
+
+    // Type.
+    in-out property <length> font-small: 12px;
+    in-out property <length> font-body: 14px;
+    in-out property <length> font-title: 18px;
+    in-out property <length> font-hero: 26px;
+}
+
+// ---------------------------------------------------------------------------------------
+// Data the Rust side fills in (see src/model.rs).
+
+// One row of the device list: either a category heading or a device.
+export struct Row {
+    is-header: bool,
+    // Heading rows: the category name and how many devices it holds.
+    header-text: string,
+    header-count: int,
+    // Device rows: index into `devices`.
+    device: int,
+}
+
+export struct DeviceItem {
+    name: string,
+    vendor: string,
+    category: string,
+    // "ok", "warn", "error", or "neutral" (no driver needed, reserved for a VM).
+    status-kind: string,
+    status-text: string,
+    driver: string,
+    hardware-id: string,
+    address: string,
+    bus: string,
+    // Plain-English explanation of a problem, if any (may be several lines).
+    why: string,
+    // A command that fixes it, if we know one.
+    fix: string,
+    // Extra explanation, e.g. why no driver is needed.
+    note: string,
+    unrecognized: bool,
+}
+
+export component AppWindow inherits Window {
+    title: "hwsight";
+    preferred-width: 1100px;
+    preferred-height: 720px;
+    min-width: 720px;
+    min-height: 480px;
+    background: Theme.background;
+
+    // Filled by Rust.
+    in property <[DeviceItem]> devices;
+    in property <[Row]> rows;
+    in property <string> summary;          // e.g. "51 devices, no problems found"
+    in property <int> problem-count;
+    in property <[string]> notes;          // things that limited the scan
+    in property <bool> scanning;
+
+    // Index into `devices` of the selected device, or -1.
+    in-out property <int> selected: -1;
+
+    callback refresh();
+
+    // ---- Placeholder layout: replaced by the Copilot GUI tasks in docs/plan.md ----
+    VerticalLayout {
+        padding: Theme.padding;
+        spacing: Theme.gap;
+
+        HorizontalLayout {
+            spacing: Theme.gap;
+            Text {
+                text: "hwsight";
+                color: Theme.text;
+                font-size: Theme.font-hero;
+                font-weight: 700;
+            }
+            Text {
+                text: root.scanning ? "Scanning..." : root.summary;
+                color: Theme.text-muted;
+                font-size: Theme.font-body;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+            Button {
+                text: "Refresh";
+                enabled: !root.scanning;
+                clicked => { root.refresh(); }
+            }
+        }
+
+        ScrollView {
+            VerticalLayout {
+                for row in root.rows: Rectangle {
+                    height: row.is-header ? 32px : 28px;
+                    TouchArea {
+                        enabled: !row.is-header;
+                        clicked => { root.selected = row.device; }
+                    }
+                    Text {
+                        x: row.is-header ? 0px : 16px;
+                        text: row.is-header
+                            ? row.header-text
+                            : root.devices[row.device].name + "  (" + root.devices[row.device].status-text + ")";
+                        color: row.is-header ? Theme.text : Theme.text-muted;
+                        font-size: row.is-header ? Theme.font-title : Theme.font-body;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}
