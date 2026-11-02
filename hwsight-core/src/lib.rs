@@ -83,12 +83,14 @@ impl ScanNote {
             Self::UsbUnreadable { error } => format!("Couldn't read the USB device list: {error}"),
             Self::PciUnreadable { error } => format!("Couldn't read the PCI device list: {error}"),
             Self::DataNeedsNewerApp { path, .. } => format!(
-                "{} is from a newer version of hwsight. Update hwsight to use it.",
-                path.display()
+                "A data update ({}) needs a newer version of hwsight. Update hwsight to use it.",
+                file_name(path)
             ),
-            Self::DataInvalid { path, error } => {
-                format!("Skipped damaged data file {}: {error}", path.display())
-            }
+            Self::DataInvalid { path, error } => format!(
+                "A damaged data file ({}) was skipped, so the built-in copy is used instead. \
+                 Details: {error}",
+                file_name(path)
+            ),
         }
     }
 }
@@ -100,6 +102,15 @@ impl From<DataProblem> for ScanNote {
             DataProblem::Invalid { path, error } => Self::DataInvalid { path, error },
         }
     }
+}
+
+/// Just the file name, for messages: full paths are noise to most people (the JSON report
+/// keeps the full path).
+fn file_name(path: &std::path::Path) -> String {
+    path.file_name().map_or_else(
+        || path.display().to_string(),
+        |n| n.to_string_lossy().into_owned(),
+    )
 }
 
 /// Which data versions the scan used, so users and bug reports can see how fresh it is.

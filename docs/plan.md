@@ -454,14 +454,45 @@ task's Done notes.
 
 **Done when:**
 
-- [ ] both components exist; header and notes look exactly as described
-- [ ] no hex colours or `Theme`-covered sizes inside the components (white text in
+- [x] both components exist; header and notes look exactly as described
+- [x] no hex colours or `Theme`-covered sizes inside the components (white text in
       `AccentButton` is allowed)
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] Done notes filled in; nothing pushed, no co-author line
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): accepted with fixes; process followed well. Fixed after
+  checking on screen: gradient-filled title text rendered as nothing (renderer
+  limitation, the task text's fault), so the gradient is now a glowing bar beside a solid
+  title; the status pill and Scan again button stretched (now sized to their text); the
+  header items weren't vertically centred and the pill floated mid-header (stretch).
+  Note messages now name just the file, not the full path. Added HWSIGHT_SNAPSHOT /
+  HWSIGHT_SELECT so the app can save a picture of itself for reviews.
+- Step 1: done in `hwsight-gui/ui/components/accent-button.slint` - Added the
+  themed gradient button, hover glow, disabled state, and click callback.
+- Step 2: done in `hwsight-gui/ui/app.slint` - Replaced the header with the gradient
+  title, scan summary/status pill, flexible spacer, and scan-again button.
+- Step 3: done in `hwsight-gui/ui/components/notes-banner.slint` and
+  `hwsight-gui/ui/app.slint` - Added the conditional notes card and placed it below
+  the two panels.
+- `tools/check.sh` output after the last edit:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```
+- Nothing was pushed, and no co-author line was added.
 
 ## Copilot 6: search and "only problems" filter
 

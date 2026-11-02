@@ -10,6 +10,9 @@ import { Theme, DeviceItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
 import { DetailsPanel } from "components/details-panel.slint";
+import { AccentButton } from "components/accent-button.slint";
+import { NotesBanner } from "components/notes-banner.slint";
+import { StatusPill } from "components/status-pill.slint";
 
 // Re-exported so the Rust side can set theme tokens and build device items.
 export { Theme, DeviceItem }
@@ -49,25 +52,60 @@ export component AppWindow inherits Window {
         padding: Theme.padding;
         spacing: Theme.gap;
 
+        // Each item sits in a centred VerticalLayout so it keeps its own size instead of
+        // stretching to fill the row.
         HorizontalLayout {
-            spacing: Theme.gap;
-            Text {
-                text: "hwsight";
-                color: Theme.text;
-                font-size: Theme.font-hero;
-                font-weight: 700;
+            height: 56px;
+            spacing: 16px;
+            // Text can't be filled with a gradient (the renderer draws nothing), so the
+            // accent gradient goes on a small bar beside the name.
+            HorizontalLayout {
+                spacing: 10px;
+                horizontal-stretch: 0;
+                VerticalLayout {
+                    alignment: center;
+                    Rectangle {
+                        width: 6px;
+                        height: 26px;
+                        border-radius: 3px;
+                        background: @linear-gradient(180deg, Theme.accent-start 0%, Theme.accent-end 100%);
+                        drop-shadow-blur: 10px;
+                        drop-shadow-color: Theme.accent-glow;
+                    }
+                }
+                Text {
+                    text: "hwsight";
+                    color: Theme.text;
+                    font-size: Theme.font-hero;
+                    font-weight: 800;
+                    vertical-alignment: center;
+                }
             }
-            Text {
-                text: root.scanning ? "Scanning..." : root.summary;
+            if root.scanning : Text {
+                text: "Scanning your hardware...";
                 color: Theme.text-muted;
                 font-size: Theme.font-body;
                 vertical-alignment: center;
+                horizontal-stretch: 0;
+            }
+            if !root.scanning : VerticalLayout {
+                alignment: center;
+                horizontal-stretch: 0;
+                StatusPill {
+                    kind: root.problem-count == 0 ? "ok" : "warn";
+                    text: root.problem-count == 0 ? "No problems found" : root.summary;
+                }
+            }
+            Rectangle {
                 horizontal-stretch: 1;
             }
-            Button {
-                text: "Refresh";
-                enabled: !root.scanning;
-                clicked => { root.refresh(); }
+            VerticalLayout {
+                alignment: center;
+                AccentButton {
+                    text: root.scanning ? "Scanning..." : "Scan again";
+                    enabled: !root.scanning;
+                    clicked => { root.refresh(); }
+                }
             }
         }
 
@@ -119,6 +157,9 @@ export component AppWindow inherits Window {
                 has-device: root.selected >= 0;
                 horizontal-stretch: 3;
             }
+        }
+        NotesBanner {
+            notes: root.notes;
         }
     }
 }

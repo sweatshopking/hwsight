@@ -1,0 +1,31 @@
+import { Theme } from "../theme.slint";
+
+export component NotesBanner inherits Rectangle {
+    in property <[string]> notes;
+    visible: root.notes.length > 0;
+    height: root.notes.length > 0 ? notes-layout.preferred-height : 0px;
+    background: Theme.surface-raised;
+    border-width: 1px;
+    border-color: Theme.border;
+    border-radius: Theme.radius-small;
+
+    notes-layout := VerticalLayout {
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        spacing: 6px;
+        Text {
+            text: "Good to know";
+            color: Theme.text-muted;
+            font-size: Theme.font-small;
+            font-weight: 700;
+        }
+        for note in root.notes : Text {
+            text: note;
+            color: Theme.text;
+            font-size: Theme.font-small;
+            wrap: word-wrap;
+        }
+    }
+}

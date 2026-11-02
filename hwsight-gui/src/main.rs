@@ -21,7 +21,50 @@ fn main() -> Result<(), slint::PlatformError> {
     window.on_refresh(move || start_scan(weak.clone()));
     start_scan(window.as_weak());
 
+    // Developer aid for reviews: HWSIGHT_SNAPSHOT=out.ppm saves a picture of the window
+    // after the first scan and quits; HWSIGHT_SELECT=<n> selects device n first. This
+    // works without taking focus or touching the screen.
+    if let Some(path) = std::env::var_os("HWSIGHT_SNAPSHOT") {
+        if let Some(n) = std::env::var("HWSIGHT_SELECT")
+            .ok()
+            .and_then(|v| v.parse().ok())
+        {
+            window.set_selected(n);
+        }
+        snapshot_when_ready(window.as_weak(), path.into());
+    }
+
     window.run()
+}
+
+fn snapshot_when_ready(window: slint::Weak<AppWindow>, path: std::path::PathBuf) {
+    let timer = Box::leak(Box::new(slint::Timer::default()));
+    timer.start(
+        slint::TimerMode::Repeated,
+        std::time::Duration::from_millis(300),
+        move || {
+            let Some(w) = window.upgrade() else { return };
+            if w.get_scanning() {
+                return;
+            }
+            let result = w
+                .window()
+                .take_snapshot()
+                .map_err(|e| e.to_string())
+                .and_then(|img| write_ppm(&path, img.width(), img.height(), img.as_bytes()));
+            if let Err(e) = result {
+                eprintln!("hwsight-gui: snapshot failed: {e}");
+            }
+            let _ = slint::quit_event_loop();
+        },
+    );
+}
+
+/// A plain PPM image (no extra dependency); convert with any image tool.
+fn write_ppm(path: &std::path::Path, width: u32, height: u32, rgba: &[u8]) -> Result<(), String> {
+    let mut out = format!("P6\n{width} {height}\n255\n").into_bytes();
+    out.extend(rgba.chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]));
+    std::fs::write(path, out).map_err(|e| e.to_string())
 }
 
 /// Scan on a background thread so the window stays responsive, then show the result.

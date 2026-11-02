@@ -1,0 +1,38 @@
+import { Theme } from "../theme.slint";
+
+export component AccentButton inherits Rectangle {
+    in property <string> text;
+    in property <bool> enabled: true;
+    callback clicked();
+    height: 36px;
+    // Fit the label (plus 18px padding each side) instead of stretching.
+    width: label.preferred-width + 36px;
+    border-radius: 18px;
+    background: @linear-gradient(90deg, Theme.accent-start 0%, Theme.accent-end 100%);
+    opacity: root.enabled ? 1.0 : 0.45;
+    animate drop-shadow-blur { duration: 150ms; }
+    animate drop-shadow-color { duration: 150ms; }
+    drop-shadow-blur: touch.has-hover && root.enabled ? 14px : 0px;
+    drop-shadow-color: touch.has-hover && root.enabled ? Theme.accent-glow : transparent;
+
+    touch := TouchArea {
+        enabled: root.enabled;
+        clicked => { root.clicked(); }
+    }
+
+    HorizontalLayout {
+        padding-left: 18px;
+        padding-right: 18px;
+        label := Text {
+            text: root.text;
+            color: white;
+            font-size: Theme.font-body;
+            font-weight: 600;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            horizontal-stretch: 1;
+            vertical-stretch: 1;
+            overflow: elide;
+        }
+    }
+}

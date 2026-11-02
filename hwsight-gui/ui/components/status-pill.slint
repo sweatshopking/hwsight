@@ -9,6 +9,8 @@ export component StatusPill inherits Rectangle {
         : kind == "error" ? Theme.error
         : Theme.neutral;
     height: 26px;
+    // Fit the dot and text instead of stretching across the parent.
+    width: label.preferred-width + 10px + 8px + 24px;
     border-radius: 13px;
     background: colour.with-alpha(0.18);
     border-width: 1px;
@@ -24,7 +26,7 @@ export component StatusPill inherits Rectangle {
                 kind: root.kind;
             }
         }
-        Text {
+        label := Text {
             text: root.text;
             color: root.colour;
             font-size: Theme.font-small;
