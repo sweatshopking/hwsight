@@ -3,6 +3,7 @@
 //! No UI code lives here, so the command line and graphical apps share one engine.
 
 pub mod data;
+pub mod descriptions;
 pub mod device;
 pub mod distro;
 pub mod firmware;
@@ -20,6 +21,7 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 pub use data::{DataDirs, DataProblem, DataSource};
+pub use descriptions::Descriptions;
 pub use device::{Bus, Category, Device, Status, short_vendor};
 pub use distro::{Distro, Family};
 pub use firmware::FirmwarePackages;
@@ -118,6 +120,7 @@ fn file_name(path: &std::path::Path) -> String {
 pub struct DataInfo {
     pub rules_version: String,
     pub firmware_version: String,
+    pub descriptions_version: String,
     /// `None` means the built-in copy.
     pub rules_path: Option<PathBuf>,
     /// `pci.ids` files used, newest first. The built-in database is always the fallback.
@@ -189,6 +192,8 @@ impl Scanner {
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (firmware, problems) = FirmwarePackages::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(ScanNote::from));
+        let (descriptions, problems) = Descriptions::load(&self.data_dirs);
+        notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
         let load_aliases = |bus: &str| {
@@ -212,6 +217,7 @@ impl Scanner {
             pci_aliases.as_ref(),
             &blocklist,
             &rules,
+            &descriptions,
         ) {
             Ok(found) => devices.extend(found),
             Err(e) => notes.push(ScanNote::PciUnreadable {
@@ -225,6 +231,7 @@ impl Scanner {
             usb_aliases.as_ref(),
             &blocklist,
             &rules,
+            &descriptions,
         ) {
             Ok(found) => devices.extend(found),
             Err(e) => notes.push(ScanNote::UsbUnreadable {
@@ -315,6 +322,7 @@ impl Scanner {
         let data = DataInfo {
             rules_version: rules.version.clone(),
             firmware_version: firmware.version.clone(),
+            descriptions_version: descriptions.version.clone(),
             rules_path: match &rules.source {
                 DataSource::Embedded => None,
                 DataSource::File(p) => Some(p.clone()),

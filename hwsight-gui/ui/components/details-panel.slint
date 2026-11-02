@@ -48,6 +48,22 @@ export component DetailsPanel inherits Rectangle {
                     text: root.device.status-text;
                 }
             }
+            if root.device.description != "" : VerticalLayout {
+                spacing: 4px;
+                Text {
+                    text: "WHAT IT DOES";
+                    color: Theme.text-muted;
+                    font-size: Theme.font-small;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                }
+                Text {
+                    text: root.device.description;
+                    color: Theme.text;
+                    font-size: Theme.font-body;
+                    wrap: word-wrap;
+                }
+            }
             if root.device.why != "" : Rectangle {
                 background: root.status-colour.with-alpha(0.10);
                 border-width: 1px;

@@ -17,7 +17,7 @@ pub struct Rules {
 
 /// Which devices a rule applies to. Every given field must match.
 #[derive(Debug, Clone)]
-struct Matcher {
+pub(crate) struct Matcher {
     /// Class codes mean different things on different buses (09 is input on PCI but a
     /// hub on USB), so every rule belongs to one bus. Defaults to PCI.
     bus: Bus,
@@ -29,8 +29,18 @@ struct Matcher {
 }
 
 impl Matcher {
+    /// How specific the rule is, so the most specific of several matching rules wins:
+    /// an exact vendor and device beats a protocol, which beats a subclass, then class.
+    pub(crate) fn specificity(&self) -> u8 {
+        u8::from(self.class.is_some())
+            + 2 * u8::from(self.subclasses.is_some())
+            + 3 * u8::from(self.prog_ifs.is_some())
+            + 4 * u8::from(self.vendor.is_some())
+            + 4 * u8::from(self.device.is_some())
+    }
+
     /// For USB, `class_code` is the interface's class, subclass, and protocol.
-    fn matches(&self, bus: Bus, class_code: u32, vendor: u16, device: u16) -> bool {
+    pub(crate) fn matches(&self, bus: Bus, class_code: u32, vendor: u16, device: u16) -> bool {
         if bus != self.bus {
             return false;
         }
@@ -264,7 +274,7 @@ fn normalize_name(name: &str) -> String {
 
 /// A rule with a bad ID rejects the whole file, so a broken download falls back to the
 /// built-in rules instead of half-working.
-fn compile_matcher(
+pub(crate) fn compile_matcher(
     bus: Option<String>,
     class: Option<String>,
     subclasses: Option<Vec<String>>,

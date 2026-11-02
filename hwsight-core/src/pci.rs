@@ -7,6 +7,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use crate::descriptions::Descriptions;
 use crate::device::{Bus, Category, Device, Status, bracketed, diagnose, short_vendor};
 use crate::modules::{AliasDb, Blocklist};
 use crate::pci_ids::PciNames;
@@ -20,6 +21,7 @@ pub(crate) fn scan(
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
+    descriptions: &Descriptions,
 ) -> io::Result<Vec<Device>> {
     let entries = match fs::read_dir(devices_dir) {
         Ok(entries) => entries,
@@ -32,7 +34,15 @@ pub(crate) fn scan(
         // Entries are symlinks into /sys/devices; follow them for the real path.
         let path = fs::canonicalize(entry.path()).unwrap_or_else(|_| entry.path());
         let address = entry.file_name().to_string_lossy().into_owned();
-        if let Some(device) = read_device(&path, address, names, aliases, blocklist, rules) {
+        if let Some(device) = read_device(
+            &path,
+            address,
+            names,
+            aliases,
+            blocklist,
+            rules,
+            descriptions,
+        ) {
             devices.push(device);
         }
     }
@@ -51,6 +61,7 @@ fn read_device(
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
+    descriptions: &Descriptions,
 ) -> Option<Device> {
     // Vendor, device, and class are always present on a real PCI device. Without them
     // there's nothing meaningful to show, so skip the entry.
@@ -94,6 +105,15 @@ fn read_device(
         missing_interface = Some(expected.what.to_owned());
     }
 
+    let device_category = category(class, subclass, prog_if);
+    let description = descriptions.describe(
+        Bus::Pci,
+        &[class_code],
+        vendor_id,
+        device_id,
+        device_category,
+    );
+
     let display_name = display_name(
         product_name.as_deref(),
         vendor_name.as_deref(),
@@ -110,7 +130,7 @@ fn read_device(
         product_name,
         model_name,
         class_name,
-        category: category(class, subclass, prog_if),
+        category: device_category,
         hardware_id: format!("{vendor_id:04x}:{device_id:04x}"),
         modalias,
         driver,
@@ -121,6 +141,7 @@ fn read_device(
             .then(|| no_driver_reason.map(str::to_owned))
             .flatten(),
         log_issues: Vec::new(),
+        description,
     })
 }
 
@@ -258,7 +279,15 @@ mod tests {
             let names = PciNames::embedded();
             let (rules, _) = Rules::load(&DataDirs::only(Path::new("/nonexistent")));
             let blocklist = Blocklist::load(&[], Some(&self.cmdline));
-            scan(&self.devices, &names, aliases.as_ref(), &blocklist, &rules).expect("scan")
+            scan(
+                &self.devices,
+                &names,
+                aliases.as_ref(),
+                &blocklist,
+                &rules,
+                &Descriptions::embedded(),
+            )
+            .expect("scan")
         }
     }
 
@@ -348,6 +377,7 @@ alias pci:v00008086d0000A0F0sv*sd*bc*sc*i* btusb_fake
             None,
             &Blocklist::default(),
             &rules,
+            &Descriptions::embedded(),
         )
         .expect("ok");
         assert!(devices.is_empty());

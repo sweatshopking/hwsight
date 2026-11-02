@@ -162,6 +162,7 @@ fn device_item(d: &Device) -> DeviceItem {
         why: why.join("\n").into(),
         fix: fix.into(),
         note: d.note.clone().unwrap_or_default().into(),
+        description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
     }
 }

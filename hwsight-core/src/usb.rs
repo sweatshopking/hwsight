@@ -12,6 +12,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use crate::descriptions::Descriptions;
 use crate::device::{Bus, Category, Device, Status, diagnose, short_vendor};
 use crate::modules::{AliasDb, Blocklist, DriverCandidate};
 use crate::rules::Rules;
@@ -40,6 +41,7 @@ pub(crate) fn scan(
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
+    descriptions: &Descriptions,
 ) -> io::Result<Vec<Device>> {
     let entries = match fs::read_dir(devices_dir) {
         Ok(entries) => entries,
@@ -56,7 +58,9 @@ pub(crate) fn scan(
             continue;
         }
         let path = fs::canonicalize(entry.path()).unwrap_or_else(|_| entry.path());
-        if let Some(device) = read_device(&path, name, names, aliases, blocklist, rules) {
+        if let Some(device) =
+            read_device(&path, name, names, aliases, blocklist, rules, descriptions)
+        {
             devices.push(device);
         }
     }
@@ -70,6 +74,7 @@ fn read_device(
     aliases: Option<&AliasDb>,
     blocklist: &Blocklist,
     rules: &Rules,
+    descriptions: &Descriptions,
 ) -> Option<Device> {
     let vendor_id = read_hex(path, "idVendor")?;
     let product_id = read_hex(path, "idProduct")?;
@@ -138,6 +143,17 @@ fn read_device(
     };
 
     let category = category(device_class, &interfaces);
+    let interface_classes: Vec<u32> = interfaces
+        .iter()
+        .map(|i| (u32::from(i.class) << 16) | (u32::from(i.subclass) << 8) | u32::from(i.protocol))
+        .collect();
+    let description = descriptions.describe(
+        Bus::Usb,
+        &interface_classes,
+        vendor_id,
+        product_id,
+        category,
+    );
 
     // Prefer what the device says about itself: some devices borrow another maker's IDs
     // (many game pads report as an Xbox 360 controller), so the database can be wrong
@@ -178,6 +194,7 @@ fn read_device(
         missing_interface: None,
         log_issues: Vec::new(),
         note,
+        description,
     })
 }
 
@@ -419,7 +436,15 @@ mod tests {
             )
             .expect("write");
             let names = UsbNames::from_files(&[ids]);
-            scan(&self.root, &names, db.as_ref(), &blocklist, &rules).expect("scan")
+            scan(
+                &self.root,
+                &names,
+                db.as_ref(),
+                &blocklist,
+                &rules,
+                &Descriptions::embedded(),
+            )
+            .expect("scan")
         }
     }
 
@@ -566,6 +591,7 @@ mod tests {
             None,
             &Blocklist::default(),
             &rules,
+            &Descriptions::embedded(),
         );
         assert!(devices.expect("ok").is_empty());
     }

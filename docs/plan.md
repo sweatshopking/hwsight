@@ -587,3 +587,13 @@ ALL CHECKS PASSED
 `hwsight-gui` crate, Theme tokens, background scans, `model::view` with tests. Next for
 Claude after the Copilot GUI tasks: "match my desktop" theme from `~/.config/kdeglobals`,
 theme switching, packaging (deb/rpm/AppImage on old bases), daily data update check.
+
+## Claude 9: "What it does" descriptions (done 2026-11-03)
+
+Owner's idea. Updatable `data/descriptions.toml` (own file, so it can be translated):
+most specific `[[describe]]` match wins (exact device > protocol > subclass > class),
+USB devices matched by their interfaces (earlier interface wins ties), and a
+`[category]` fallback so every device gets text. Shown as "What it does" in the
+details panel and in `--json`. Specific entries so far: NZXT Kraken, ASUS AURA, Logi
+Bolt receiver, Xbox-style pads (USB ff/5d, ff/47). Good Copilot data-entry task later:
+more specific device entries, following the writing style in the file header.

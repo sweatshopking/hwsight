@@ -165,6 +165,8 @@ pub struct Device {
     /// A plain-English explanation of the status when there's more to say, e.g. why no
     /// driver is needed, or that USB security settings blocked the device.
     pub note: Option<String>,
+    /// What this kind of device does, in plain English (from descriptions.toml).
+    pub description: Option<String>,
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

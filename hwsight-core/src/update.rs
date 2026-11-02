@@ -52,7 +52,13 @@ const MAX_FILE_BYTES: u64 = 64 * 1024 * 1024;
 
 /// Files an update may write. Anything else in a manifest is ignored, so a manifest can
 /// never write outside the data folder.
-const KNOWN_FILES: &[&str] = &["rules.toml", "firmware.toml", "pci.ids", "usb.ids"];
+const KNOWN_FILES: &[&str] = &[
+    "rules.toml",
+    "firmware.toml",
+    "descriptions.toml",
+    "pci.ids",
+    "usb.ids",
+];
 
 /// Gets release files by name. The real one uses HTTPS; tests use a folder.
 pub trait Fetch {
@@ -229,6 +235,9 @@ pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
         "firmware.toml" => data::parse_data::<crate::firmware::Table>(text)
             .map(|(v, _)| v)
             .map_err(|e| format!("{name}: {e:?}"))?,
+        "descriptions.toml" => data::parse_data::<crate::descriptions::Table>(text)
+            .map(|(v, _)| v)
+            .map_err(|e| format!("{name}: {e:?}"))?,
         "pci.ids" => {
             if !crate::pci_ids::looks_valid(text) {
                 return Err("pci.ids has no devices".into());
@@ -274,6 +283,7 @@ fn write_atomically(path: &Path, bytes: &[u8]) -> Result<(), String> {
 pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
     let rules = crate::rules::Rules::load(dirs).0.version;
     let firmware = crate::firmware::FirmwarePackages::load(dirs).0.version;
+    let descriptions = crate::descriptions::Descriptions::load(dirs).0.version;
     let ids = |name: &str| {
         dirs.id_files(name)
             .iter()
@@ -286,6 +296,7 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
     move |name: &str| match name {
         "rules.toml" => Some(rules.clone()),
         "firmware.toml" => Some(firmware.clone()),
+        "descriptions.toml" => Some(descriptions.clone()),
         "pci.ids" => pci.clone(),
         "usb.ids" => usb.clone(),
         _ => None,
