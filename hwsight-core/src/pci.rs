@@ -8,7 +8,7 @@ use std::io;
 use std::path::Path;
 
 use crate::device::{Bus, Category, Device, bracketed, diagnose, short_vendor};
-use crate::modules::AliasDb;
+use crate::modules::{AliasDb, Blocklist};
 use crate::pci_ids::PciNames;
 use crate::rules::Rules;
 
@@ -18,6 +18,7 @@ pub(crate) fn scan(
     devices_dir: &Path,
     names: &PciNames,
     aliases: Option<&AliasDb>,
+    blocklist: &Blocklist,
     rules: &Rules,
 ) -> io::Result<Vec<Device>> {
     let entries = match fs::read_dir(devices_dir) {
@@ -31,11 +32,15 @@ pub(crate) fn scan(
         // Entries are symlinks into /sys/devices; follow them for the real path.
         let path = fs::canonicalize(entry.path()).unwrap_or_else(|_| entry.path());
         let address = entry.file_name().to_string_lossy().into_owned();
-        if let Some(device) = read_device(&path, address, names, aliases, rules) {
+        if let Some(device) = read_device(&path, address, names, aliases, blocklist, rules) {
             devices.push(device);
         }
     }
-    devices.sort_by(|a, b| a.category.cmp(&b.category).then_with(|| a.address.cmp(&b.address)));
+    devices.sort_by(|a, b| {
+        a.category
+            .cmp(&b.category)
+            .then_with(|| a.address.cmp(&b.address))
+    });
     Ok(devices)
 }
 
@@ -44,6 +49,7 @@ fn read_device(
     address: String,
     names: &PciNames,
     aliases: Option<&AliasDb>,
+    blocklist: &Blocklist,
     rules: &Rules,
 ) -> Option<Device> {
     // Vendor, device, and class are always present on a real PCI device. Without them
@@ -70,10 +76,12 @@ fn read_device(
         .ok()
         .and_then(|target| target.file_name().map(|n| n.to_string_lossy().into_owned()));
     let driver_candidates = match (aliases, &modalias) {
-        (Some(db), Some(alias)) => db.candidates(alias),
+        (Some(db), Some(alias)) => db.candidates(alias, blocklist),
         _ => Vec::new(),
     };
-    let needs_driver = rules.no_driver_needed(class_code, vendor_id, device_id).is_none();
+    let needs_driver = rules
+        .no_driver_needed(class_code, vendor_id, device_id)
+        .is_none();
     let status = diagnose(driver.as_deref(), &driver_candidates, needs_driver);
 
     let display_name = display_name(
@@ -164,6 +172,7 @@ mod tests {
         devices: PathBuf,
         modules: PathBuf,
         sys_module: PathBuf,
+        cmdline: String,
     }
 
     impl FakeSys {
@@ -174,9 +183,15 @@ mod tests {
                 devices: root.join("devices"),
                 modules: root.join("modules"),
                 sys_module: root.join("sys_module"),
+                cmdline: "quiet modprobe.blacklist=btusb_fake".to_owned(),
                 _tmp: tmp,
             };
-            for d in [&fake.devices, &fake.modules, &fake.sys_module, &root.join("drivers")] {
+            for d in [
+                &fake.devices,
+                &fake.modules,
+                &fake.sys_module,
+                &root.join("drivers"),
+            ] {
                 fs::create_dir_all(d).expect("mkdir");
             }
             fake
@@ -201,7 +216,12 @@ mod tests {
             );
             fs::write(dir.join("modalias"), alias).expect("write");
             if let Some(drv) = driver {
-                let target = self.devices.parent().expect("parent").join("drivers").join(drv);
+                let target = self
+                    .devices
+                    .parent()
+                    .expect("parent")
+                    .join("drivers")
+                    .join(drv);
                 fs::create_dir_all(&target).expect("mkdir");
                 symlink(&target, dir.join("driver")).expect("symlink");
             }
@@ -215,12 +235,16 @@ mod tests {
             let aliases = AliasDb::load(&self.modules, &self.sys_module, "pci:");
             let names = PciNames::embedded();
             let (rules, _) = Rules::load(&DataDirs::only(Path::new("/nonexistent")));
-            scan(&self.devices, &names, aliases.as_ref(), &rules).expect("scan")
+            let blocklist = Blocklist::load(&[], Some(&self.cmdline));
+            scan(&self.devices, &names, aliases.as_ref(), &blocklist, &rules).expect("scan")
         }
     }
 
     fn by_addr<'a>(devices: &'a [Device], addr: &str) -> &'a Device {
-        devices.iter().find(|d| d.address == addr).expect("device present")
+        devices
+            .iter()
+            .find(|d| d.address == addr)
+            .expect("device present")
     }
 
     #[test]
@@ -231,20 +255,40 @@ mod tests {
         sys.add("0000:02:00.0", "8086", "2725", "028000", None); // wifi, driver not loaded
         sys.add("0000:03:00.0", "10ec", "8125", "020000", None); // ethernet, driver failed
         sys.add("0000:04:00.0", "ffee", "0001", "ff0000", None); // nothing knows it
+        sys.add("0000:05:00.0", "8086", "a0f0", "028000", None); // driver blocked
+        sys.add("0000:06:00.0", "10de", "2c05", "030000", Some("vfio-pci")); // VM passthrough
 
         let alias = "\
 alias pci:v00008086d00002725sv*sd*bc*sc*i* iwlwifi
 alias pci:v000010ECd00008125sv*sd*bc*sc*i* r8169
+alias pci:v00008086d0000A0F0sv*sd*bc*sc*i* btusb_fake
 ";
         let devices = sys.scan(alias, &["r8169"]);
-        assert_eq!(devices.len(), 5);
-        assert_eq!(by_addr(&devices, "0000:00:00.0").status, Status::NoDriverNeeded);
+        assert_eq!(devices.len(), 7);
+        assert_eq!(
+            by_addr(&devices, "0000:05:00.0").status,
+            Status::DriverBlocked
+        );
+        assert_eq!(
+            by_addr(&devices, "0000:06:00.0").status,
+            Status::ReservedForVirtualMachine
+        );
+        assert_eq!(
+            by_addr(&devices, "0000:00:00.0").status,
+            Status::NoDriverNeeded
+        );
         let gpu = by_addr(&devices, "0000:01:00.0");
         assert_eq!(gpu.status, Status::Working);
         assert_eq!(gpu.driver.as_deref(), Some("nvidia"));
         assert_eq!(gpu.category, Category::Graphics);
-        assert_eq!(by_addr(&devices, "0000:02:00.0").status, Status::DriverAvailableNotLoaded);
-        assert_eq!(by_addr(&devices, "0000:03:00.0").status, Status::DriverNotAttached);
+        assert_eq!(
+            by_addr(&devices, "0000:02:00.0").status,
+            Status::DriverAvailableNotLoaded
+        );
+        assert_eq!(
+            by_addr(&devices, "0000:03:00.0").status,
+            Status::DriverNotAttached
+        );
         let unknown = by_addr(&devices, "0000:04:00.0");
         assert_eq!(unknown.status, Status::NoDriver);
         assert!(unknown.unrecognized);
@@ -266,20 +310,38 @@ alias pci:v000010ECd00008125sv*sd*bc*sc*i* r8169
     fn missing_pci_bus_is_empty_not_an_error() {
         let names = PciNames::embedded();
         let rules = Rules::embedded();
-        let devices = scan(Path::new("/nonexistent/pci"), &names, None, &rules).expect("ok");
+        let devices = scan(
+            Path::new("/nonexistent/pci"),
+            &names,
+            None,
+            &Blocklist::default(),
+            &rules,
+        )
+        .expect("ok");
         assert!(devices.is_empty());
     }
 
     #[test]
     fn unknown_devices_still_get_useful_names() {
         assert_eq!(
-            display_name(None, Some("Realtek Semiconductor Co., Ltd."), Some("Network controller")),
+            display_name(
+                None,
+                Some("Realtek Semiconductor Co., Ltd."),
+                Some("Network controller")
+            ),
             "Unknown Realtek Semiconductor network controller"
         );
-        assert_eq!(display_name(None, None, Some("Audio device")), "Unknown audio device");
+        assert_eq!(
+            display_name(None, None, Some("Audio device")),
+            "Unknown audio device"
+        );
         assert_eq!(display_name(None, None, None), "Unknown device");
         assert_eq!(
-            display_name(Some("GB203 [GeForce RTX 5070 Ti]"), Some("NVIDIA Corporation"), None),
+            display_name(
+                Some("GB203 [GeForce RTX 5070 Ti]"),
+                Some("NVIDIA Corporation"),
+                None
+            ),
             "GeForce RTX 5070 Ti"
         );
     }

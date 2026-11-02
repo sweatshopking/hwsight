@@ -15,7 +15,7 @@ use serde::Serialize;
 
 pub use data::DataDirs;
 pub use device::{Bus, Category, Device, Status, short_vendor};
-pub use modules::DriverCandidate;
+pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::{DataSource, Rules, RulesProblem};
 
@@ -85,6 +85,10 @@ pub struct Scanner {
     pub kernel_modules: Option<PathBuf>,
     /// Where loaded modules appear, normally `/sys/module`.
     pub loaded_modules: PathBuf,
+    /// modprobe settings folders, highest priority first.
+    pub modprobe_dirs: Vec<PathBuf>,
+    /// The kernel command line file, normally `/proc/cmdline`.
+    pub kernel_cmdline: PathBuf,
 }
 
 impl Scanner {
@@ -94,6 +98,8 @@ impl Scanner {
             pci_devices: PathBuf::from("/sys/bus/pci/devices"),
             kernel_modules: modules::running_kernel_modules_dir(),
             loaded_modules: PathBuf::from("/sys/module"),
+            modprobe_dirs: modules::MODPROBE_DIRS.iter().map(PathBuf::from).collect(),
+            kernel_cmdline: PathBuf::from("/proc/cmdline"),
         }
     }
 
@@ -104,7 +110,9 @@ impl Scanner {
 
         let (rules, problems) = Rules::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(|p| match p {
-            RulesProblem::NewerSchema { path, schema } => ScanNote::DataNeedsNewerApp { path, schema },
+            RulesProblem::NewerSchema { path, schema } => {
+                ScanNote::DataNeedsNewerApp { path, schema }
+            }
             RulesProblem::Invalid { path, error } => ScanNote::DataInvalid { path, error },
         }));
 
@@ -117,10 +125,21 @@ impl Scanner {
             notes.push(ScanNote::NoDriverList);
         }
 
-        let devices = match pci::scan(&self.pci_devices, &names, aliases.as_ref(), &rules) {
+        let cmdline = std::fs::read_to_string(&self.kernel_cmdline).ok();
+        let blocklist = modules::Blocklist::load(&self.modprobe_dirs, cmdline.as_deref());
+
+        let devices = match pci::scan(
+            &self.pci_devices,
+            &names,
+            aliases.as_ref(),
+            &blocklist,
+            &rules,
+        ) {
             Ok(devices) => devices,
             Err(e) => {
-                notes.push(ScanNote::PciUnreadable { error: e.to_string() });
+                notes.push(ScanNote::PciUnreadable {
+                    error: e.to_string(),
+                });
                 Vec::new()
             }
         };
@@ -134,11 +153,18 @@ impl Scanner {
             pci_ids: names
                 .sources()
                 .into_iter()
-                .map(|s| IdsSourceInfo { path: s.path, version: s.version })
+                .map(|s| IdsSourceInfo {
+                    path: s.path,
+                    version: s.version,
+                })
                 .collect(),
         };
 
-        ScanReport { devices, notes, data }
+        ScanReport {
+            devices,
+            notes,
+            data,
+        }
     }
 }
 

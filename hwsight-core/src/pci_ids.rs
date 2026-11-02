@@ -56,7 +56,10 @@ impl PciNames {
     pub fn sources(&self) -> Vec<IdsSource> {
         self.layers
             .iter()
-            .map(|l| IdsSource { path: l.path.clone(), version: l.version.clone() })
+            .map(|l| IdsSource {
+                path: l.path.clone(),
+                version: l.version.clone(),
+            })
             .collect()
     }
 
@@ -74,9 +77,19 @@ impl PciNames {
             .or_else(|| embedded::device(vendor, device))
     }
 
-    pub fn subsystem(&self, vendor: u16, device: u16, sub_vendor: u16, sub_device: u16) -> Option<String> {
-        self.find(|db| db.subsystems.get(&(vendor, device, sub_vendor, sub_device)).cloned())
-            .or_else(|| embedded::subsystem(vendor, device, sub_vendor, sub_device))
+    pub fn subsystem(
+        &self,
+        vendor: u16,
+        device: u16,
+        sub_vendor: u16,
+        sub_device: u16,
+    ) -> Option<String> {
+        self.find(|db| {
+            db.subsystems
+                .get(&(vendor, device, sub_vendor, sub_device))
+                .cloned()
+        })
+        .or_else(|| embedded::subsystem(vendor, device, sub_vendor, sub_device))
     }
 
     /// The most specific class name available: subclass if known, else the base class.
@@ -86,7 +99,6 @@ impl PciNames {
             .or_else(|| self.find(|db| db.classes.get(&class).cloned()))
             .or_else(|| embedded::class(class))
     }
-
 }
 
 fn load_layer(path: &Path) -> Option<IdsLayer> {
@@ -96,7 +108,11 @@ fn load_layer(path: &Path) -> Option<IdsLayer> {
     if db.vendors.is_empty() {
         return None; // Empty or not a pci.ids file at all.
     }
-    Some(IdsLayer { path: path.to_path_buf(), version: header_version(&text), db })
+    Some(IdsLayer {
+        path: path.to_path_buf(),
+        version: header_version(&text),
+        db,
+    })
 }
 
 /// The `#\tVersion: 2026.10.01` line near the top of an ids file.
@@ -122,7 +138,12 @@ mod embedded {
         pci_ids::Device::from_vid_pid(vendor, device).map(|d| d.name().to_owned())
     }
 
-    pub(super) fn subsystem(vendor: u16, device: u16, sub_vendor: u16, sub_device: u16) -> Option<String> {
+    pub(super) fn subsystem(
+        vendor: u16,
+        device: u16,
+        sub_vendor: u16,
+        sub_device: u16,
+    ) -> Option<String> {
         pci_ids::Device::from_vid_pid(vendor, device)?
             .subsystems()
             .find(|s| s.subvendor() == sub_vendor && s.subdevice() == sub_device)
@@ -262,13 +283,18 @@ C 06  Bridge
     #[test]
     fn parses_vendors_devices_and_subsystems() {
         let db = db();
-        assert_eq!(db.vendors.get(&0x10de).map(String::as_str), Some("NVIDIA Corporation"));
+        assert_eq!(
+            db.vendors.get(&0x10de).map(String::as_str),
+            Some("NVIDIA Corporation")
+        );
         assert_eq!(
             db.devices.get(&(0x10de, 0x2c05)).map(String::as_str),
             Some("GB203 [GeForce RTX 5070 Ti]")
         );
         assert_eq!(
-            db.subsystems.get(&(0x10de, 0x2c05, 0x1043, 0x8a2f)).map(String::as_str),
+            db.subsystems
+                .get(&(0x10de, 0x2c05, 0x1043, 0x8a2f))
+                .map(String::as_str),
             Some("TUF Gaming RTX 5070 Ti")
         );
         assert_eq!(
@@ -280,12 +306,18 @@ C 06  Bridge
     #[test]
     fn parses_classes_without_mixing_them_into_vendors() {
         let db = db();
-        assert_eq!(db.classes.get(&0x03).map(String::as_str), Some("Display controller"));
+        assert_eq!(
+            db.classes.get(&0x03).map(String::as_str),
+            Some("Display controller")
+        );
         assert_eq!(
             db.subclasses.get(&(0x03, 0x00)).map(String::as_str),
             Some("VGA compatible controller")
         );
-        assert_eq!(db.subclasses.get(&(0x06, 0x00)).map(String::as_str), Some("Host bridge"));
+        assert_eq!(
+            db.subclasses.get(&(0x06, 0x00)).map(String::as_str),
+            Some("Host bridge")
+        );
         // Class-section "00" lines must not become devices of the last vendor.
         assert_eq!(db.devices.len(), 2);
     }
@@ -313,7 +345,11 @@ C 06  Bridge
         let tmp = tempfile::tempdir().expect("tempdir");
         let old = tmp.path().join("old.ids");
         let new = tmp.path().join("new.ids");
-        fs::write(&old, "#\tVersion: 2020.01.01\n10de  Old NVIDIA\nabcd  Only In Old\n").expect("write");
+        fs::write(
+            &old,
+            "#\tVersion: 2020.01.01\n10de  Old NVIDIA\nabcd  Only In Old\n",
+        )
+        .expect("write");
         fs::write(&new, "#\tVersion: 2026.10.01\n10de  New NVIDIA\n").expect("write");
         // Order given doesn't matter; versions decide.
         let names = PciNames::from_files(&[old, new.clone()]);

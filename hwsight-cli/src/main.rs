@@ -26,7 +26,11 @@ struct Options {
 }
 
 fn main() -> ExitCode {
-    let mut opts = Options { json: false, problems_only: false, show_ids: false };
+    let mut opts = Options {
+        json: false,
+        problems_only: false,
+        show_ids: false,
+    };
     for arg in std::env::args().skip(1) {
         match arg.as_str() {
             "--json" => opts.json = true,
@@ -48,7 +52,11 @@ fn main() -> ExitCode {
     }
 
     let report = hwsight_core::scan();
-    let result = if opts.json { print_json(&report) } else { print_text(&report, &opts) };
+    let result = if opts.json {
+        print_json(&report)
+    } else {
+        print_text(&report, &opts)
+    };
     match result {
         Ok(()) => ExitCode::SUCCESS,
         // A closed pipe (e.g. `hwsight | head`) isn't worth an error message.
@@ -92,9 +100,19 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         let mut detail = format!("      {}", device.status.summary());
         match (&device.driver, device.status) {
             (Some(driver), _) => detail.push_str(&format!(", driver: {driver}")),
+            (None, Status::DriverBlocked) => {
+                for c in &device.driver_candidates {
+                    if let Some(by) = &c.blocked_by {
+                        detail.push_str(&format!(", {} blocked in {by}", c.module));
+                    }
+                }
+            }
             (None, Status::DriverAvailableNotLoaded | Status::DriverNotAttached) => {
-                let names: Vec<&str> =
-                    device.driver_candidates.iter().map(|c| c.module.as_str()).collect();
+                let names: Vec<&str> = device
+                    .driver_candidates
+                    .iter()
+                    .map(|c| c.module.as_str())
+                    .collect();
                 detail.push_str(&format!(", available: {}", names.join(", ")));
             }
             _ => {}
@@ -104,11 +122,19 @@ fn print_text(report: &ScanReport, opts: &Options) -> io::Result<()> {
         }
         writeln!(out, "{detail}")?;
         if opts.show_ids {
-            writeln!(out, "      id {}  at {}", device.hardware_id, device.address)?;
+            writeln!(
+                out,
+                "      id {}  at {}",
+                device.hardware_id, device.address
+            )?;
         }
     }
 
-    let problems = report.devices.iter().filter(|d| d.status.is_problem()).count();
+    let problems = report
+        .devices
+        .iter()
+        .filter(|d| d.status.is_problem())
+        .count();
     writeln!(out)?;
     match (shown.is_empty(), problems) {
         (true, 0) if opts.problems_only => writeln!(out, "No problems found.")?,
@@ -127,6 +153,7 @@ fn symbol(status: Status) -> &'static str {
     match status {
         Status::Working | Status::NoDriverNeeded => "✓",
         Status::DriverAvailableNotLoaded | Status::DriverNotAttached => "!",
-        Status::NoDriver => "✗",
+        Status::NoDriver | Status::DriverBlocked => "✗",
+        Status::ReservedForVirtualMachine => "•",
     }
 }

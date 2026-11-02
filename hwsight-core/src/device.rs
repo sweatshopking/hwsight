@@ -70,14 +70,21 @@ pub enum Status {
     /// A suitable driver is loaded, but it didn't take the device (often a failed start,
     /// missing firmware, or the device is turned off).
     DriverNotAttached,
+    /// Every installed driver for this device is turned off by a setting.
+    DriverBlocked,
     /// No installed driver supports this device.
     NoDriver,
+    /// Deliberately set aside for a virtual machine, so the host doesn't use it.
+    ReservedForVirtualMachine,
 }
 
 impl Status {
     /// Whether the user should be told something is wrong.
     pub fn is_problem(self) -> bool {
-        !matches!(self, Self::Working | Self::NoDriverNeeded)
+        !matches!(
+            self,
+            Self::Working | Self::NoDriverNeeded | Self::ReservedForVirtualMachine
+        )
     }
 
     pub fn summary(self) -> &'static str {
@@ -86,7 +93,9 @@ impl Status {
             Self::NoDriverNeeded => "Working (no driver needed)",
             Self::DriverAvailableNotLoaded => "Driver installed but not loaded",
             Self::DriverNotAttached => "Driver loaded but not using this device",
+            Self::DriverBlocked => "Driver turned off by a setting",
             Self::NoDriver => "No driver",
+            Self::ReservedForVirtualMachine => "Reserved for a virtual machine",
         }
     }
 }
@@ -119,20 +128,29 @@ pub struct Device {
     pub status: Status,
 }
 
+/// Placeholder drivers that hold a device for passing through to a virtual machine.
+const VM_PASSTHROUGH_DRIVERS: &[&str] = &["vfio-pci", "pci-stub", "pciback", "xen-pciback"];
+
 /// Decide a device's status from what's attached and what's installed.
 pub(crate) fn diagnose(
     driver: Option<&str>,
     candidates: &[DriverCandidate],
     needs_driver: bool,
 ) -> Status {
-    if driver.is_some() {
-        Status::Working
+    if let Some(driver) = driver {
+        if VM_PASSTHROUGH_DRIVERS.contains(&driver) {
+            Status::ReservedForVirtualMachine
+        } else {
+            Status::Working
+        }
     } else if !needs_driver {
         Status::NoDriverNeeded
     } else if candidates.iter().any(|c| c.loaded) {
         Status::DriverNotAttached
-    } else if !candidates.is_empty() {
+    } else if candidates.iter().any(|c| c.blocked_by.is_none()) {
         Status::DriverAvailableNotLoaded
+    } else if !candidates.is_empty() {
+        Status::DriverBlocked
     } else {
         Status::NoDriver
     }
@@ -146,8 +164,22 @@ pub fn short_vendor(name: &str) -> String {
         return inner.to_owned();
     }
     const SUFFIXES: &[&str] = &[
-        " Inc.", " Inc", " Co., Ltd.", " Co., Ltd", " Co.", " Ltd.", " Ltd", " Corporation",
-        " Corp.", " Corp", " Technologies", " Technology", " GmbH", " AG", " Limited", " LLC",
+        " Inc.",
+        " Inc",
+        " Co., Ltd.",
+        " Co., Ltd",
+        " Co.",
+        " Ltd.",
+        " Ltd",
+        " Corporation",
+        " Corp.",
+        " Corp",
+        " Technologies",
+        " Technology",
+        " GmbH",
+        " AG",
+        " Limited",
+        " LLC",
     ];
     let mut short = name.trim();
     // Strip repeatedly: "Qualcomm Technologies, Inc" needs two passes.
@@ -178,22 +210,60 @@ mod tests {
     use super::*;
 
     fn candidate(loaded: bool) -> DriverCandidate {
-        DriverCandidate { module: "m".into(), builtin: false, loaded }
+        DriverCandidate {
+            module: "m".into(),
+            builtin: false,
+            loaded,
+            blocked_by: None,
+        }
+    }
+
+    fn blocked() -> DriverCandidate {
+        DriverCandidate {
+            blocked_by: Some("/etc/modprobe.d/x.conf".into()),
+            ..candidate(false)
+        }
     }
 
     #[test]
     fn diagnosis_order() {
         assert_eq!(diagnose(Some("nvidia"), &[], true), Status::Working);
-        assert_eq!(diagnose(None, &[candidate(false)], false), Status::NoDriverNeeded);
-        assert_eq!(diagnose(None, &[candidate(false), candidate(true)], true), Status::DriverNotAttached);
-        assert_eq!(diagnose(None, &[candidate(false)], true), Status::DriverAvailableNotLoaded);
+        assert_eq!(
+            diagnose(None, &[candidate(false)], false),
+            Status::NoDriverNeeded
+        );
+        assert_eq!(
+            diagnose(None, &[candidate(false), candidate(true)], true),
+            Status::DriverNotAttached
+        );
+        assert_eq!(
+            diagnose(None, &[candidate(false)], true),
+            Status::DriverAvailableNotLoaded
+        );
         assert_eq!(diagnose(None, &[], true), Status::NoDriver);
+        assert_eq!(diagnose(None, &[blocked()], true), Status::DriverBlocked);
+        assert_eq!(
+            diagnose(None, &[blocked(), candidate(false)], true),
+            Status::DriverAvailableNotLoaded
+        );
+        assert_eq!(
+            diagnose(Some("vfio-pci"), &[], true),
+            Status::ReservedForVirtualMachine
+        );
+        assert!(!Status::ReservedForVirtualMachine.is_problem());
+        assert!(Status::DriverBlocked.is_problem());
     }
 
     #[test]
     fn vendor_shortening() {
-        assert_eq!(short_vendor("Advanced Micro Devices, Inc. [AMD/ATI]"), "AMD/ATI");
-        assert_eq!(short_vendor("Realtek Semiconductor Co., Ltd."), "Realtek Semiconductor");
+        assert_eq!(
+            short_vendor("Advanced Micro Devices, Inc. [AMD/ATI]"),
+            "AMD/ATI"
+        );
+        assert_eq!(
+            short_vendor("Realtek Semiconductor Co., Ltd."),
+            "Realtek Semiconductor"
+        );
         assert_eq!(short_vendor("NVIDIA Corporation"), "NVIDIA");
         assert_eq!(short_vendor("Intel Corporation"), "Intel");
         assert_eq!(short_vendor("Qualcomm Technologies, Inc"), "Qualcomm");
@@ -202,11 +272,20 @@ mod tests {
 
     #[test]
     fn marketing_names() {
-        assert_eq!(bracketed("GB203 [GeForce RTX 5070 Ti]"), Some("GeForce RTX 5070 Ti"));
+        assert_eq!(
+            bracketed("GB203 [GeForce RTX 5070 Ti]"),
+            Some("GeForce RTX 5070 Ti")
+        );
         assert_eq!(bracketed("Raphael"), None);
         assert_eq!(bracketed("Foo []"), None);
         assert_eq!(bracketed("Internal GPP Bridge to Bus [C:A]"), None);
-        assert_eq!(bracketed("Granite Ridge [Radeon 610M]"), Some("Radeon 610M"));
-        assert_eq!(bracketed("Advanced Micro Devices, Inc. [AMD/ATI]"), Some("AMD/ATI"));
+        assert_eq!(
+            bracketed("Granite Ridge [Radeon 610M]"),
+            Some("Radeon 610M")
+        );
+        assert_eq!(
+            bracketed("Advanced Micro Devices, Inc. [AMD/ATI]"),
+            Some("AMD/ATI")
+        );
     }
 }

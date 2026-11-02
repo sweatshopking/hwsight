@@ -113,10 +113,16 @@ impl Rules {
 }
 
 fn load_file(path: &Path) -> Result<Rules, RulesProblem> {
-    let invalid = |error: String| RulesProblem::Invalid { path: path.to_path_buf(), error };
+    let invalid = |error: String| RulesProblem::Invalid {
+        path: path.to_path_buf(),
+        error,
+    };
     let text = fs::read_to_string(path).map_err(|e| invalid(e.to_string()))?;
     parse(&text, DataSource::File(path.to_path_buf())).map_err(|e| match e {
-        ParseError::NewerSchema(schema) => RulesProblem::NewerSchema { path: path.to_path_buf(), schema },
+        ParseError::NewerSchema(schema) => RulesProblem::NewerSchema {
+            path: path.to_path_buf(),
+            schema,
+        },
         ParseError::Invalid(error) => invalid(error),
     })
 }
@@ -261,10 +267,16 @@ mod tests {
     #[test]
     fn newer_schema_is_reported_not_used() {
         let tmp = tempfile::tempdir().expect("tempdir");
-        write(tmp.path(), "schema = 2\nversion = \"2099.01.01\"\nnew_shape = { x = 1 }\n");
+        write(
+            tmp.path(),
+            "schema = 2\nversion = \"2099.01.01\"\nnew_shape = { x = 1 }\n",
+        );
         let (rules, problems) = Rules::load(&DataDirs::only(tmp.path()));
         assert_eq!(rules.source, DataSource::Embedded);
-        assert!(matches!(problems.as_slice(), [RulesProblem::NewerSchema { schema: 2, .. }]));
+        assert!(matches!(
+            problems.as_slice(),
+            [RulesProblem::NewerSchema { schema: 2, .. }]
+        ));
     }
 
     #[test]
@@ -276,7 +288,10 @@ mod tests {
         );
         let (rules, problems) = Rules::load(&DataDirs::only(tmp.path()));
         assert_eq!(rules.source, DataSource::Embedded);
-        assert!(matches!(problems.as_slice(), [RulesProblem::Invalid { .. }]));
+        assert!(matches!(
+            problems.as_slice(),
+            [RulesProblem::Invalid { .. }]
+        ));
     }
 
     #[test]
