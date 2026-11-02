@@ -11,31 +11,67 @@ devices reserved for virtual machines (vfio-pci, pci-stub).
 ## Copilot 1: USB ID names (`usb_ids.rs`)
 
 **Goal:** names for USB vendors, products, and classes, loaded the same layered way as
-PCI names, ready for the USB scanner.
+PCI names. The USB scanner will use them later; you do not wire them into it.
 
-**Do:**
-1. Create `hwsight-core/src/usb_ids.rs` modelled closely on `pci_ids.rs`. Read that file
-   first and follow its structure: a private parsed database, `UsbNames` with
+**Files you may change:** `hwsight-core/src/usb_ids.rs` (new), `hwsight-core/src/lib.rs`
+(two lines only, step 5), `hwsight-core/src/update.rs` (step 6 only), and this task's
+Done notes. Nothing else.
+
+**Steps (do all of them):**
+
+1. Read `hwsight-core/src/pci_ids.rs` completely before writing anything. Your file must
+   follow its structure: a private parsed database struct, a public `UsbNames` with
    `load(&DataDirs)` (uses `dirs.id_files("usb.ids")`), `from_files(&[PathBuf])`,
-   `embedded()`, `sources()`, newest file first by its `Version:` header (reuse
-   `pci_ids::header_version`), and older files filling gaps per ID.
-2. Lookups: `vendor(vid) -> Option<String>`, `product(vid, pid) -> Option<String>`,
-   `class(class, subclass, protocol) -> Option<String>` (most specific name known).
-3. `usb.ids` format: vendor lines `vvvv  Name`, product lines `\tpppp  Name`; class
-   section lines `C cc  Name`, `\tss  Name`, `\t\tpp  Name`. After the class section
-   come other sections (`AT`, `HID`, `R`, `BIAS`, `PHY`, `HUT`, `L`, `HCC`, `VT`):
-   ignore all of them. Their indented lines must not be parsed as products or classes.
-4. Embedded fallback: there's no crate yet, so `embedded()` has no names (every lookup
-   returns `None`). Leave a `// TODO: embedded usb.ids` comment where it would go. Don't
-   add a dependency.
-5. Add `pub mod usb_ids;` and `pub use usb_ids::UsbNames;` in `lib.rs`. Don't wire it
-   into `Scanner` (the USB scanner task will).
+   `embedded()`, and `sources() -> Vec<IdsSource>` (reuse `crate::pci_ids::IdsSource`).
+   Files are ordered newest first by their `Version:` header (call
+   `crate::pci_ids::header_version`), and an ID missing from the newest file is looked
+   up in the older ones.
+2. Public lookups, each returning `Option<String>`:
+   `vendor(vid: u16)`, `product(vid: u16, pid: u16)`,
+   `class(class: u8, subclass: u8, protocol: u8)` (most specific name known: protocol,
+   else subclass, else class).
+3. The `usb.ids` format: vendor lines `vvvv  Name`; product lines `\tpppp  Name`; class
+   section lines `C cc  Name`, `\tss  Name`, `\t\tpp  Name`. After the class section come
+   other sections whose top-level lines start with `AT`, `HID`, `R`, `BIAS`, `PHY`, `HUT`,
+   `L`, `HCC`, or `VT`. Ignore those sections entirely: none of their indented lines may
+   be stored as products or classes. Malformed lines are skipped, never fatal.
+4. `embedded()` has no built-in database yet: it returns a `UsbNames` with no files, so
+   every lookup returns `None`. Write exactly one comment there:
+   `// TODO: embed a usb.ids snapshot as a last-resort fallback.`
+5. In `lib.rs` add `pub mod usb_ids;` and `pub use usb_ids::UsbNames;`. Change nothing
+   else in `lib.rs`.
+6. Add `pub(crate) fn looks_valid(text: &str) -> bool` to `usb_ids.rs` (true when the text
+   parses with at least one vendor). In `update.rs`, in `file_version`, make the
+   `"usb.ids"` branch call it and return `Err("usb.ids has no devices".into())` when it is
+   false, exactly like the `"pci.ids"` branch. Change nothing else in `update.rs`.
 
-**Tests** (in the file): vendors/products parse; class/subclass/protocol most-specific
-lookup; lines in the `AT`/`HID`/`L` sections are ignored; newest file wins and older
-files fill gaps; malformed lines are skipped; real-file smoke test that loads
-`/usr/share/hwdata/usb.ids` *only if it exists* and checks vendor `1d6b` is
-"Linux Foundation" (skip silently otherwise).
+**Tests (all required, in `usb_ids.rs` unless noted):**
+
+- `parses_vendors_and_products`: a sample with two vendors and three products; check
+  every name.
+- `class_lookup_is_most_specific`: class only, class+subclass, class+subclass+protocol,
+  and an unknown protocol falling back to the subclass name.
+- `other_sections_are_ignored`: a sample with lines from `AT`, `HID`, `HUT`, and `L`
+  sections placed after the class section; assert none of them became vendors,
+  products, or classes, and that the counts are exactly what the sample defines.
+- `newest_file_wins_and_older_files_fill_gaps`: two temp files with different
+  `Version:` headers, passed in the wrong order; the newer name wins and an ID only in
+  the older file is still found; `sources()[0]` is the newer file.
+- `malformed_lines_are_skipped`: bad hex, missing names, orphan product lines.
+- `real_system_file_if_present`: if `/usr/share/hwdata/usb.ids` exists, load it and
+  assert vendor `0x1d6b` is `"Linux Foundation"`; if it doesn't exist, return early
+  (this is the only test allowed to read a real system file).
+- In `update.rs`'s tests: `usb_ids_without_devices_is_rejected`:
+  `file_version("usb.ids", b"# Version: 2026.01.01\n")` returns `Err`.
+
+**Done when:**
+
+- [ ] `usb_ids.rs` exists with every function in steps 1, 2, 4, and 6
+- [ ] `lib.rs` and `update.rs` changed exactly as steps 5 and 6 say, nothing more
+- [ ] all seven tests above exist and pass
+- [ ] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test`
+      all pass with zero warnings (paste the final `test result:` lines below)
+- [ ] nothing committed
 
 **Done notes:**
 
@@ -64,18 +100,44 @@ Why a driver didn't start; missing firmware mapped to a package per distro
 
 ## Copilot 2: colour in the CLI
 
+**Do this only after Copilot 1 is reviewed and committed.**
+
 **Goal:** easier-to-scan `hwsight` output in a terminal.
 
-**Do:** in `hwsight-cli/src/main.rs` only. Colour the status symbol and the "Why:"/"Fix:"
-labels with plain ANSI escape codes (no new dependency): green for working, yellow for
-`!`, red for `✗`, dim for "no driver needed" and the reserved-for-VM `•`. Category
-headings bold. Only colour when stdout is a terminal (`std::io::IsTerminal`) and the
-`NO_COLOR` environment variable is unset or empty (see no-color.org). Add `--no-color`
-to turn it off and list it in `HELP`. Never colour `--json` output.
+**Files you may change:** `hwsight-cli/src/main.rs` and this task's Done notes. Nothing else.
 
-**Tests:** move the colour decision into a small pure function
-`fn use_color(is_terminal: bool, no_color_env: Option<&str>, flag: bool) -> bool` and test
-it; test that the text with colour off is byte-for-byte what it is today.
+**Steps (do all of them):**
+
+1. Add `fn use_color(is_terminal: bool, no_color_env: Option<&str>, flag_off: bool) -> bool`:
+   true only when `is_terminal` is true, `no_color_env` is `None` or empty, and `flag_off`
+   is false (rules from no-color.org).
+2. Add a `--no-color` option and list it in `HELP` in the same style as the others.
+3. In `main`, compute colour with `std::io::IsTerminal` on stdout and
+   `std::env::var("NO_COLOR").ok()`, and pass it to `print_text`. `--json` output is
+   never coloured.
+4. Use plain ANSI escape codes (no new crate): status symbol green `\x1b[32m` for
+   working, yellow `\x1b[33m` for `!`, red `\x1b[31m` for `✗`, dim `\x1b[2m` for
+   "no driver needed" and the reserved-for-VM `•`; category headings and the
+   "USB ports" heading bold `\x1b[1m`; the `Why:` and `Fix:` labels bold. Every coloured
+   piece ends with `\x1b[0m`.
+5. Put the escape codes in one small helper (for example `fn paint(text, code, on) ->
+   String`) so that when colour is off the output is byte-for-byte what it is today.
+
+**Tests (all required, in `main.rs`):**
+
+- `color_rules`: every combination of the three inputs to `use_color` (8 cases).
+- `paint_off_is_plain`: with colour off, `paint` returns the text unchanged.
+- `paint_on_wraps_and_resets`: with colour on, the result starts with the code and ends
+  with `\x1b[0m`.
+
+**Done when:**
+
+- [ ] steps 1 to 5 done; `--no-color` in `HELP`
+- [ ] the three tests exist and pass
+- [ ] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test`
+      all pass with zero warnings (paste the final `test result:` lines below)
+- [ ] running `hwsight --no-color` prints exactly what `hwsight` printed before this task
+- [ ] nothing committed
 
 **Done notes:**
 
