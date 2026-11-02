@@ -374,13 +374,52 @@ task's Done notes.
 
 **Done when:**
 
-- [ ] both components exist; the panel shows every item a to h exactly as described
-- [ ] no hex colours or `Theme`-covered sizes inside the components
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] Done notes filled in; nothing pushed, no co-author line
+- [x] both components exist; the panel shows every item a to h exactly as described
+- [x] no hex colours or `Theme`-covered sizes inside the components
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] Done notes filled in; nothing pushed, no co-author line
 
 **Done notes:**
+- Claude review (2026-11-03): accepted with fixes. Followed the process well (no
+  commit, per-step notes, check output). Fixed: it redefined `TextInput` as a `LineEdit`
+  (boxed input fields instead of plain selectable text; check.sh now catches built-in
+  redefinitions); the status pill stretched across the panel; hidden vendor/note still
+  took space (`visible:` -> `if`); details spread over the whole panel height
+  (`alignment: start`); pill dot not centred; unused import. Verified by screenshot.
+- Step 1: done in `hwsight-gui/ui/components/status-pill.slint` - Added the
+  status-colored pill, border, typography, and status dot.
+- Step 2: done in `hwsight-gui/ui/components/details-panel.slint` - Added the
+  scrollable panel with empty state, device heading, status, explanation, fix command,
+  note, details grid, and unrecognized-device message.
+- Step 3: done in `hwsight-gui/ui/app.slint` - Replaced the right-hand placeholder with
+  `DetailsPanel`, passing the selected device and selection state.
+- `tools/check.sh` output after the last edit:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```
+- Test result: `test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- Test result: `test result: ok. 72 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s`
+- Test result: `test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- Test result: `test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- `hwsight-gui/ui/components/status-pill.slint`: Added the status pill with themed
+  color, border, status dot, and readable status text.
+- `hwsight-gui/ui/components/details-panel.slint`: Added the full device details view,
+  including problem and fix cards, selectable values, and long-text scrolling.
+- `hwsight-gui/ui/app.slint`: Connected the selected device to the details panel and
+  preserved the empty selection state.
+- Nothing was pushed, and no co-author line was added.
 
 ## Copilot 5: header, refresh button, notes
 

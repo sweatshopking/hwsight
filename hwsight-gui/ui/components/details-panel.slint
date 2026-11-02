@@ -1,0 +1,182 @@
+import { ScrollView } from "std-widgets.slint";
+import { Theme, DeviceItem } from "../theme.slint";
+import { StatusPill } from "status-pill.slint";
+
+export component DetailsPanel inherits Rectangle {
+    in property <DeviceItem> device;
+    in property <bool> has-device;
+    property <color> status-colour: root.device.status-kind == "ok" ? Theme.ok
+        : root.device.status-kind == "warn" ? Theme.warn
+        : root.device.status-kind == "error" ? Theme.error
+        : Theme.neutral;
+    background: Theme.surface;
+    border-radius: Theme.radius;
+
+    VerticalLayout {
+        padding: 24px;
+        if !root.has-device : Text {
+            text: "Select a device to see its details";
+            color: Theme.text-faint;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            horizontal-stretch: 1;
+            vertical-stretch: 1;
+        }
+        if root.has-device : ScrollView {
+        VerticalLayout {
+            // Pack from the top; without this the items spread to fill the panel.
+            alignment: start;
+            spacing: Theme.gap;
+            Text {
+                text: root.device.name;
+                color: Theme.text;
+                font-size: Theme.font-hero;
+                font-weight: 700;
+                wrap: word-wrap;
+            }
+            if root.device.vendor != "" : Text {
+                text: root.device.vendor;
+                color: Theme.text-muted;
+                font-size: Theme.font-body;
+                overflow: elide;
+            }
+            // Wrapped so the pill fits its text instead of stretching across the panel.
+            HorizontalLayout {
+                alignment: start;
+                StatusPill {
+                    kind: root.device.status-kind;
+                    text: root.device.status-text;
+                }
+            }
+            if root.device.why != "" : Rectangle {
+                background: root.status-colour.with-alpha(0.10);
+                border-width: 1px;
+                border-color: root.status-colour.with-alpha(0.35);
+                border-radius: Theme.radius-small;
+                VerticalLayout {
+                    padding: 16px;
+                    spacing: Theme.gap;
+                    Text {
+                        text: "What's wrong";
+                        color: Theme.text;
+                        font-size: Theme.font-body;
+                        font-weight: 700;
+                    }
+                    Text {
+                        text: root.device.why;
+                        color: Theme.text;
+                        wrap: word-wrap;
+                    }
+                }
+            }
+            if root.device.fix != "" : Rectangle {
+                background: Theme.surface-raised;
+                border-radius: Theme.radius-small;
+                VerticalLayout {
+                    padding: 16px;
+                    spacing: Theme.gap;
+                    Text {
+                        text: "How to fix";
+                        color: Theme.text;
+                        font-size: Theme.font-body;
+                        font-weight: 700;
+                    }
+                    Text {
+                        text: "Run this in a terminal:";
+                        color: Theme.text-muted;
+                        wrap: word-wrap;
+                    }
+                    Rectangle {
+                        background: Theme.background;
+                        border-radius: 6px;
+                        HorizontalLayout {
+                            padding: 10px;
+                            TextInput {
+                                text: root.device.fix;
+                                read-only: true;
+                                color: Theme.highlight;
+                                font-family: "monospace";
+                                horizontal-stretch: 1;
+                            }
+                        }
+                    }
+                }
+            }
+            if root.device.note != "" : Text {
+                text: root.device.note;
+                color: Theme.text-muted;
+                wrap: word-wrap;
+            }
+            VerticalLayout {
+                spacing: Theme.gap;
+                Text {
+                    text: "DETAILS";
+                    color: Theme.text-muted;
+                    font-size: Theme.font-small;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                }
+                GridLayout {
+                    spacing: Theme.gap;
+                    Row {
+                        Text { text: "Type"; color: Theme.text-muted; }
+                        TextInput {
+                            text: root.device.category;
+                            read-only: true;
+                            single-line: true;
+                            color: Theme.text;
+                            font-size: Theme.font-body;
+                        }
+                    }
+                    Row {
+                        Text { text: "Driver"; color: Theme.text-muted; }
+                        TextInput {
+                            text: root.device.driver == "" ? "None" : root.device.driver;
+                            read-only: true;
+                            single-line: true;
+                            color: Theme.text;
+                            font-size: Theme.font-body;
+                        }
+                    }
+                    Row {
+                        Text { text: "Hardware ID"; color: Theme.text-muted; }
+                        TextInput {
+                            text: root.device.hardware-id;
+                            read-only: true;
+                            single-line: true;
+                            color: Theme.text;
+                            font-size: Theme.font-body;
+                        }
+                    }
+                    Row {
+                        Text { text: "Connection"; color: Theme.text-muted; }
+                        TextInput {
+                            text: root.device.bus;
+                            read-only: true;
+                            single-line: true;
+                            color: Theme.text;
+                            font-size: Theme.font-body;
+                        }
+                    }
+                    Row {
+                        Text { text: "Address"; color: Theme.text-muted; }
+                        TextInput {
+                            text: root.device.address;
+                            read-only: true;
+                            single-line: true;
+                            color: Theme.text;
+                            font-size: Theme.font-body;
+                        }
+                    }
+                }
+                if root.device.unrecognized : Text {
+                    text: "This device isn't in the device database yet. Its hardware ID above can be searched for online.";
+                    color: Theme.text-faint;
+                    wrap: word-wrap;
+                }
+            }
+        }
+    }
+    }
+}
+

@@ -1,0 +1,36 @@
+import { Theme } from "../theme.slint";
+import { StatusDot } from "status-dot.slint";
+
+export component StatusPill inherits Rectangle {
+    in property <string> kind;
+    in property <string> text;
+    property <color> colour: kind == "ok" ? Theme.ok
+        : kind == "warn" ? Theme.warn
+        : kind == "error" ? Theme.error
+        : Theme.neutral;
+    height: 26px;
+    border-radius: 13px;
+    background: colour.with-alpha(0.18);
+    border-width: 1px;
+    border-color: colour.with-alpha(0.5);
+
+    HorizontalLayout {
+        padding-left: 12px;
+        padding-right: 12px;
+        spacing: 8px;
+        VerticalLayout {
+            alignment: center;
+            StatusDot {
+                kind: root.kind;
+            }
+        }
+        Text {
+            text: root.text;
+            color: root.colour;
+            font-size: Theme.font-small;
+            font-weight: 600;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+}

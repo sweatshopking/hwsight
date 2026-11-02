@@ -9,6 +9,7 @@ import { ScrollView, Button, ListView } from "std-widgets.slint";
 import { Theme, DeviceItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
+import { DetailsPanel } from "components/details-panel.slint";
 
 // Re-exported so the Rust side can set theme tokens and build device items.
 export { Theme, DeviceItem }
@@ -99,18 +100,24 @@ export component AppWindow inherits Window {
                     }
                 }
             }
-            Rectangle {
-                background: Theme.surface;
-                border-radius: Theme.radius;
+            DetailsPanel {
+                device: root.selected >= 0 ? root.devices[root.selected] : {
+                    name: "",
+                    vendor: "",
+                    category: "",
+                    status-kind: "neutral",
+                    status-text: "",
+                    driver: "",
+                    hardware-id: "",
+                    address: "",
+                    bus: "",
+                    why: "",
+                    fix: "",
+                    note: "",
+                    unrecognized: false
+                };
+                has-device: root.selected >= 0;
                 horizontal-stretch: 3;
-                Text {
-                    text: "Select a device to see its details";
-                    color: Theme.text-faint;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                    horizontal-stretch: 1;
-                    vertical-stretch: 1;
-                }
             }
         }
     }

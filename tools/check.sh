@@ -44,6 +44,11 @@ hits=$(grep -rnE 'from "[^"]*app\.slint"' "$comp" 2>/dev/null)
 hits=$(grep -rnE 'in(-out)? property <(color|brush)>' "$comp" 2>/dev/null)
 [[ -z $hits ]] && pass "no colours passed into components as properties (use Theme)" || fail "no colours passed into components as properties (use Theme)" "$hits"
 
+# Components must not redefine Slint's built-in elements (e.g. turning TextInput into a
+# LineEdit), which silently changes how everything using that name looks.
+hits=$(grep -rnE 'export component (Text|TextInput|Rectangle|Image|Path|TouchArea|FocusScope|Flickable|Window|PopupWindow|Dialog)\b' "$ui" 2>/dev/null)
+[[ -z $hits ]] && pass "no built-in elements redefined" || fail "no built-in elements redefined" "$hits"
+
 # Every `for ... : Rectangle {` must set a height within its first 3 lines.
 hits=$(awk '
     function report() { if (pending > 0) print where; pending = 0 }
