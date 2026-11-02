@@ -109,5 +109,6 @@ protocols ourselves (thousands of devices, real risk of bricking controllers). I
    - Boards whose firmware blocks SMBus access (`acpi_enforce_resources=lax` advice,
      explained carefully, never applied automatically).
    - Other software holding the device (liquidctl, OpenRazer, vendor tools in Wine).
-   - Known-quirky controllers as data (`rgb.toml`, updatable), e.g. ITE 048d:5702 that
-     changes colour once then ignores further commands (seen on owner's previous board).
+   - Known-quirky controllers as data (`rgb.toml`, updatable), e.g. Gigabyte RGB Fusion 2
+     USB (ITE 048d:5702, on the owner's LVbox B650M board) that changed colour once and
+     then ignored further commands with OpenRGB.
