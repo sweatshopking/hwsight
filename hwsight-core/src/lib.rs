@@ -12,6 +12,8 @@ mod pci;
 pub mod pci_ids;
 pub mod rules;
 pub mod update;
+pub mod usb_ids;
+pub use usb_ids::UsbNames;
 mod usb;
 
 use std::path::PathBuf;

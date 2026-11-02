@@ -235,8 +235,12 @@ pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
             }
             crate::pci_ids::header_version(text).ok_or("pci.ids has no version")?
         }
-        // usb.ids: the same format; checked fully once the USB name reader exists.
-        "usb.ids" => crate::pci_ids::header_version(text).ok_or("usb.ids has no version")?,
+        "usb.ids" => {
+            if !crate::usb_ids::looks_valid(text) {
+                return Err("usb.ids has no devices".into());
+            }
+            crate::pci_ids::header_version(text).ok_or("usb.ids has no version")?
+        }
         _ => return Err(format!("unexpected file {name}")),
     })
 }
@@ -545,6 +549,11 @@ mod tests {
         let ids = b"# Version: 2026.06.26\n1d6b  Linux Foundation\n\t0034  \xb4 and \"\n";
         assert_eq!(file_version("usb.ids", ids).as_deref(), Ok("2026.06.26"));
         assert!(file_version("rules.toml", b"schema = 1\n\xb4").is_err());
+    }
+
+    #[test]
+    fn usb_ids_without_devices_is_rejected() {
+        assert!(file_version("usb.ids", b"# Version: 2026.01.01\n").is_err());
     }
 
     #[test]

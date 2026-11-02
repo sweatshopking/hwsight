@@ -66,14 +66,23 @@ Done notes. Nothing else.
 
 **Done when:**
 
-- [ ] `usb_ids.rs` exists with every function in steps 1, 2, 4, and 6
-- [ ] `lib.rs` and `update.rs` changed exactly as steps 5 and 6 say, nothing more
-- [ ] all seven tests above exist and pass
-- [ ] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test`
+- [x] `usb_ids.rs` exists with every function in steps 1, 2, 4, and 6
+- [x] `lib.rs` and `update.rs` changed exactly as steps 5 and 6 say, nothing more
+- [x] all seven tests above exist and pass
+- [x] `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, and `cargo test`
       all pass with zero warnings (paste the final `test result:` lines below)
-- [ ] nothing committed
+- [x] nothing committed
 
 **Done notes:**
+- `hwsight-core/src/usb_ids.rs`: Added layered USB vendor, product, and class name
+  parsing, source reporting, validity checking, and all six USB ID tests.
+- `hwsight-core/src/lib.rs`: Exported the `usb_ids` module and `UsbNames`.
+- `hwsight-core/src/update.rs`: Rejected `usb.ids` files that contain no vendors and
+  added `usb_ids_without_devices_is_rejected`.
+- Test result: `test result: ok. 69 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s`
+- Test result: `test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- Test result: `test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
+- Test result: `test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s`
 
 ## Claude 2: USB scanner (done 2026-11-02, names integration waits for Copilot 1)
 
