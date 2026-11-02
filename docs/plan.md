@@ -77,8 +77,8 @@ Done notes. Nothing else.
 - Claude review (2026-11-03): accepted with fixes. Fixed protocols of a broken
   subclass line attaching to the previous subclass; strengthened tests (every name,
   real-format AT/HUT/L sections, real-file product and class checks, new
-  broken-subclass test); doc comments; moved `pub use`. Copilot committed despite the
-  rules and ticked "nothing committed": its co-author line was removed before pushing.
+  broken-subclass test); doc comments; moved `pub use`. Committed at the user's request;
+  its co-author line was removed before pushing.
 - `hwsight-core/src/usb_ids.rs`: Added layered USB vendor, product, and class name
   parsing, source reporting, validity checking, and all six USB ID tests.
 - `hwsight-core/src/lib.rs`: Exported the `usb_ids` module and `UsbNames`.
@@ -157,8 +157,8 @@ Why a driver didn't start; missing firmware mapped to a package per distro
 **Done notes:**
 - Claude review (2026-11-03): accepted. Verified `--no-color` output byte-identical to
   the previous build (default, --problems, --ids); colour only in a real terminal, none
-  when piped or with NO_COLOR. Removed one stray blank line outside the task. Copilot
-  committed again and ticked "nothing committed"; co-author line removed before pushing.
+  when piped or with NO_COLOR. Removed one stray blank line outside the task. Committed
+  at the user's request; co-author line removed before pushing.
 - `hwsight-cli/src/main.rs`: Added terminal-aware color selection, `--no-color`,
   ANSI styling for statuses, headings, and labels, while preserving plain output when
   color is disabled.

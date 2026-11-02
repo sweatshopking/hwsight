@@ -21,8 +21,9 @@ These are requirements, not suggestions. A task that breaks any of them is not d
 4. **Stay inside the task.** Change only the files the task names. Do not refactor,
    rename, or "tidy" anything else. Do not edit `CLAUDE.md`, `Cargo.toml` versions,
    `.github/workflows/`, or `hwsight-core/data/`.
-5. **Do not commit, push, or create branches.** Leave your changes uncommitted. They are
-   reviewed first, then committed by the maintainer.
+5. **Never push, and never create branches.** Commit only if the user asks you to, as a
+   single local commit on the current branch, with no `Co-authored-by` line. Every change
+   is reviewed before it's pushed.
 6. **Run the checks yourself, in the terminal, and read the output.** Do not claim they
    pass without running them:
 
