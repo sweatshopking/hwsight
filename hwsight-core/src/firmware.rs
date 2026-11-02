@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
-use crate::distro::Family;
+use crate::distro::{Distro, Family};
 
 #[derive(Debug, Clone)]
 pub struct FirmwarePackages {
@@ -15,7 +15,7 @@ pub struct FirmwarePackages {
 }
 
 #[derive(Debug, Clone, Default)]
-struct Table {
+pub(crate) struct Table {
     entries: Vec<Entry>,
     notes: HashMap<String, String>,
 }
@@ -111,14 +111,16 @@ impl FirmwarePackages {
         }
     }
 
-    /// The package that provides firmware `file` on this distro family.
-    pub fn package_for(&self, file: &str, family: Family) -> Option<&str> {
-        let key = family.key()?;
+    /// The package that provides firmware `file` on this distro. The most specific path
+    /// wins; within it, a release-specific name (`debian-bookworm`) beats the general
+    /// one (`debian`).
+    pub fn package_for(&self, file: &str, distro: &Distro) -> Option<&str> {
+        let keys = distro.data_keys();
         self.table
             .entries
             .iter()
             .filter(|e| file.starts_with(&e.path))
-            .find_map(|e| e.packages.get(key))
+            .find_map(|e| keys.iter().find_map(|k| e.packages.get(k)))
             .map(String::as_str)
     }
 
@@ -133,6 +135,27 @@ mod tests {
     use super::*;
     use std::fs;
 
+    fn distro(family: Family) -> Distro {
+        let id = family.key().unwrap_or("void");
+        Distro::from_os_release(&format!("ID={id}\n"), false)
+    }
+
+    #[test]
+    fn release_specific_names_win() {
+        let fw = FirmwarePackages::embedded();
+        let bookworm = Distro::from_os_release("ID=debian\nVERSION_CODENAME=bookworm\n", false);
+        let trixie = Distro::from_os_release("ID=debian\nVERSION_CODENAME=trixie\n", false);
+        let file = "nvidia/ad102/gsp/booter_load-535.113.01.bin";
+        assert_eq!(
+            fw.package_for(file, &bookworm),
+            Some("firmware-misc-nonfree")
+        );
+        assert_eq!(
+            fw.package_for(file, &trixie),
+            Some("firmware-nvidia-graphics")
+        );
+    }
+
     #[test]
     fn embedded_file_is_valid() {
         assert!(data::parse_data::<Table>(Table::EMBEDDED).is_ok());
@@ -143,41 +166,44 @@ mod tests {
     fn most_specific_entry_wins_per_distro() {
         let fw = FirmwarePackages::embedded();
         assert_eq!(
-            fw.package_for("rtl_nic/rtl8125b-2.fw", Family::Arch),
+            fw.package_for("rtl_nic/rtl8125b-2.fw", &distro(Family::Arch)),
             Some("linux-firmware-realtek")
         );
         assert_eq!(
-            fw.package_for("rtl_nic/rtl8125b-2.fw", Family::Debian),
+            fw.package_for("rtl_nic/rtl8125b-2.fw", &distro(Family::Debian)),
             Some("firmware-realtek")
         );
         // Ubuntu has one package for everything, found through the fallback entry.
         assert_eq!(
-            fw.package_for("rtl_nic/rtl8125b-2.fw", Family::Ubuntu),
+            fw.package_for("rtl_nic/rtl8125b-2.fw", &distro(Family::Ubuntu)),
             Some("linux-firmware")
         );
         assert_eq!(
-            fw.package_for("iwlwifi-ty-a0-gf-a0-89.ucode", Family::Fedora),
+            fw.package_for("iwlwifi-ty-a0-gf-a0-89.ucode", &distro(Family::Fedora)),
             Some("iwlwifi-mvm-firmware")
         );
         // "intel/sof..." is more specific than "intel/".
         assert_eq!(
-            fw.package_for("intel/sof-ipc4/mtl/sof-mtl.ri", Family::Arch),
+            fw.package_for("intel/sof-ipc4/mtl/sof-mtl.ri", &distro(Family::Arch)),
             Some("sof-firmware")
         );
         assert_eq!(
-            fw.package_for("intel/ibt-0040-0041.sfi", Family::Arch),
+            fw.package_for("intel/ibt-0040-0041.sfi", &distro(Family::Arch)),
             Some("linux-firmware-intel")
         );
         // A distro missing from a specific entry falls back to the general package.
         assert_eq!(
-            fw.package_for("amd/amd_sev_fam19h_model1xh.sbin", Family::Fedora),
+            fw.package_for("amd/amd_sev_fam19h_model1xh.sbin", &distro(Family::Fedora)),
             Some("linux-firmware")
         );
         assert_eq!(
-            fw.package_for("anything/new.bin", Family::OpenSuse),
+            fw.package_for("anything/new.bin", &distro(Family::OpenSuse)),
             Some("kernel-firmware-all")
         );
-        assert_eq!(fw.package_for("rtl_nic/x.fw", Family::Unknown), None);
+        assert_eq!(
+            fw.package_for("rtl_nic/x.fw", &distro(Family::Unknown)),
+            None
+        );
         assert!(fw.note(Family::Debian).is_some());
         assert!(fw.note(Family::Arch).is_none());
     }

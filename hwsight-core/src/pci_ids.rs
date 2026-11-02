@@ -115,6 +115,11 @@ fn load_layer(path: &Path) -> Option<IdsLayer> {
     })
 }
 
+/// Whether text parses as a `pci.ids` file with at least one vendor.
+pub(crate) fn looks_valid(text: &str) -> bool {
+    !PciIdsDb::parse(text).vendors.is_empty()
+}
+
 /// The `#\tVersion: 2026.10.01` line near the top of an ids file.
 pub(crate) fn header_version(text: &str) -> Option<String> {
     text.lines()

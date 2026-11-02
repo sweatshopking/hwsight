@@ -58,6 +58,10 @@ pub struct Distro {
     pub family: Family,
     /// Read-only system (Fedora Atomic, Bazzite, SteamOS...): normal installs don't work.
     pub immutable: bool,
+    /// The release of the *base* distro, where package names depend on it: the Debian or
+    /// Ubuntu codename (`bookworm`, `noble`) or the Fedora version (`43`). Derivatives
+    /// report their base, so Linux Mint 22 gives `noble`, not 22.
+    pub base_release: Option<String>,
 }
 
 impl Distro {
@@ -101,11 +105,39 @@ impl Distro {
         } else {
             Family::Unknown
         };
+        let lower = |key: &str| {
+            field(key)
+                .map(|v| v.to_lowercase())
+                .filter(|v| !v.is_empty())
+        };
+        let own = |key: &str, base: &str| (id == base).then(|| lower(key)).flatten();
+        let base_release = match family {
+            Family::Ubuntu => {
+                lower("UBUNTU_CODENAME").or_else(|| own("VERSION_CODENAME", "ubuntu"))
+            }
+            Family::Debian => {
+                lower("DEBIAN_CODENAME").or_else(|| own("VERSION_CODENAME", "debian"))
+            }
+            Family::Fedora => own("VERSION_ID", "fedora"),
+            _ => None,
+        };
         Self {
             id,
             name,
             family,
             immutable,
+            base_release,
+        }
+    }
+
+    /// Keys to look up in hwsight data, most specific first: `["debian-bookworm", "debian"]`.
+    pub fn data_keys(&self) -> Vec<String> {
+        let Some(family) = self.family.key() else {
+            return Vec::new();
+        };
+        match &self.base_release {
+            Some(release) => vec![format!("{family}-{release}"), family.to_owned()],
+            None => vec![family.to_owned()],
         }
     }
 }
@@ -153,6 +185,40 @@ mod tests {
         let d = Distro::from_os_release("ID_LIKE=arch\nID=endeavouros\n", false);
         assert_eq!(d.id, "endeavouros");
         assert_eq!(d.family, Family::Arch);
+    }
+
+    #[test]
+    fn base_release_of_derivatives() {
+        let d = |text: &str| Distro::from_os_release(text, false);
+        assert_eq!(
+            d("ID=debian\nVERSION_CODENAME=bookworm\n").data_keys(),
+            ["debian-bookworm", "debian"]
+        );
+        assert_eq!(
+            d("ID=ubuntu\nVERSION_ID=\"24.04\"\nVERSION_CODENAME=noble\nUBUNTU_CODENAME=noble\n")
+                .data_keys(),
+            ["ubuntu-noble", "ubuntu"]
+        );
+        // Linux Mint 22 is based on Ubuntu 24.04 (noble): its own version must not be used.
+        let mint = d(
+            "ID=linuxmint\nID_LIKE=\"ubuntu debian\"\nVERSION_ID=\"22\"\nVERSION_CODENAME=wilma\nUBUNTU_CODENAME=noble\n",
+        );
+        assert_eq!(mint.data_keys(), ["ubuntu-noble", "ubuntu"]);
+        // A Debian derivative that doesn't say which Debian it's based on: generic only.
+        assert_eq!(
+            d("ID=mx\nID_LIKE=debian\nVERSION_CODENAME=libretto\n").data_keys(),
+            ["debian"]
+        );
+        assert_eq!(
+            d("ID=fedora\nVERSION_ID=43\n").data_keys(),
+            ["fedora-43", "fedora"]
+        );
+        assert_eq!(
+            d("ID=nobara\nID_LIKE=fedora\nVERSION_ID=42\n").data_keys(),
+            ["fedora"]
+        );
+        assert_eq!(d("ID=cachyos\nID_LIKE=arch\n").data_keys(), ["arch"]);
+        assert!(d("ID=void\n").data_keys().is_empty());
     }
 
     #[test]

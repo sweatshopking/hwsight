@@ -18,6 +18,9 @@ Options:
   --kernel-log FILE
                Explain problems using this saved kernel log (from `journalctl -k -b`
                or `dmesg`) instead of reading this computer's log
+  --update-data
+               Download the newest device data (names, rules, firmware packages)
+               and exit. Updates are signed and checked before use.
   -h, --help   Show this help
   -V, --version
 ";
@@ -53,6 +56,7 @@ fn main() -> ExitCode {
                 print!("{HELP}");
                 return ExitCode::SUCCESS;
             }
+            "--update-data" => return update_data(),
             "-V" | "--version" => {
                 println!("hwsight {}", env!("CARGO_PKG_VERSION"));
                 return ExitCode::SUCCESS;
@@ -222,5 +226,39 @@ fn symbol(status: Status) -> &'static str {
         }
         Status::NoDriver | Status::DriverBlocked => "✗",
         Status::ReservedForVirtualMachine => "•",
+    }
+}
+
+fn update_data() -> ExitCode {
+    let dirs = hwsight_core::DataDirs::standard();
+    let Some(dest) = dirs.download.clone() else {
+        eprintln!("hwsight: can't find your home folder to save updates in");
+        return ExitCode::FAILURE;
+    };
+    let fetch = hwsight_core::update::HttpFetch {
+        base_url: std::env::var("HWSIGHT_DATA_URL")
+            .unwrap_or_else(|_| hwsight_core::update::DEFAULT_SOURCE.to_owned()),
+    };
+    let current = hwsight_core::update::current_versions(&dirs);
+    let result =
+        hwsight_core::update::update(&fetch, hwsight_core::update::TRUSTED_KEYS, &dest, &current);
+    if let Some(state) = hwsight_core::update::default_state_file() {
+        let _ = hwsight_core::update::mark_checked(&state);
+    }
+    match result {
+        Ok(outcome) if outcome.installed.is_empty() => {
+            println!("Device data is up to date.");
+            ExitCode::SUCCESS
+        }
+        Ok(outcome) => {
+            for (name, version) in &outcome.installed {
+                println!("Updated {name} to {version}");
+            }
+            ExitCode::SUCCESS
+        }
+        Err(e) => {
+            eprintln!("hwsight: {}", e.message());
+            ExitCode::FAILURE
+        }
     }
 }

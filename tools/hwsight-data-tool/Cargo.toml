@@ -1,0 +1,16 @@
+[package]
+name = "hwsight-data-tool"
+description = "Developer tool: create signing keys and sign hwsight data releases. Not shipped."
+publish = false
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+hwsight-core = { path = "../../hwsight-core", default-features = false }
+ed25519-dalek = "3.0.0"
+
+[lints]
+workspace = true

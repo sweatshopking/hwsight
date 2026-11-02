@@ -108,7 +108,7 @@ struct RawInterfaceRule {
 
 /// The parsed rule lists, without version info.
 #[derive(Debug, Clone)]
-struct RuleSet {
+pub(crate) struct RuleSet {
     no_driver_needed: Vec<NoDriverRule>,
     expect_interface: Vec<InterfaceRule>,
 }

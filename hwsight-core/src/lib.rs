@@ -11,6 +11,7 @@ pub mod modules;
 mod pci;
 pub mod pci_ids;
 pub mod rules;
+pub mod update;
 mod usb;
 
 use std::path::PathBuf;
@@ -236,9 +237,7 @@ impl Scanner {
                     ..
                 } = issue
                 {
-                    *package = firmware
-                        .package_for(file, self.distro.family)
-                        .map(str::to_owned);
+                    *package = firmware.package_for(file, &self.distro).map(str::to_owned);
                     *install_command = package
                         .as_deref()
                         .and_then(|p| self.distro.family.install_command(p, self.distro.immutable));

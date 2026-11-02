@@ -7,13 +7,21 @@ authors.workspace = true
 repository.workspace = true
 
 [dependencies]
+ed25519-dalek = "3.0.0"
 glob = "0.3.4"
 pci-ids = "0.2.6"
 serde = { version = "1.0.229", features = ["derive"] }
+sha2 = "0.11.1"
 toml = { version = "1.1.8", default-features = false, features = ["parse", "serde"] }
+ureq = { version = "3.5.0", default-features = false, features = ["rustls"], optional = true }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
 tempfile = "3.27.0"
+
+[features]
+default = ["updater"]
+# Download data updates over HTTPS. Signature and checksum checks work without it.
+updater = ["dep:ureq"]
