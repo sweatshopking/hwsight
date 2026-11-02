@@ -21,7 +21,7 @@ run "GUI builds" cargo build -q -p hwsight-gui
 
 # The app must open and still be running when the timeout closes it (exit code 124).
 if [[ -n ${WAYLAND_DISPLAY:-}${DISPLAY:-} ]]; then
-    timeout 6 target/debug/hwsight-gui >/dev/null 2>&1
+    HWSIGHT_NO_UPDATE=1 timeout 6 target/debug/hwsight-gui >/dev/null 2>&1
     code=$?
     if [[ $code -eq 124 ]]; then pass "GUI opens and stays open"; else fail "GUI opens and stays open" "exit code $code (expected 124: it crashed or quit)"; fi
 else

@@ -27,7 +27,8 @@ fn main() -> Result<(), slint::PlatformError> {
     let filter_window = window.as_weak();
     let filter_devices = devices.clone();
     window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
-    start_scan(window.as_weak(), devices);
+    start_scan(window.as_weak(), devices.clone());
+    check_for_data_update(window.as_weak(), devices);
 
     // Developer aid for reviews: HWSIGHT_SNAPSHOT=out.ppm saves a picture of the window
     // after the first scan and quits; HWSIGHT_SELECT=<n> selects device n first. This
@@ -43,6 +44,52 @@ fn main() -> Result<(), slint::PlatformError> {
     }
 
     window.run()
+}
+
+/// At most once a day, quietly download newer device data in the background. If
+/// anything new was installed, scan again so it's used straight away. Never blocks the
+/// window and never asks anything; problems just mean we try again tomorrow.
+/// HWSIGHT_NO_UPDATE=1 turns it off (tests, review snapshots).
+fn check_for_data_update(
+    window: slint::Weak<AppWindow>,
+    devices: Arc<Mutex<Vec<hwsight_core::Device>>>,
+) {
+    if std::env::var_os("HWSIGHT_NO_UPDATE").is_some()
+        || std::env::var_os("HWSIGHT_SNAPSHOT").is_some()
+    {
+        return;
+    }
+    let Some(state) = hwsight_core::update::default_state_file() else {
+        return;
+    };
+    let day = std::time::Duration::from_secs(24 * 60 * 60);
+    if !hwsight_core::update::check_due(&state, std::time::SystemTime::now(), day) {
+        return;
+    }
+    std::thread::spawn(move || {
+        let dirs = hwsight_core::DataDirs::standard();
+        let Some(dest) = dirs.download.clone() else {
+            return;
+        };
+        let fetch = hwsight_core::update::HttpFetch {
+            base_url: hwsight_core::update::DEFAULT_SOURCE.to_owned(),
+        };
+        let current = hwsight_core::update::current_versions(&dirs);
+        let result = hwsight_core::update::update(
+            &fetch,
+            hwsight_core::update::TRUSTED_KEYS,
+            &dest,
+            &current,
+        );
+        // Record the attempt even if it failed (e.g. offline), so a broken connection
+        // doesn't mean a download attempt on every start.
+        let _ = hwsight_core::update::mark_checked(&state);
+        if let Ok(outcome) = result
+            && !outcome.installed.is_empty()
+        {
+            let _ = slint::invoke_from_event_loop(move || start_scan(window, devices));
+        }
+    });
 }
 
 fn snapshot_when_ready(window: slint::Weak<AppWindow>, path: std::path::PathBuf) {
