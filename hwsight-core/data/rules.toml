@@ -1,0 +1,38 @@
+# hwsight knowledge rules.
+#
+# This file is built into hwsight and can be replaced by a newer downloaded copy.
+# `schema` is the file format version: bump it only for changes old hwsight versions
+# can't read. `version` is the release date of this data (YYYY.MM.DD); newest wins.
+schema = 1
+version = "2026.11.02"
+
+# Devices that normally work with no driver attached. Without these rules hwsight would
+# raise false alarms about parts of every motherboard.
+#
+# Match fields (all optional, all must match, hex without "0x"):
+#   class       base class, 2 digits
+#   subclasses  list of subclasses, 2 digits each (omit to match the whole class)
+#   vendor      4-digit vendor ID
+#   device      4-digit device ID (needs vendor)
+
+[[no_driver_needed]]
+class = "05"
+reason = "Memory controllers are run by the motherboard firmware."
+
+[[no_driver_needed]]
+class = "06"
+subclasses = ["00", "01", "02", "03", "04", "80"]
+reason = "Bridges connect parts of the computer together and work without a driver."
+
+[[no_driver_needed]]
+class = "08"
+subclasses = ["00", "01", "02", "03", "04", "05", "06", "07"]
+reason = "This core system part is handled directly by the kernel."
+
+[[no_driver_needed]]
+class = "0b"
+reason = "Processors are handled directly by the kernel."
+
+[[no_driver_needed]]
+class = "13"
+reason = "This is a testing or debugging function that isn't used in normal operation."

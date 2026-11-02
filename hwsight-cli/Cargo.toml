@@ -8,6 +8,11 @@ repository.workspace = true
 
 [dependencies]
 hwsight-core = { path = "../hwsight-core" }
+serde_json = "1.0.154"
 
 [lints]
 workspace = true
+
+[[bin]]
+name = "hwsight"
+path = "src/main.rs"
