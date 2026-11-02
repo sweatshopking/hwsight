@@ -5,13 +5,14 @@
 // colours, sizes, and fonts from `Theme`, so themes can be swapped without touching
 // components.
 
-import { ScrollView, Button, ListView, Switch } from "std-widgets.slint";
+import { ScrollView, Button, ListView, Switch, Palette } from "std-widgets.slint";
 import { Theme, DeviceItem, FixItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
 import { DetailsPanel } from "components/details-panel.slint";
 import { AccentButton } from "components/accent-button.slint";
 import { NotesBanner } from "components/notes-banner.slint";
+import { UpdateBanner } from "components/update-banner.slint";
 import { StatusPill } from "components/status-pill.slint";
 import { SearchBox } from "components/search-box.slint";
 
@@ -35,6 +36,9 @@ export component AppWindow inherits Window {
     min-width: 720px;
     min-height: 480px;
     background: Theme.background;
+    // Slint's built-in widgets (the switch, scrollbars) default to a light scheme with
+    // dark text, which is hard to read on our dark background.
+    init => { Palette.color-scheme = ColorScheme.dark; }
 
     // Filled by Rust.
     in property <[DeviceItem]> devices;
@@ -43,6 +47,10 @@ export component AppWindow inherits Window {
     in property <int> problem-count;
     in property <[string]> notes;          // things that limited the scan
     in property <bool> scanning;
+    in property <string> update-text;
+    in property <bool> update-can-update;
+    in property <bool> update-busy;
+    in property <bool> update-can-restart;
     in-out property <string> query;
     in-out property <bool> only-problems;
 
@@ -51,6 +59,8 @@ export component AppWindow inherits Window {
 
     callback refresh();
     callback filter-changed();
+    callback update-now();
+    callback restart-now();
 
     changed query => { root.filter-changed(); }
     changed only-problems => { root.filter-changed(); }
@@ -114,6 +124,14 @@ export component AppWindow inherits Window {
                     clicked => { root.refresh(); }
                 }
             }
+        }
+        UpdateBanner {
+            text: root.update-text;
+            can-update: root.update-can-update;
+            busy: root.update-busy;
+            can-restart: root.update-can-restart;
+            update-now => { root.update-now(); }
+            restart-now => { root.restart-now(); }
         }
 
         HorizontalLayout {

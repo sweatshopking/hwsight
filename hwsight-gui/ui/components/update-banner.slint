@@ -1,0 +1,48 @@
+import { Theme } from "../theme.slint";
+import { AccentButton } from "accent-button.slint";
+
+export component UpdateBanner inherits Rectangle {
+    in property <string> text;
+    in property <bool> can-update;
+    in property <bool> busy;
+    in property <bool> can-restart;
+    callback update-now();
+    callback restart-now();
+
+    visible: root.text != "";
+    height: root.text != "" ? banner-layout.preferred-height : 0px;
+    background: Theme.surface-raised;
+    border-width: 1px;
+    border-color: Theme.accent-start.with-alpha(0.6);
+    border-radius: Theme.radius-small;
+
+    banner-layout := HorizontalLayout {
+        padding-left: Theme.padding;
+        padding-right: Theme.padding;
+        padding-top: Theme.gap;
+        padding-bottom: Theme.gap;
+        spacing: Theme.gap;
+        Text {
+            text: root.text;
+            color: Theme.text;
+            font-size: Theme.font-body;
+            wrap: word-wrap;
+            vertical-alignment: center;
+            horizontal-stretch: 1;
+        }
+        if root.can-update && !root.busy : AccentButton {
+            text: "Update now";
+            clicked => { root.update-now(); }
+        }
+        if root.busy : Text {
+            text: "Updating...";
+            color: Theme.text-muted;
+            font-size: Theme.font-body;
+            vertical-alignment: center;
+        }
+        if root.can-restart : AccentButton {
+            text: "Restart";
+            clicked => { root.restart-now(); }
+        }
+    }
+}

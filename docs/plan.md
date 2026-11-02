@@ -667,12 +667,36 @@ Build `Release` values directly: `Release { version: "9.9.9".into(), assets: vec
 
 **Done when:**
 
-- [ ] steps 1 to 5 done; the three tests exist and pass
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] steps 1 to 5 done; the three tests exist and pass
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Claude review (2026-11-06): accepted as is. Matches the spec; real run with no
+  releases yet prints "hwsight 0.1.0 is the newest version."
+- Step 1: done in `hwsight-cli/src/main.rs` - added `--check-update` and `--update` help entries.
+- Step 2: done in `hwsight-cli/src/main.rs` - added exact-version comparison text using `is_newer`.
+- Step 3: done in `hwsight-cli/src/main.rs` - added the check-update request, output, and exit status.
+- Step 4: done in `hwsight-cli/src/main.rs` - added release detection, installation, outcome messages, and exit statuses.
+- Step 5: done in `hwsight-cli/src/main.rs` - both update options run independently and exit.
+- `check_update_text_newer`, `check_update_text_same_and_none`, and `check_update_text_error` pass.
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```
 
 ## Copilot 8: update banner in the app
 
@@ -731,9 +755,36 @@ components in `ui/components/`, `tools/check.sh`).
 
 **Done when:**
 
-- [ ] steps 1 to 6 done; the four tests exist and pass
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] steps 1 to 6 done; the four tests exist and pass
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Claude review (2026-11-06): accepted with one real fix: the app's daily check used
+  the data updater's state file, so whichever daily check ran first silently cancelled
+  the other (spec said app_update::default_state_file). Also moved install detection
+  (package-manager queries) off the UI thread.
+- Step 1: done in `hwsight-gui/src/app_updates.rs` - added pure banner decisions for each install type and version state.
+- Step 2: done in `hwsight-gui/ui/components/update-banner.slint` - added the themed update card with update, busy, and restart actions.
+- Step 3: done in `hwsight-gui/ui/app.slint` - added update properties, callbacks, and the banner below the header.
+- Step 4: done in `hwsight-gui/src/main.rs` - added the daily background release check, installation behavior, and UI-thread results.
+- Step 5: done in `hwsight-gui/src/main.rs` - added background manual installation with busy, retry, and restart state.
+- Step 6: done in `hwsight-gui/src/main.rs` - added safe restart spawning from the completed update path.
+- `hidden_when_not_newer`, `appimage_installs_automatically`, `packages_get_an_offer`, and `aur_and_source_builds_get_info_only` pass.
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```

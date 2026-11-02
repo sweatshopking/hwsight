@@ -1,10 +1,13 @@
 //! hwsight graphical app.
 
+mod app_updates;
 mod model;
 
 use std::{
+    path::PathBuf,
     rc::Rc,
     sync::{Arc, Mutex},
+    time::{Duration, SystemTime},
 };
 
 use slint::{ComponentHandle, ModelRc, SharedString, VecModel};
@@ -17,9 +20,20 @@ mod ui {
 }
 use ui::{AppWindow, DeviceItem, FixItem, Row};
 
+struct UpdateState {
+    release: Option<hwsight_core::app_update::Release>,
+    install: Option<hwsight_core::app_update::Install>,
+    restart: Option<PathBuf>,
+}
+
 fn main() -> Result<(), slint::PlatformError> {
     let window = AppWindow::new()?;
     let devices = Arc::new(Mutex::new(Vec::new()));
+    let update_state = Arc::new(Mutex::new(UpdateState {
+        release: None,
+        install: None,
+        restart: None,
+    }));
 
     let weak = window.as_weak();
     let scan_devices = devices.clone();
@@ -29,6 +43,8 @@ fn main() -> Result<(), slint::PlatformError> {
     window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
     start_scan(window.as_weak(), devices.clone());
     check_for_data_update(window.as_weak(), devices);
+    check_for_app_update(window.as_weak(), update_state.clone());
+    connect_update_actions(window.as_weak(), update_state);
 
     // Developer aid for reviews: HWSIGHT_SNAPSHOT=out.ppm saves a picture of the window
     // after the first scan and quits; HWSIGHT_SELECT=<n> selects device n first. This
@@ -40,10 +56,161 @@ fn main() -> Result<(), slint::PlatformError> {
         {
             window.set_selected(n);
         }
+
         snapshot_when_ready(window.as_weak(), path.into());
     }
 
     window.run()
+}
+
+fn connect_update_actions(window: slint::Weak<AppWindow>, state: Arc<Mutex<UpdateState>>) {
+    let Some(window) = window.upgrade() else {
+        return;
+    };
+    let update_window = window.as_weak();
+    let update_state = state.clone();
+    window.on_update_now(move || {
+        let Ok(state) = update_state.lock() else {
+            return;
+        };
+        let (Some(release), Some(install)) = (state.release.clone(), state.install.clone()) else {
+            return;
+        };
+        drop(state);
+        let Some(w) = update_window.upgrade() else {
+            return;
+        };
+        w.set_update_busy(true);
+        w.set_update_can_update(false);
+        let thread_window = update_window.clone();
+        let thread_state = update_state.clone();
+        std::thread::spawn(move || {
+            let outcome = hwsight_core::app_update::install_update(
+                &release,
+                &install,
+                env!("CARGO_PKG_VERSION"),
+            );
+            let _ = slint::invoke_from_event_loop(move || {
+                let Some(w) = thread_window.upgrade() else {
+                    return;
+                };
+                let can_restart =
+                    matches!(outcome, hwsight_core::app_update::Outcome::Updated { .. });
+                let can_update = matches!(outcome, hwsight_core::app_update::Outcome::Cancelled);
+                if let hwsight_core::app_update::Outcome::Updated { restart, .. } = &outcome
+                    && let Ok(mut state) = thread_state.lock()
+                {
+                    state.restart = Some(restart.clone());
+                }
+                w.set_update_text(outcome.message().into());
+                w.set_update_busy(false);
+                w.set_update_can_update(can_update);
+                w.set_update_can_restart(can_restart);
+            });
+        });
+    });
+
+    let restart_window = window.as_weak();
+    window.on_restart_now(move || {
+        let Ok(mut state) = state.lock() else {
+            return;
+        };
+        let Some(path) = state.restart.take() else {
+            return;
+        };
+        drop(state);
+        if let Err(e) = std::process::Command::new(&path).spawn() {
+            eprintln!("hwsight-gui: couldn't restart hwsight: {e}");
+            return;
+        }
+        if let Some(window) = restart_window.upgrade() {
+            let _ = window.hide();
+        }
+        let _ = slint::quit_event_loop();
+    });
+}
+
+fn check_for_app_update(window: slint::Weak<AppWindow>, state: Arc<Mutex<UpdateState>>) {
+    if std::env::var_os("HWSIGHT_NO_UPDATE").is_some()
+        || std::env::var_os("HWSIGHT_SNAPSHOT").is_some()
+    {
+        return;
+    }
+    // Its own state file: sharing the data updater's would let one daily check
+    // silently cancel the other.
+    let Some(state_file) = hwsight_core::app_update::default_state_file() else {
+        return;
+    };
+    if !hwsight_core::update::check_due(
+        &state_file,
+        SystemTime::now(),
+        Duration::from_secs(24 * 60 * 60),
+    ) {
+        return;
+    }
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    std::thread::spawn(move || {
+        // Runs package-manager queries, so off the window's thread.
+        let install = hwsight_core::app_update::detect_install(&exe, std::env::var_os("APPIMAGE"));
+        let result = hwsight_core::app_update::latest_release();
+        let _ = hwsight_core::update::mark_checked(&state_file);
+        let Ok(Some(release)) = result else {
+            return;
+        };
+        match app_updates::banner_for(&install, &release.version, env!("CARGO_PKG_VERSION")) {
+            app_updates::Banner::Hidden => {}
+            app_updates::Banner::AutoInstall => {
+                let outcome = hwsight_core::app_update::install_update(
+                    &release,
+                    &install,
+                    env!("CARGO_PKG_VERSION"),
+                );
+                let _ = slint::invoke_from_event_loop(move || {
+                    let Some(w) = window.upgrade() else {
+                        return;
+                    };
+                    if let hwsight_core::app_update::Outcome::Updated { restart, .. } = &outcome
+                        && let Ok(mut state) = state.lock()
+                    {
+                        state.restart = Some(restart.clone());
+                    }
+                    w.set_update_text(outcome.message().into());
+                    w.set_update_can_restart(matches!(
+                        outcome,
+                        hwsight_core::app_update::Outcome::Updated { .. }
+                    ));
+                });
+            }
+            app_updates::Banner::Offer { text } => {
+                let _ = slint::invoke_from_event_loop(move || {
+                    let Some(w) = window.upgrade() else {
+                        return;
+                    };
+                    if let Ok(mut state) = state.lock() {
+                        state.release = Some(release);
+                        state.install = Some(install);
+                    }
+                    w.set_update_text(text.into());
+                    w.set_update_can_update(true);
+                });
+            }
+            app_updates::Banner::Info { text } => {
+                let _ = slint::invoke_from_event_loop(move || {
+                    let Some(w) = window.upgrade() else {
+                        return;
+                    };
+                    if let Ok(mut state) = state.lock() {
+                        state.release = Some(release);
+                        state.install = Some(install);
+                    }
+                    w.set_update_text(text.into());
+                    w.set_update_can_update(false);
+                });
+            }
+        }
+    });
 }
 
 /// At most once a day, quietly download newer device data in the background. If

@@ -22,6 +22,9 @@ Options:
   --update-data
                Download the newest device data (names, rules, firmware packages)
                and exit. Updates are signed and checked before use.
+  --check-update
+               See whether a newer version of hwsight is out
+  --update     Download and install the newest version of hwsight
   -h, --help   Show this help
   -V, --version
 ";
@@ -61,6 +64,8 @@ fn main() -> ExitCode {
                 return ExitCode::SUCCESS;
             }
             "--update-data" => return update_data(),
+            "--check-update" => return check_update(),
+            "--update" => return update_app(),
             "-V" | "--version" => {
                 println!("hwsight {}", env!("CARGO_PKG_VERSION"));
                 return ExitCode::SUCCESS;
@@ -107,6 +112,65 @@ fn main() -> ExitCode {
             eprintln!("hwsight: {e}");
             ExitCode::FAILURE
         }
+    }
+}
+
+fn check_update_text(
+    result: Result<Option<hwsight_core::app_update::Release>, String>,
+    current: &str,
+) -> String {
+    match result {
+        Ok(Some(release)) if hwsight_core::app_update::is_newer(&release.version, current) => {
+            format!(
+                "hwsight {} is available (you have {current}). Run hwsight --update to install it.",
+                release.version
+            )
+        }
+        Ok(_) => format!("hwsight {current} is the newest version."),
+        Err(e) => format!("Couldn't check for updates: {e}"),
+    }
+}
+
+fn check_update() -> ExitCode {
+    let result = hwsight_core::app_update::latest_release();
+    let failed = result.is_err();
+    println!("{}", check_update_text(result, env!("CARGO_PKG_VERSION")));
+    if failed {
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
+    }
+}
+
+fn update_app() -> ExitCode {
+    let release = match hwsight_core::app_update::latest_release() {
+        Ok(Some(release)) => release,
+        Ok(None) => {
+            println!("{}", check_update_text(Ok(None), env!("CARGO_PKG_VERSION")));
+            return ExitCode::SUCCESS;
+        }
+        Err(e) => {
+            println!("{}", check_update_text(Err(e), env!("CARGO_PKG_VERSION")));
+            return ExitCode::FAILURE;
+        }
+    };
+    let current_exe = match std::env::current_exe() {
+        Ok(path) => path,
+        Err(_) => {
+            println!("Couldn't find where hwsight is installed.");
+            return ExitCode::FAILURE;
+        }
+    };
+    let install =
+        hwsight_core::app_update::detect_install(&current_exe, std::env::var_os("APPIMAGE"));
+    let outcome =
+        hwsight_core::app_update::install_update(&release, &install, env!("CARGO_PKG_VERSION"));
+    let failed = matches!(outcome, hwsight_core::app_update::Outcome::Failed(_));
+    println!("{}", outcome.message());
+    if failed {
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
     }
 }
 
@@ -348,5 +412,41 @@ mod tests {
     #[test]
     fn paint_on_wraps_and_resets() {
         assert_eq!(paint("hello", "\x1b[32m", true), "\x1b[32mhello\x1b[0m");
+    }
+
+    #[test]
+    fn check_update_text_newer() {
+        let release = hwsight_core::app_update::Release {
+            version: "9.9.9".into(),
+            assets: vec![],
+        };
+        assert_eq!(
+            check_update_text(Ok(Some(release)), "0.1.0"),
+            "hwsight 9.9.9 is available (you have 0.1.0). Run hwsight --update to install it."
+        );
+    }
+
+    #[test]
+    fn check_update_text_same_and_none() {
+        let release = hwsight_core::app_update::Release {
+            version: "9.9.9".into(),
+            assets: vec![],
+        };
+        assert_eq!(
+            check_update_text(Ok(Some(release)), "9.9.9"),
+            "hwsight 9.9.9 is the newest version."
+        );
+        assert_eq!(
+            check_update_text(Ok(None), "0.1.0"),
+            "hwsight 0.1.0 is the newest version."
+        );
+    }
+
+    #[test]
+    fn check_update_text_error() {
+        assert_eq!(
+            check_update_text(Err("offline".to_owned()), "0.1.0"),
+            "Couldn't check for updates: offline"
+        );
     }
 }
