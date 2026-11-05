@@ -1,10 +1,13 @@
 import { ScrollView } from "std-widgets.slint";
 import { Theme, DeviceItem, FixItem } from "../theme.slint";
 import { StatusPill } from "status-pill.slint";
+import { AccentButton } from "accent-button.slint";
 
 export component DetailsPanel inherits Rectangle {
     in property <DeviceItem> device;
     in property <bool> has-device;
+    callback copy-report();
+    property <bool> copied;
     property <color> status-colour: root.device.status-kind == "ok" ? Theme.ok
         : root.device.status-kind == "warn" ? Theme.warn
         : root.device.status-kind == "error" ? Theme.error
@@ -140,6 +143,27 @@ export component DetailsPanel inherits Rectangle {
             }
             VerticalLayout {
                 spacing: Theme.gap;
+                AccentButton {
+                    text: root.copied ? "Copied" : "Copy for a forum post";
+                    clicked => {
+                        root.copied = true;
+                        root.copy-report();
+                    }
+                }
+                Text {
+                    text: "Copies a short report about this device. Your user name and computer name are removed.";
+                    color: Theme.text-muted;
+                    font-size: Theme.font-body;
+                    wrap: word-wrap;
+                }
+            }
+            copy-timer := Timer {
+                interval: 2s;
+                running: root.copied;
+                triggered => { root.copied = false; }
+            }
+            VerticalLayout {
+                spacing: Theme.gap;
                 Text {
                     text: "DETAILS";
                     color: Theme.text-muted;
@@ -210,4 +234,3 @@ export component DetailsPanel inherits Rectangle {
     }
     }
 }
-

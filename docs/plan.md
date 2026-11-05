@@ -1285,10 +1285,57 @@ what you saw, don't work around it.
 
 **Done when:**
 
-- [ ] steps 1 to 4 done
-- [ ] clipboard output after each button pasted below
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] steps 1 to 4 done
+- [x] clipboard output after each button pasted below
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Step 1: done in `hwsight-gui/ui/components/copy-text.slint` - added the hidden `CopyText` TextInput, which focuses itself, selects all, copies, and clears without a crate.
+- Step 2: done in `hwsight-gui/ui/components/details-panel.slint` - added the forum-copy button, exact help text, and two-second `Copied` timer using the existing button style.
+- Step 3: done in `hwsight-gui/ui/app.slint` - added the `device-report` callback, the all-devices copy button, and one shared `CopyText` instance.
+- Step 4: done in `hwsight-gui/src/main.rs` - retained the last `ScanReport`, generated privacy-safe Markdown for the requested address, and returned an empty string before the first scan.
+- Review fixes (Claude): CopyText no longer calls focus() (copy needs only a selection), and its TextInput is `enabled: false`, so it never takes focus by Tab or otherwise; before this, every copy left focus on the hidden input and broke the keyboard shortcuts. Copilot checked with xclip on a Wayland session; re-tested with wl-paste after a real click: device report copied correctly.
+- Clipboard output after `Copy report for all devices` via `xclip -o -selection clipboard | head -10`:
+  ```
+  ## hwsight report
+
+  - Computer: CachyOS
+  - Kernel: 7.3.1-1-cachyos
+  - hwsight: 0.1.0
+  - Data: rules 2026.11.03
+
+  50 devices, 0 with problems.
+
+  #### Working devices
+  ```
+- Clipboard output after `Copy for a forum post` via `xclip -o -selection clipboard | head -10`:
+  ```
+  ## hwsight report
+
+  - Computer: CachyOS
+  - Kernel: 7.3.1-1-cachyos
+  - hwsight: 0.1.0
+  - Data: rules 2026.11.03
+
+  ### GeForce RTX 5070 Ti
+  - Status: Working
+  - Type: Graphics
+  ```
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```

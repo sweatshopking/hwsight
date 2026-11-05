@@ -29,6 +29,7 @@ struct UpdateState {
 fn main() -> Result<(), slint::PlatformError> {
     let window = AppWindow::new()?;
     let devices = Arc::new(Mutex::new(Vec::new()));
+    let last_report = Arc::new(Mutex::new(None));
     let update_state = Arc::new(Mutex::new(UpdateState {
         release: None,
         install: None,
@@ -37,7 +38,8 @@ fn main() -> Result<(), slint::PlatformError> {
 
     let weak = window.as_weak();
     let scan_devices = devices.clone();
-    window.on_refresh(move || start_scan(weak.clone(), scan_devices.clone()));
+    let scan_report = last_report.clone();
+    window.on_refresh(move || start_scan(weak.clone(), scan_devices.clone(), scan_report.clone()));
     let filter_window = window.as_weak();
     let filter_devices = devices.clone();
     window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
@@ -54,8 +56,23 @@ fn main() -> Result<(), slint::PlatformError> {
         w.set_selected(selected);
         scroll_to_selected(&w, &rows, selected);
     });
-    start_scan(window.as_weak(), devices.clone());
-    check_for_data_update(window.as_weak(), devices);
+    let report_state = last_report.clone();
+    window.on_device_report(move |address| {
+        let Ok(report) = report_state.lock() else {
+            return SharedString::default();
+        };
+        let Some(report) = report.as_ref() else {
+            return SharedString::default();
+        };
+        hwsight_core::report::markdown(
+            report,
+            (!address.is_empty()).then_some(address.as_str()),
+            &hwsight_core::report::Privacy::system(),
+        )
+        .into()
+    });
+    start_scan(window.as_weak(), devices.clone(), last_report.clone());
+    check_for_data_update(window.as_weak(), devices, last_report);
     check_for_app_update(window.as_weak(), update_state.clone());
     connect_update_actions(window.as_weak(), update_state);
 
@@ -259,6 +276,7 @@ fn scroll_to_selected(window: &AppWindow, rows: &[Row], selected: i32) {
 fn check_for_data_update(
     window: slint::Weak<AppWindow>,
     devices: Arc<Mutex<Vec<hwsight_core::Device>>>,
+    last_report: Arc<Mutex<Option<hwsight_core::ScanReport>>>,
 ) {
     if std::env::var_os("HWSIGHT_NO_UPDATE").is_some()
         || std::env::var_os("HWSIGHT_SNAPSHOT").is_some()
@@ -293,7 +311,7 @@ fn check_for_data_update(
         if let Ok(outcome) = result
             && !outcome.installed.is_empty()
         {
-            let _ = slint::invoke_from_event_loop(move || start_scan(window, devices));
+            let _ = slint::invoke_from_event_loop(move || start_scan(window, devices, last_report));
         }
     });
 }
@@ -362,7 +380,11 @@ fn apply_filter(window: &slint::Weak<AppWindow>, devices: &Arc<Mutex<Vec<hwsight
 }
 
 /// Scan on a background thread so the window stays responsive, then show the result.
-fn start_scan(window: slint::Weak<AppWindow>, devices: Arc<Mutex<Vec<hwsight_core::Device>>>) {
+fn start_scan(
+    window: slint::Weak<AppWindow>,
+    devices: Arc<Mutex<Vec<hwsight_core::Device>>>,
+    last_report: Arc<Mutex<Option<hwsight_core::ScanReport>>>,
+) {
     if let Some(w) = window.upgrade() {
         if w.get_scanning() {
             return;
@@ -376,7 +398,10 @@ fn start_scan(window: slint::Weak<AppWindow>, devices: Arc<Mutex<Vec<hwsight_cor
         let _ = slint::invoke_from_event_loop(move || {
             let Some(w) = window.upgrade() else { return };
             let view = model::view(&report);
-            let scanned_devices = report.devices;
+            let scanned_devices = report.devices.clone();
+            if let Ok(mut stored_report) = last_report.lock() {
+                *stored_report = Some(report);
+            }
             let device_count = view.devices.len() as i32;
             if let Ok(mut stored_devices) = devices.lock() {
                 *stored_devices = scanned_devices;

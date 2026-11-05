@@ -1,0 +1,23 @@
+export component CopyText inherits Rectangle {
+    width: 0px;
+    height: 0px;
+    opacity: 0;
+
+    input := TextInput {
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+        // Copying needs a selection, not focus. Disabled, it never takes focus (by Tab
+        // or otherwise), so the window's keyboard shortcuts keep working after a copy.
+        enabled: false;
+    }
+
+    public function copy(text: string) {
+        if text != "" {
+            input.text = text;
+            input.select-all();
+            input.copy();
+            input.text = "";
+        }
+    }
+}
