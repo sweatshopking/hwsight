@@ -1339,3 +1339,149 @@ what you saw, don't work around it.
 
   ALL CHECKS PASSED
   ```
+
+---
+
+# Pre-release batch (owner, 2026-11-06)
+
+Before the first release the owner wants, as core features: the three detail levels
+(Claude 12), firmware updates through fwupd, translations, and **software
+recommendations** ("if somebody has a Logitech Bolt, recommend software that can use
+it"). A bug report is also core, but **don't build one here**: DriveDeck's is being
+built now, and hwsight reuses it when it's done. Copilot does every part it can.
+
+Order (each task starts only after the one before is reviewed):
+
+1. **Claude 13 (done 2026-11-06):** translation foundation. `hwsight_core::tr!`, catalogs
+   in `po/`, `tools/update-translations.sh`, and three new checks in `tools/check.sh`.
+   Read `po/README.md`.
+2. **Copilot 13:** mark every user-facing text for translation (below).
+3. **Copilot 14:** machine-draft all 11 catalogs (below).
+4. **Claude 14:** translated data files (descriptions, fixes) per language.
+5. **Copilot 15:** software recommendations (`software.toml`, core, CLI, GUI). Spec written
+   after Copilot 14.
+6. **Claude 15:** detail levels foundation (data model, Simple / More details /
+   Technical toggle, `hwsight --details`). Then **Copilot 16 and on:** one detail reader
+   per device type (PCI link and power, USB, drivers, CPU, GPU, memory, board and BIOS,
+   drives, monitors, battery, network, audio, input, sensors), each against fake sysfs
+   files. Admin-only data (polkit helper) and NVIDIA through NVML may follow the release.
+7. **Copilot:** fwupd reading (parse `fwupdmgr get-devices --json` and `get-updates
+   --json`, link fwupd devices to ours by IDs such as `NVME\VEN_C0A9&DEV_5427` or
+   `USB\VID_046D&PID_C548`, show versions and available updates). Real output from the
+   owner's PC is in `hwsight-core/tests/fixtures/fwupd/`. **Claude:** the install flow
+   (it changes the system: confirmations, reboots for BIOS capsules, polkit).
+8. **Claude:** port DriveDeck's bug report when it's finished.
+9. **Claude:** packaging (deb, rpm, AppImage) and the first release.
+
+## Copilot 13: mark every user-facing text for translation
+
+**Only after Claude 13.** Read `po/README.md` and `hwsight-core/src/i18n.rs` first.
+
+**Files you may change:** every file in `hwsight-core/src/`, `hwsight-cli/src/main.rs`,
+`hwsight-gui/src/`, `hwsight-gui/ui/` (all `.slint` files), the catalogs in `po/` (only by
+running `tools/update-translations.sh`, never by hand), and this task's Done notes.
+Not `hwsight-core/src/i18n.rs`, `build.rs`, `tools/`, `Cargo.toml`, or data files.
+
+**What "user-facing" means:** any text a person can read in the app window or in the
+CLI's normal output: labels, buttons, headings, statuses, category names, messages,
+notes, errors shown in the window, and every sentence that `summary()`, `label()`, and
+`message()` style functions return.
+**Not translated (leave exactly as they are):** the CLI `HELP` text and CLI option
+errors (`hwsight: unknown option ...`), `--json` output and its keys, log and `eprintln!`
+messages, file paths, driver and module names, hardware IDs, TOML keys, and text inside
+`#[cfg(test)]`. Text that comes from data files (descriptions, fixes) is handled in
+Claude 14: leave it.
+
+**Steps (do all of them):**
+
+1. **Slint:** wrap every user-facing string literal in `@tr(...)`, including both sides
+   of a `? :` (`root.copied ? @tr("Copied") : @tr("Copy for a forum post")`). Text with
+   a value inside uses a placeholder, never `+`: `@tr("{} devices", n)`. The window title
+   and the "hwsight" name stay as they are. When this step is done,
+   `python3 tools/check-slint-tr.py hwsight-gui/ui` prints nothing.
+2. **Rust, fixed text:** wrap every user-facing literal in `crate::tr!("...")` (core) or
+   `hwsight_core::tr!("...")` (CLI, GUI). Functions that return `&'static str` for
+   user-facing text (`Status::summary`, `Category::label`, and any others) now return
+   `String`. Update every caller, including tests (compare with `"..."` via
+   `.as_str()` or `String::from`), so everything still compiles.
+3. **Rust, text with values:** `format!("Couldn't download the update: {e}")` becomes
+   `crate::tr!("Couldn't download the update: {}", e)`. Inside `tr!`, use only `{}` or
+   `{0}`, `{1}`: **never a name inside braces** (`{e}`, `{version}`) and never a format
+   spec (`{:?}`, `{:>5}`). Those don't work in translations: pass the value instead, and
+   if it needed formatting, format it into a variable first.
+4. **Rust, counts:** any sentence with a number of things uses the plural form:
+   `crate::tr!("1 device" | "{n} devices" % count)`, or with more values
+   `crate::tr!("1 device, {} with problems" | "{n} devices, {} with problems" % count, problems)`.
+   Never build plurals with `if count == 1`.
+5. **Whole sentences only:** never split a sentence into pieces that get joined
+   (`tr!("Driver") + ": " + name`). One sentence is one `tr!` with placeholders.
+   Multi-line strings written with `\` at line ends stay one literal inside one `tr!`.
+6. **Text in constants or tables:** `tr!` must wrap the literal where it is written.
+   If a user-facing literal sits in a `const`, `static`, or array, turn that into a
+   function that returns `String` and calls `tr!` on each literal.
+7. **Reports stay English:** don't change `report.rs` behaviour. It already runs inside
+   `i18n::in_english`; its own output text does not get `tr!`, but the functions it calls
+   (like `Status::summary`) do, which is fine.
+8. Run `tools/update-translations.sh`, then check that `po/hwsight.pot` lists the new
+   strings (paste `grep -c '^msgid' po/hwsight.pot` into Done notes).
+
+**Tests:** keep every existing test passing without weakening it (update types only).
+Add in `hwsight-core/src/device.rs`'s tests: `labels_and_summaries_are_english_by_default`
+(checks `Status::Working.summary()` is `"Working"` and one `Category` label, inside
+`crate::i18n::in_english`).
+
+**Done when:**
+
+- [ ] steps 1 to 8 done
+- [ ] `python3 tools/check-slint-tr.py hwsight-gui/ui` prints nothing (paste "no output")
+- [ ] `grep -rnE 'tr!\("[^"]*\{[a-z_:?]' hwsight-*/src` prints nothing (no named or
+      formatted placeholders inside `tr!`; paste "no output")
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted
+      below; it now includes the translation checks)
+- [ ] `hwsight` and the app still show the same English text as before (paste the first
+      10 lines of `hwsight` output)
+- [ ] one `Step N: done in <files> - <what>` line per numbered step in Done notes
+- [ ] nothing committed, nothing pushed, no co-author line
+
+**Done notes:**
+
+---
+
+## Copilot 14: machine-draft the translations
+
+**Only after Copilot 13 is reviewed.** Read `po/README.md` first.
+
+**Files you may change:** the 11 catalogs `po/<language>/LC_MESSAGES/hwsight-gui.po` and
+this task's Done notes. Nothing else. Don't edit `po/hwsight.pot`.
+
+**Steps (do all of them):**
+
+1. Fill in every empty `msgstr` (and every `msgstr[N]` of plural entries) in all 11
+   catalogs: de, es, fr, it, ja, ko, nl, pt_BR, ru, tr, zh_CN. Every language, every
+   entry. Don't stop after one language and don't ask whether to continue.
+2. Tone: plain, friendly, short sentences for non-technical people, like the English.
+   Use the informal "you" where the language normally does in apps (German "du", French
+   "vous" is fine, Spanish "tú"). Keep the same meaning; don't add or drop information.
+3. Keep every placeholder exactly: `{}`, `{0}`, `{1}`, `{n}`. Same count, same numbers.
+   In plural entries, fill as many `msgstr[N]` as the catalog's `Plural-Forms` header
+   says (ru has 3; ja, ko, and zh_CN have 1).
+4. Don't translate: hwsight, driver and module names, file names, hardware IDs, command
+   names (`hwsight`, `fwupdmgr`), and anything inside backticks.
+5. Don't change `msgid` lines, headers, or comments. Remove no entries. Don't mark
+   entries `fuzzy`.
+
+**Tests:** none new. `tools/check.sh` already checks placeholders. Also run
+`cargo test -p hwsight-core -- --ignored every_language_is_complete`: it must pass
+(that test fails while any entry is empty).
+
+**Done when:**
+
+- [ ] all 11 catalogs complete: `every_language_is_complete` passes (output pasted)
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` (output pasted)
+- [ ] `LANGUAGE=de hwsight | head -5` and `LANGUAGE=ja hwsight | head -5` show
+      translated text (pasted)
+- [ ] `LANGUAGE=fr target/debug/hwsight-gui` opened and the window is in French
+      (say what the "Scan again" button reads)
+- [ ] nothing committed, nothing pushed, no co-author line
+
+**Done notes:**

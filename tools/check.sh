@@ -52,6 +52,10 @@ else
 fi
 rm -rf "$tmp"
 
+# Every word a user can read in the Slint UI goes through @tr.
+hits=$(python3 -I tools/check-slint-tr.py hwsight-gui/ui)
+[[ -z $hits ]] && pass "every Slint text uses @tr" || fail "every Slint text uses @tr" "$hits"
+
 # ---- GUI rules (docs/plan.md, "GUI batch") ----
 ui=hwsight-gui/ui
 comp=$ui/components
