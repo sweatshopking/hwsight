@@ -170,13 +170,14 @@ fn check_update_text(
 ) -> String {
     match result {
         Ok(Some(release)) if hwsight_core::app_update::is_newer(&release.version, current) => {
-            format!(
-                "hwsight {} is available (you have {current}). Run hwsight --update to install it.",
-                release.version
+            hwsight_core::tr!(
+                "hwsight {} is available (you have {}). Run hwsight --update to install it.",
+                release.version,
+                current
             )
         }
-        Ok(_) => format!("hwsight {current} is the newest version."),
-        Err(e) => format!("Couldn't check for updates: {e}"),
+        Ok(_) => hwsight_core::tr!("hwsight {} is the newest version.", current),
+        Err(e) => hwsight_core::tr!("Couldn't check for updates: {}", e),
     }
 }
 
@@ -206,7 +207,10 @@ fn update_app() -> ExitCode {
     let current_exe = match std::env::current_exe() {
         Ok(path) => path,
         Err(_) => {
-            println!("Couldn't find where hwsight is installed.");
+            println!(
+                "{}",
+                hwsight_core::tr!("Couldn't find where hwsight is installed.")
+            );
             return ExitCode::FAILURE;
         }
     };
@@ -243,7 +247,7 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             if current.is_some() {
                 writeln!(out)?;
             }
-            writeln!(out, "{}", paint(device.category.label(), "\x1b[1m", color))?;
+            writeln!(out, "{}", paint(&device.category.label(), "\x1b[1m", color))?;
             current = Some(device.category);
         }
         let status_code = match device.status {
@@ -264,13 +268,15 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
         }
         writeln!(out, "{line}")?;
 
-        let mut detail = format!("      {}", device.status.summary());
+        let mut detail = device.status.summary();
         match (&device.driver, device.status) {
-            (Some(driver), _) => detail.push_str(&format!(", driver: {driver}")),
+            (Some(driver), _) => {
+                detail = hwsight_core::tr!("{}, driver: {}", detail, driver);
+            }
             (None, Status::DriverBlocked) => {
                 for c in &device.driver_candidates {
                     if let Some(by) = &c.blocked_by {
-                        detail.push_str(&format!(", {} blocked in {by}", c.module));
+                        detail = hwsight_core::tr!("{}, {} blocked in {}", detail, c.module, by);
                     }
                 }
             }
@@ -280,35 +286,36 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
                     .iter()
                     .map(|c| c.module.as_str())
                     .collect();
-                detail.push_str(&format!(", available: {}", names.join(", ")));
+                detail = hwsight_core::tr!("{}, available: {}", detail, names.join(", "));
             }
             _ => {}
         }
         if device.unrecognized {
-            detail.push_str(", not in the device database yet");
+            detail = hwsight_core::tr!("{}, not in the device database yet", detail);
         }
-        writeln!(out, "{detail}")?;
+        writeln!(out, "      {detail}")?;
         if device.status.is_problem() {
             if let Some(what) = &device.missing_interface {
                 writeln!(
                     out,
-                    "      {} The driver is loaded, but no {what} was created.",
-                    paint("Why:", "\x1b[1m", color)
+                    "      {} {}",
+                    paint(&hwsight_core::tr!("Why:"), "\x1b[1m", color),
+                    hwsight_core::tr!("The driver is loaded, but no {} was created.", what)
                 )?;
             }
             for issue in &device.log_issues {
                 writeln!(
                     out,
                     "      {} {}",
-                    paint("Why:", "\x1b[1m", color),
+                    paint(&hwsight_core::tr!("Why:"), "\x1b[1m", color),
                     issue.message()
                 )?;
             }
             for (n, fix) in device.fixes.iter().enumerate() {
                 let label = if device.fixes.len() == 1 {
-                    "Fix:".to_owned()
+                    hwsight_core::tr!("Fix:")
                 } else {
-                    format!("Fix {}:", n + 1)
+                    hwsight_core::tr!("Fix {}:", n + 1)
                 };
                 writeln!(
                     out,
@@ -335,13 +342,17 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
         if !shown.is_empty() {
             writeln!(out)?;
         }
-        writeln!(out, "{}", paint("USB ports", "\x1b[1m", color))?;
+        writeln!(
+            out,
+            "{}",
+            paint(&hwsight_core::tr!("USB ports"), "\x1b[1m", color)
+        )?;
         for p in &report.port_issues {
             writeln!(out, "  {} {}", paint("✗", "\x1b[31m", color), p.port)?;
             writeln!(
                 out,
                 "      {} {}",
-                paint("Why:", "\x1b[1m", color),
+                paint(&hwsight_core::tr!("Why:"), "\x1b[1m", color),
                 p.issue.message()
             )?;
         }
@@ -356,17 +367,33 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
     let devices = report.devices.len();
     writeln!(out)?;
     match (devices, problems) {
-        (0, 0) => writeln!(out, "No devices found.")?,
-        (_, 0) if opts.problems_only => writeln!(out, "No problems found.")?,
-        (_, 0) => writeln!(out, "{devices} devices, no problems found.")?,
-        (_, 1) => writeln!(out, "{devices} devices, 1 problem.")?,
-        (_, n) => writeln!(out, "{devices} devices, {n} problems.")?,
+        (0, 0) => writeln!(out, "{}", hwsight_core::tr!("No devices found."))?,
+        (_, 0) if opts.problems_only => {
+            writeln!(out, "{}", hwsight_core::tr!("No problems found."))?
+        }
+        (_, 0) => {
+            let device_text = hwsight_core::tr!("1 device" | "{n} devices" % devices);
+            writeln!(
+                out,
+                "{}",
+                hwsight_core::tr!("{}, no problems found.", device_text)
+            )?
+        }
+        (_, _) => {
+            let device_text = hwsight_core::tr!("1 device" | "{n} devices" % devices);
+            let problem_text = hwsight_core::tr!("1 problem" | "{n} problems" % problems);
+            writeln!(
+                out,
+                "{}",
+                hwsight_core::tr!("{}, {}.", device_text, problem_text)
+            )?
+        }
     }
     if let Some(note) = &report.firmware_note {
-        writeln!(out, "Note: {note}")?;
+        writeln!(out, "{}", hwsight_core::tr!("Note: {}", note))?;
     }
     for note in &report.notes {
-        writeln!(out, "Note: {}", note.message())?;
+        writeln!(out, "{}", hwsight_core::tr!("Note: {}", note.message()))?;
     }
     Ok(())
 }
@@ -412,12 +439,12 @@ fn update_data() -> ExitCode {
     }
     match result {
         Ok(outcome) if outcome.installed.is_empty() => {
-            println!("Device data is up to date.");
+            println!("{}", hwsight_core::tr!("Device data is up to date."));
             ExitCode::SUCCESS
         }
         Ok(outcome) => {
             for (name, version) in &outcome.installed {
-                println!("Updated {name} to {version}");
+                println!("{}", hwsight_core::tr!("Updated {} to {}", name, version));
             }
             ExitCode::SUCCESS
         }

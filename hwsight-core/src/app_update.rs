@@ -97,15 +97,18 @@ impl Outcome {
     pub fn message(&self) -> String {
         match self {
             Self::Updated { version, .. } => {
-                format!("hwsight {version} is installed. Restart hwsight to use it.")
+                crate::tr!(
+                    "hwsight {} is installed. Restart hwsight to use it.",
+                    version
+                )
             }
-            Self::Cancelled => "The update was cancelled.".to_owned(),
-            Self::UpToDate => "hwsight is up to date.".to_owned(),
-            Self::UpdateElsewhere => format!(
-                "This copy of hwsight is updated through your package manager or from \
-                 {RELEASES_URL}."
+            Self::Cancelled => crate::tr!("The update was cancelled."),
+            Self::UpToDate => crate::tr!("hwsight is up to date."),
+            Self::UpdateElsewhere => crate::tr!(
+                "This copy of hwsight is updated through your package manager or from {}.",
+                RELEASES_URL
             ),
-            Self::Failed(e) => format!("Couldn't update hwsight: {e}"),
+            Self::Failed(e) => crate::tr!("Couldn't update hwsight: {}", e),
         }
     }
 }

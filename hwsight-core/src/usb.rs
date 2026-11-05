@@ -119,11 +119,9 @@ fn read_device(
     let mut note = None;
     let status = if !authorized {
         // Blocked by the system's USB security settings (e.g. USBGuard).
-        note = Some(
-            "This device was blocked by the computer's USB security settings, so nothing is \
-             allowed to use it."
-                .to_owned(),
-        );
+        note = Some(crate::tr!(
+            "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
+        ));
         Status::DriverBlocked
     } else if driver.is_some() {
         Status::Working
@@ -297,17 +295,17 @@ fn display_name(
         return product.to_owned();
     }
     let kind = match category {
-        Category::Other => "USB device",
+        Category::Other => crate::tr!("USB device"),
         other => other.singular(),
     };
     let described = match vendor {
-        Some(v) => format!("{} {kind}", short_vendor(v)),
-        None => format!("USB {kind}").replace("USB USB", "USB"),
+        Some(v) => crate::tr!("{} {}", short_vendor(v), kind),
+        None => crate::tr!("USB {}", kind).replace("USB USB", "USB"),
     };
     if gave_a_name {
         described
     } else {
-        format!("Unknown {described}")
+        crate::tr!("Unknown {}", described)
     }
 }
 

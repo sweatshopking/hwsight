@@ -81,22 +81,26 @@ pub enum ScanNote {
 impl ScanNote {
     pub fn message(&self) -> String {
         match self {
-            Self::NoDriverList => "Couldn't read the kernel's list of drivers, so hwsight can't \
-                tell whether a driver is available for devices without one."
-                .to_owned(),
-            Self::KernelLogUnreadable => "Couldn't read the kernel log, so hwsight can't say why \
-                a device isn't working. On some systems only administrators can read it."
-                .to_owned(),
-            Self::UsbUnreadable { error } => format!("Couldn't read the USB device list: {error}"),
-            Self::PciUnreadable { error } => format!("Couldn't read the PCI device list: {error}"),
-            Self::DataNeedsNewerApp { path, .. } => format!(
+            Self::NoDriverList => crate::tr!(
+                "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
+            ),
+            Self::KernelLogUnreadable => crate::tr!(
+                "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
+            ),
+            Self::UsbUnreadable { error } => {
+                crate::tr!("Couldn't read the USB device list: {}", error)
+            }
+            Self::PciUnreadable { error } => {
+                crate::tr!("Couldn't read the PCI device list: {}", error)
+            }
+            Self::DataNeedsNewerApp { path, .. } => crate::tr!(
                 "A data update ({}) needs a newer version of hwsight. Update hwsight to use it.",
                 file_name(path)
             ),
-            Self::DataInvalid { path, error } => format!(
-                "A damaged data file ({}) was skipped, so the built-in copy is used instead. \
-                 Details: {error}",
-                file_name(path)
+            Self::DataInvalid { path, error } => crate::tr!(
+                "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}",
+                file_name(path),
+                error
             ),
         }
     }
@@ -398,9 +402,9 @@ pub fn usb_port_label(name: &str) -> Option<String> {
         .map(|p| p.parse().ok())
         .collect::<Option<_>>()?;
     let (first, hubs) = ports.split_first()?;
-    let mut label = format!("USB bus {bus}, port {first}");
+    let mut label = crate::tr!("USB bus {}, port {}", bus, first);
     for hub_port in hubs {
-        label.push_str(&format!(", then hub port {hub_port}"));
+        label = crate::tr!("{}, then hub port {}", label, hub_port);
     }
     Some(label)
 }

@@ -8,5 +8,5 @@ slint-tr-extractor --no-default-translation-context -o po/hwsight.pot \
     hwsight-gui/ui/app.slint hwsight-gui/ui/theme.slint hwsight-gui/ui/components/*.slint
 python3 -I tools/extract-rust-translations.py po/hwsight.pot
 for catalog in po/*/LC_MESSAGES/hwsight-gui.po; do
-    msgmerge --quiet --update --backup=none --no-fuzzy-matching "$catalog" po/hwsight.pot
+    msgmerge --quiet --update --backup=none --no-fuzzy-matching --no-wrap "$catalog" po/hwsight.pot
 done

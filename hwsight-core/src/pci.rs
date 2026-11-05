@@ -159,10 +159,12 @@ fn display_name(product: Option<&str>, vendor: Option<&str>, class: Option<&str>
     if let Some(product) = product {
         return bracketed(product).unwrap_or(product).to_owned();
     }
-    let kind = class.map_or_else(|| "device".to_owned(), str::to_lowercase);
+    let kind = class
+        .map(str::to_lowercase)
+        .unwrap_or_else(|| crate::tr!("device"));
     match vendor {
-        Some(vendor) => format!("Unknown {} {kind}", short_vendor(vendor)),
-        None => format!("Unknown {kind}"),
+        Some(vendor) => crate::tr!("Unknown {} {}", short_vendor(vendor), kind),
+        None => crate::tr!("Unknown {}", kind),
     }
 }
 

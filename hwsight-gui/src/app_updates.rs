@@ -14,11 +14,12 @@ pub fn banner_for(install: &Install, latest: &str, current: &str) -> Banner {
     match install {
         Install::AppImage(_) => Banner::AutoInstall,
         Install::Package { .. } => Banner::Offer {
-            text: format!("hwsight {latest} is available."),
+            text: hwsight_core::tr!("hwsight {} is available.", latest),
         },
         Install::Aur | Install::Unmanaged => Banner::Info {
-            text: format!(
-                "hwsight {latest} is available. Update it with your package manager, or download it from the website."
+            text: hwsight_core::tr!(
+                "hwsight {} is available. Update it with your package manager, or download it from the website.",
+                latest
             ),
         },
     }

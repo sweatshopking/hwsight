@@ -16,7 +16,7 @@ run() {  # run <name> <command...>
 
 run "cargo fmt --check" cargo fmt --check
 run "cargo clippy (no warnings)" cargo clippy --all-targets -- -D warnings
-run "cargo test" cargo test -q
+run "cargo test" env LANGUAGE=C cargo test -q
 run "GUI builds" cargo build -q -p hwsight-gui
 
 # The app must open and still be running when the timeout closes it (exit code 124).
@@ -35,7 +35,7 @@ if command -v slint-tr-extractor >/dev/null && command -v msgmerge >/dev/null; t
     slint-tr-extractor --no-default-translation-context -o "$tmp/fresh.pot" \
         hwsight-gui/ui/app.slint hwsight-gui/ui/theme.slint hwsight-gui/ui/components/*.slint 2>"$tmp/err" \
         && python3 -I tools/extract-rust-translations.py "$tmp/fresh.pot" 2>>"$tmp/err"
-    ids() { grep -E '^msgid ' "$1" | sort -u; }
+    ids() { msgcat --no-wrap "$1" | grep -E '^msgid ' | sort -u; }
     if diff <(ids "$tmp/fresh.pot") <(ids po/hwsight.pot) >"$tmp/diff" 2>&1; then
         pass "translation catalog up to date"
     else

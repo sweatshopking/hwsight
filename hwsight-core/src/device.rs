@@ -39,46 +39,46 @@ pub enum Category {
 }
 
 impl Category {
-    pub fn label(self) -> &'static str {
+    pub fn label(self) -> String {
         match self {
-            Self::Graphics => "Graphics",
-            Self::Sound => "Sound",
-            Self::Network => "Network",
-            Self::Bluetooth => "Bluetooth",
-            Self::Storage => "Storage",
-            Self::UsbControllers => "USB controllers and hubs",
-            Self::Thunderbolt => "Thunderbolt",
-            Self::Input => "Input devices",
-            Self::Camera => "Cameras",
-            Self::Printers => "Printers and scanners",
-            Self::Communication => "Modems and serial ports",
-            Self::Security => "Security and encryption",
-            Self::Accelerators => "AI and compute accelerators",
-            Self::Processors => "Processors",
-            Self::SystemDevices => "System devices",
-            Self::Other => "Other devices",
+            Self::Graphics => crate::tr!("Graphics"),
+            Self::Sound => crate::tr!("Sound"),
+            Self::Network => crate::tr!("Network"),
+            Self::Bluetooth => crate::tr!("Bluetooth"),
+            Self::Storage => crate::tr!("Storage"),
+            Self::UsbControllers => crate::tr!("USB controllers and hubs"),
+            Self::Thunderbolt => crate::tr!("Thunderbolt"),
+            Self::Input => crate::tr!("Input devices"),
+            Self::Camera => crate::tr!("Cameras"),
+            Self::Printers => crate::tr!("Printers and scanners"),
+            Self::Communication => crate::tr!("Modems and serial ports"),
+            Self::Security => crate::tr!("Security and encryption"),
+            Self::Accelerators => crate::tr!("AI and compute accelerators"),
+            Self::Processors => crate::tr!("Processors"),
+            Self::SystemDevices => crate::tr!("System devices"),
+            Self::Other => crate::tr!("Other devices"),
         }
     }
 
     /// One device of this kind, for sentences like "Unknown Logitech USB input device".
-    pub fn singular(self) -> &'static str {
+    pub fn singular(self) -> String {
         match self {
-            Self::Graphics => "graphics device",
-            Self::Sound => "sound device",
-            Self::Network => "network device",
-            Self::Bluetooth => "Bluetooth device",
-            Self::Storage => "storage device",
-            Self::UsbControllers => "hub",
-            Self::Thunderbolt => "Thunderbolt device",
-            Self::Input => "input device",
-            Self::Camera => "camera",
-            Self::Printers => "printer or scanner",
-            Self::Communication => "modem or serial device",
-            Self::Security => "security device",
-            Self::Accelerators => "accelerator",
-            Self::Processors => "processor",
-            Self::SystemDevices => "system device",
-            Self::Other => "device",
+            Self::Graphics => crate::tr!("graphics device"),
+            Self::Sound => crate::tr!("sound device"),
+            Self::Network => crate::tr!("network device"),
+            Self::Bluetooth => crate::tr!("Bluetooth device"),
+            Self::Storage => crate::tr!("storage device"),
+            Self::UsbControllers => crate::tr!("hub"),
+            Self::Thunderbolt => crate::tr!("Thunderbolt device"),
+            Self::Input => crate::tr!("input device"),
+            Self::Camera => crate::tr!("camera"),
+            Self::Printers => crate::tr!("printer or scanner"),
+            Self::Communication => crate::tr!("modem or serial device"),
+            Self::Security => crate::tr!("security device"),
+            Self::Accelerators => crate::tr!("accelerator"),
+            Self::Processors => crate::tr!("processor"),
+            Self::SystemDevices => crate::tr!("system device"),
+            Self::Other => crate::tr!("device"),
         }
     }
 }
@@ -116,16 +116,16 @@ impl Status {
         )
     }
 
-    pub fn summary(self) -> &'static str {
+    pub fn summary(self) -> String {
         match self {
-            Self::Working => "Working",
-            Self::NoDriverNeeded => "Working (no driver needed)",
-            Self::DriverAvailableNotLoaded => "Driver installed but not loaded",
-            Self::DriverNotAttached => "Driver loaded but not using this device",
-            Self::DriverNotReady => "Driver loaded, but the device isn't ready",
-            Self::DriverBlocked => "Driver turned off by a setting",
-            Self::NoDriver => "No driver",
-            Self::ReservedForVirtualMachine => "Reserved for a virtual machine",
+            Self::Working => crate::tr!("Working"),
+            Self::NoDriverNeeded => crate::tr!("Working (no driver needed)"),
+            Self::DriverAvailableNotLoaded => crate::tr!("Driver installed but not loaded"),
+            Self::DriverNotAttached => crate::tr!("Driver loaded but not using this device"),
+            Self::DriverNotReady => crate::tr!("Driver loaded, but the device isn't ready"),
+            Self::DriverBlocked => crate::tr!("Driver turned off by a setting"),
+            Self::NoDriver => crate::tr!("No driver"),
+            Self::ReservedForVirtualMachine => crate::tr!("Reserved for a virtual machine"),
         }
     }
 }
@@ -331,5 +331,13 @@ mod tests {
             bracketed("Advanced Micro Devices, Inc. [AMD/ATI]"),
             Some("AMD/ATI")
         );
+    }
+
+    #[test]
+    fn labels_and_summaries_are_english_by_default() {
+        crate::i18n::in_english(|| {
+            assert_eq!(Status::Working.summary(), "Working");
+            assert_eq!(Category::Graphics.label(), "Graphics");
+        });
     }
 }

@@ -128,7 +128,7 @@ export component AppWindow inherits Window {
                 }
             }
             if root.scanning : Text {
-                text: "Scanning your hardware...";
+                text: @tr("Scanning your hardware...");
                 color: Theme.text-muted;
                 font-size: Theme.font-body;
                 vertical-alignment: center;
@@ -139,7 +139,7 @@ export component AppWindow inherits Window {
                 horizontal-stretch: 0;
                 StatusPill {
                     kind: root.problem-count == 0 ? "ok" : "warn";
-                    text: root.problem-count == 0 ? "No problems found" : root.summary;
+                    text: root.problem-count == 0 ? @tr("No problems found") : root.summary;
                 }
             }
             Rectangle {
@@ -150,11 +150,11 @@ export component AppWindow inherits Window {
                 HorizontalLayout {
                     spacing: Theme.gap;
                     AccentButton {
-                        text: "Copy report for all devices";
+                        text: @tr("Copy report for all devices");
                         clicked => { copy-text.copy(root.device-report("")); }
                     }
                     AccentButton {
-                        text: root.scanning ? "Scanning..." : "Scan again";
+                        text: root.scanning ? @tr("Scanning...") : @tr("Scan again");
                         enabled: !root.scanning;
                         clicked => { root.refresh(); }
                     }
@@ -183,7 +183,7 @@ export component AppWindow inherits Window {
                     y: 60px;
                     width: parent.width;
                     height: parent.height - 60px;
-                    text: "Nothing matches.";
+                    text: @tr("Nothing matches.");
                     color: Theme.text-faint;
                     font-size: Theme.font-body;
                     horizontal-alignment: center;
@@ -202,7 +202,7 @@ export component AppWindow inherits Window {
                                 horizontal-stretch: 1;
                             }
                             Switch {
-                                text: "Only problems";
+                                text: @tr("Only problems");
                                 checked <=> root.only-problems;
                             }
                         }

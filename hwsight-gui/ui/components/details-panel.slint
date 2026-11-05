@@ -18,7 +18,7 @@ export component DetailsPanel inherits Rectangle {
     VerticalLayout {
         padding: 24px;
         if !root.has-device : Text {
-            text: "Select a device to see its details";
+            text: @tr("Select a device to see its details");
             color: Theme.text-faint;
             horizontal-alignment: center;
             vertical-alignment: center;
@@ -54,7 +54,7 @@ export component DetailsPanel inherits Rectangle {
             if root.device.description != "" : VerticalLayout {
                 spacing: 4px;
                 Text {
-                    text: "WHAT IT DOES";
+                    text: @tr("WHAT IT DOES");
                     color: Theme.text-muted;
                     font-size: Theme.font-small;
                     font-weight: 700;
@@ -76,7 +76,7 @@ export component DetailsPanel inherits Rectangle {
                     padding: 16px;
                     spacing: Theme.gap;
                     Text {
-                        text: "What's wrong";
+                        text: @tr("What's wrong");
                         color: Theme.text;
                         font-size: Theme.font-body;
                         font-weight: 700;
@@ -95,7 +95,7 @@ export component DetailsPanel inherits Rectangle {
                     padding: 16px;
                     spacing: Theme.gap;
                     Text {
-                        text: "How to fix";
+                        text: @tr("How to fix");
                         color: Theme.text;
                         font-size: Theme.font-body;
                         font-weight: 700;
@@ -144,14 +144,14 @@ export component DetailsPanel inherits Rectangle {
             VerticalLayout {
                 spacing: Theme.gap;
                 AccentButton {
-                    text: root.copied ? "Copied" : "Copy for a forum post";
+                    text: root.copied ? @tr("Copied") : @tr("Copy for a forum post");
                     clicked => {
                         root.copied = true;
                         root.copy-report();
                     }
                 }
                 Text {
-                    text: "Copies a short report about this device. Your user name and computer name are removed.";
+                    text: @tr("Copies a short report about this device. Your user name and computer name are removed.");
                     color: Theme.text-muted;
                     font-size: Theme.font-body;
                     wrap: word-wrap;
@@ -165,7 +165,7 @@ export component DetailsPanel inherits Rectangle {
             VerticalLayout {
                 spacing: Theme.gap;
                 Text {
-                    text: "DETAILS";
+                    text: @tr("DETAILS");
                     color: Theme.text-muted;
                     font-size: Theme.font-small;
                     font-weight: 700;
@@ -174,7 +174,7 @@ export component DetailsPanel inherits Rectangle {
                 GridLayout {
                     spacing: Theme.gap;
                     Row {
-                        Text { text: "Type"; color: Theme.text-muted; }
+                        Text { text: @tr("Type"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.category;
                             read-only: true;
@@ -184,9 +184,9 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: "Driver"; color: Theme.text-muted; }
+                        Text { text: @tr("Driver"); color: Theme.text-muted; }
                         TextInput {
-                            text: root.device.driver == "" ? "None" : root.device.driver;
+                            text: root.device.driver == "" ? @tr("None") : root.device.driver;
                             read-only: true;
                             single-line: true;
                             color: Theme.text;
@@ -194,7 +194,7 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: "Hardware ID"; color: Theme.text-muted; }
+                        Text { text: @tr("Hardware ID"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.hardware-id;
                             read-only: true;
@@ -204,7 +204,7 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: "Connection"; color: Theme.text-muted; }
+                        Text { text: @tr("Connection"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.bus;
                             read-only: true;
@@ -214,7 +214,7 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: "Address"; color: Theme.text-muted; }
+                        Text { text: @tr("Address"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.address;
                             read-only: true;
@@ -225,7 +225,7 @@ export component DetailsPanel inherits Rectangle {
                     }
                 }
                 if root.device.unrecognized : Text {
-                    text: "This device isn't in the device database yet. Its hardware ID above can be searched for online.";
+                    text: @tr("This device isn't in the device database yet. Its hardware ID above can be searched for online.");
                     color: Theme.text-faint;
                     wrap: word-wrap;
                 }

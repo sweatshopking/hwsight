@@ -31,17 +31,17 @@ export component UpdateBanner inherits Rectangle {
             horizontal-stretch: 1;
         }
         if root.can-update && !root.busy : AccentButton {
-            text: "Update now";
+            text: @tr("Update now");
             clicked => { root.update-now(); }
         }
         if root.busy : Text {
-            text: "Updating...";
+            text: @tr("Updating...");
             color: Theme.text-muted;
             font-size: Theme.font-body;
             vertical-alignment: center;
         }
         if root.can-restart : AccentButton {
-            text: "Restart";
+            text: @tr("Restart");
             clicked => { root.restart-now(); }
         }
     }

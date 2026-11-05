@@ -1,6 +1,496 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:29+0000\n"
+"POT-Creation-Date: 2026-11-05 23:55+0000\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: hwsight-gui/ui/app.slint:131
+msgid "Scanning your hardware..."
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:142
+msgid "No problems found"
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:153
+msgid "Copy report for all devices"
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:157
+msgid "Scanning..."
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:157
+msgid "Scan again"
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:186
+msgid "Nothing matches."
+msgstr ""
+
+#: hwsight-gui/ui/app.slint:205
+msgid "Only problems"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:21
+msgid "Select a device to see its details"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:57
+msgid "WHAT IT DOES"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:79
+msgid "What's wrong"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:98
+msgid "How to fix"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:147
+msgid "Copied"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:147
+msgid "Copy for a forum post"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:154
+msgid ""
+"Copies a short report about this device. Your user name and computer name "
+"are removed."
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:168
+msgid "DETAILS"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:177
+msgid "Type"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:187
+msgid "Driver"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:189
+msgid "None"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:197
+msgid "Hardware ID"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:207
+msgid "Connection"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:217
+msgid "Address"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:228
+msgid ""
+"This device isn't in the device database yet. Its hardware ID above can be "
+"searched for online."
+msgstr ""
+
+#: hwsight-gui/ui/components/notes-banner.slint:19
+msgid "Good to know"
+msgstr ""
+
+#: hwsight-gui/ui/components/search-box.slint:27
+msgid "Search devices"
+msgstr ""
+
+#: hwsight-gui/ui/components/update-banner.slint:34
+msgid "Update now"
+msgstr ""
+
+#: hwsight-gui/ui/components/update-banner.slint:38
+msgid "Updating..."
+msgstr ""
+
+#: hwsight-gui/ui/components/update-banner.slint:44
+msgid "Restart"
+msgstr ""
+
+msgid "hwsight {} is installed. Restart hwsight to use it."
+msgstr ""
+
+msgid "The update was cancelled."
+msgstr ""
+
+msgid "hwsight is up to date."
+msgstr ""
+
+msgid ""
+"This copy of hwsight is updated through your package manager or from {}."
+msgstr ""
+
+msgid "Couldn't update hwsight: {}"
+msgstr ""
+
+msgid "Graphics"
+msgstr ""
+
+msgid "Sound"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Bluetooth"
+msgstr ""
+
+msgid "Storage"
+msgstr ""
+
+msgid "USB controllers and hubs"
+msgstr ""
+
+msgid "Thunderbolt"
+msgstr ""
+
+msgid "Input devices"
+msgstr ""
+
+msgid "Cameras"
+msgstr ""
+
+msgid "Printers and scanners"
+msgstr ""
+
+msgid "Modems and serial ports"
+msgstr ""
+
+msgid "Security and encryption"
+msgstr ""
+
+msgid "AI and compute accelerators"
+msgstr ""
+
+msgid "Processors"
+msgstr ""
+
+msgid "System devices"
+msgstr ""
+
+msgid "Other devices"
+msgstr ""
+
+msgid "graphics device"
+msgstr ""
+
+msgid "sound device"
+msgstr ""
+
+msgid "network device"
+msgstr ""
+
+msgid "Bluetooth device"
+msgstr ""
+
+msgid "storage device"
+msgstr ""
+
+msgid "hub"
+msgstr ""
+
+msgid "Thunderbolt device"
+msgstr ""
+
+msgid "input device"
+msgstr ""
+
+msgid "camera"
+msgstr ""
+
+msgid "printer or scanner"
+msgstr ""
+
+msgid "modem or serial device"
+msgstr ""
+
+msgid "security device"
+msgstr ""
+
+msgid "accelerator"
+msgstr ""
+
+msgid "processor"
+msgstr ""
+
+msgid "system device"
+msgstr ""
+
+msgid "device"
+msgstr ""
+
+msgid "Working"
+msgstr ""
+
+msgid "Working (no driver needed)"
+msgstr ""
+
+msgid "Driver installed but not loaded"
+msgstr ""
+
+msgid "Driver loaded but not using this device"
+msgstr ""
+
+msgid "Driver loaded, but the device isn't ready"
+msgstr ""
+
+msgid "Driver turned off by a setting"
+msgstr ""
+
+msgid "No driver"
+msgstr ""
+
+msgid "Reserved for a virtual machine"
+msgstr ""
+
+msgid ""
+"Firmware file {} was missing when the computer started, but it's installed "
+"now. Restarting should fix this."
+msgstr ""
+
+msgid ""
+"The driver needs a firmware file that isn't installed: {}. It comes in the "
+"{} package."
+msgstr ""
+
+msgid "The driver needs a firmware file that isn't installed: {}"
+msgstr ""
+
+msgid ""
+"A device plugged in here couldn't connect. This is usually a bad cable, a "
+"faulty device, or not enough power. Try another cable or port."
+msgstr ""
+
+msgid ""
+"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
+"a faulty device, or not enough power. Try another cable or port."
+msgstr ""
+
+msgid ""
+"This USB port reported drawing too much power. The device plugged into it "
+"may be faulty or need its own power supply."
+msgstr ""
+
+msgid "The {} driver couldn't start this device ({})."
+msgstr ""
+
+msgid "it wasn't allowed to"
+msgstr ""
+
+msgid "a file it needs is missing"
+msgstr ""
+
+msgid "the device didn't respond correctly"
+msgstr ""
+
+msgid "the device was temporarily unavailable"
+msgstr ""
+
+msgid "the computer ran out of memory for it"
+msgstr ""
+
+msgid "the device was already in use"
+msgstr ""
+
+msgid "the device wasn't found when the driver looked for it"
+msgstr ""
+
+msgid "the device sent something the driver didn't expect"
+msgstr ""
+
+msgid "the device stopped responding"
+msgstr ""
+
+msgid "the connection kept failing"
+msgstr ""
+
+msgid "this device model isn't supported by the driver"
+msgstr ""
+
+msgid "the device didn't respond in time"
+msgstr ""
+
+msgid "it was waiting on another part that never became ready"
+msgstr ""
+
+msgid "an unexpected error"
+msgstr ""
+
+msgid ""
+"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
+"driver is available for devices without one."
+msgstr ""
+
+msgid ""
+"Couldn't read the kernel log, so hwsight can't say why a device isn't "
+"working. On some systems only administrators can read it."
+msgstr ""
+
+msgid "Couldn't read the USB device list: {}"
+msgstr ""
+
+msgid "Couldn't read the PCI device list: {}"
+msgstr ""
+
+msgid ""
+"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
+"it."
+msgstr ""
+
+msgid ""
+"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
+"Details: {}"
+msgstr ""
+
+msgid "USB bus {}, port {}"
+msgstr ""
+
+msgid "{}, then hub port {}"
+msgstr ""
+
+msgid "Unknown {} {}"
+msgstr ""
+
+msgid "Unknown {}"
+msgstr ""
+
+msgid "Data updates aren't available in this version."
+msgstr ""
+
+msgid "Couldn't download the update: {}"
+msgstr ""
+
+msgid ""
+"The downloaded update failed its security check, so it wasn't installed."
+msgstr ""
+
+msgid "A data update needs a newer version of hwsight."
+msgstr ""
+
+msgid "The downloaded update was damaged ({}), so it wasn't installed."
+msgstr ""
+
+msgid "Couldn't save the update: {}"
+msgstr ""
+
+msgid ""
+"This device was blocked by the computer's USB security settings, so nothing "
+"is allowed to use it."
+msgstr ""
+
+msgid "USB device"
+msgstr ""
+
+msgid "{} {}"
+msgstr ""
+
+msgid "USB {}"
+msgstr ""
+
+msgid ""
+"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgstr ""
+
+msgid "hwsight {} is the newest version."
+msgstr ""
+
+msgid "Couldn't check for updates: {}"
+msgstr ""
+
+msgid "Couldn't find where hwsight is installed."
+msgstr ""
+
+msgid "{}, driver: {}"
+msgstr ""
+
+msgid "{}, {} blocked in {}"
+msgstr ""
+
+msgid "{}, available: {}"
+msgstr ""
+
+msgid "{}, not in the device database yet"
+msgstr ""
+
+msgid "Why:"
+msgstr ""
+
+msgid "The driver is loaded, but no {} was created."
+msgstr ""
+
+msgid "Fix:"
+msgstr ""
+
+msgid "Fix {}:"
+msgstr ""
+
+msgid "USB ports"
+msgstr ""
+
+msgid "No devices found."
+msgstr ""
+
+msgid "No problems found."
+msgstr ""
+
+msgid "1 device"
+msgid_plural "{n} devices"
+msgstr[0] ""
+
+msgid "{}, no problems found."
+msgstr ""
+
+msgid "1 problem"
+msgid_plural "{n} problems"
+msgstr[0] ""
+
+msgid "{}, {}."
+msgstr ""
+
+msgid "Note: {}"
+msgstr ""
+
+msgid "Device data is up to date."
+msgstr ""
+
+msgid "Updated {} to {}"
+msgstr ""
+
+msgid "hwsight {} is available."
+msgstr ""
+
+msgid ""
+"hwsight {} is available. Update it with your package manager, or download it "
+"from the website."
+msgstr ""
+
+msgid "No devices found"
+msgstr ""
+
+msgid "{}, no problems found"
+msgstr ""
+
+msgid "{}, {}"
+msgstr ""
+
+msgid "{}: {}"
+msgstr ""
+
+msgid "PCI"
+msgstr ""
+
+msgid "USB"
+msgstr ""
+
+msgid "Other"
+msgstr ""

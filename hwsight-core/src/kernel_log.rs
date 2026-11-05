@@ -47,37 +47,36 @@ impl LogIssue {
                 file,
                 installed_now: true,
                 ..
-            } => format!(
-                "Firmware file {file} was missing when the computer started, but it's installed \
-                 now. Restarting should fix this."
+            } => crate::tr!(
+                "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this.",
+                file
             ),
             Self::MissingFirmware {
                 file,
                 package: Some(package),
                 ..
-            } => format!(
-                "The driver needs a firmware file that isn't installed: {file}. \
-                 It comes in the {package} package."
+            } => crate::tr!(
+                "The driver needs a firmware file that isn't installed: {}. It comes in the {} package.",
+                file,
+                package
             ),
-            Self::MissingFirmware { file, .. } => {
-                format!("The driver needs a firmware file that isn't installed: {file}")
-            }
-            Self::UsbConnectFailed { error } => {
-                let why = if *error == 0 {
-                    String::new()
-                } else {
-                    format!(" ({})", errno_meaning(*error))
-                };
-                format!(
-                    "A device plugged in here couldn't connect{why}. This is usually a bad \
-                     cable, a faulty device, or not enough power. Try another cable or port."
-                )
-            }
-            Self::UsbOverCurrent => "This USB port reported drawing too much power. The device \
-                plugged into it may be faulty or need its own power supply."
-                .to_owned(),
-            Self::DriverFailed { driver, error } => format!(
-                "The {driver} driver couldn't start this device ({}).",
+            Self::MissingFirmware { file, .. } => crate::tr!(
+                "The driver needs a firmware file that isn't installed: {}",
+                file
+            ),
+            Self::UsbConnectFailed { error: 0 } => crate::tr!(
+                "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+            ),
+            Self::UsbConnectFailed { error } => crate::tr!(
+                "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port.",
+                errno_meaning(*error)
+            ),
+            Self::UsbOverCurrent => crate::tr!(
+                "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
+            ),
+            Self::DriverFailed { driver, error } => crate::tr!(
+                "The {} driver couldn't start this device ({}).",
+                driver,
                 errno_meaning(*error)
             ),
         }
@@ -324,22 +323,22 @@ fn firmware_installed(file: &str, dirs: &[PathBuf]) -> bool {
 }
 
 /// A plain-English meaning for the error numbers drivers report.
-pub fn errno_meaning(error: i32) -> &'static str {
+pub fn errno_meaning(error: i32) -> String {
     match error.abs() {
-        1 | 13 => "it wasn't allowed to",
-        2 => "a file it needs is missing",
-        5 => "the device didn't respond correctly",
-        11 => "the device was temporarily unavailable",
-        12 => "the computer ran out of memory for it",
-        16 => "the device was already in use",
-        19 => "the device wasn't found when the driver looked for it",
-        22 => "the device sent something the driver didn't expect",
-        32 => "the device stopped responding",
-        71 => "the connection kept failing",
-        95 => "this device model isn't supported by the driver",
-        110 => "the device didn't respond in time",
-        517 => "it was waiting on another part that never became ready",
-        _ => "an unexpected error",
+        1 | 13 => crate::tr!("it wasn't allowed to"),
+        2 => crate::tr!("a file it needs is missing"),
+        5 => crate::tr!("the device didn't respond correctly"),
+        11 => crate::tr!("the device was temporarily unavailable"),
+        12 => crate::tr!("the computer ran out of memory for it"),
+        16 => crate::tr!("the device was already in use"),
+        19 => crate::tr!("the device wasn't found when the driver looked for it"),
+        22 => crate::tr!("the device sent something the driver didn't expect"),
+        32 => crate::tr!("the device stopped responding"),
+        71 => crate::tr!("the connection kept failing"),
+        95 => crate::tr!("this device model isn't supported by the driver"),
+        110 => crate::tr!("the device didn't respond in time"),
+        517 => crate::tr!("it was waiting on another part that never became ready"),
+        _ => crate::tr!("an unexpected error"),
     }
 }
 

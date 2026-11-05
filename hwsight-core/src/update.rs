@@ -85,17 +85,17 @@ pub enum UpdateError {
 impl UpdateError {
     pub fn message(&self) -> String {
         match self {
-            Self::NotConfigured => "Data updates aren't available in this version.".to_owned(),
-            Self::Download(e) => format!("Couldn't download the update: {e}"),
-            Self::BadSignature => "The downloaded update failed its security check, so it \
-                wasn't installed."
-                .to_owned(),
-            Self::NeedsNewerApp => "A data update needs a newer version of hwsight.".to_owned(),
-            Self::Invalid(e) => format!(
-                "The downloaded update was damaged ({e}), so it wasn't \
-                installed."
+            Self::NotConfigured => crate::tr!("Data updates aren't available in this version."),
+            Self::Download(e) => crate::tr!("Couldn't download the update: {}", e),
+            Self::BadSignature => crate::tr!(
+                "The downloaded update failed its security check, so it wasn't installed."
             ),
-            Self::Write(e) => format!("Couldn't save the update: {e}"),
+            Self::NeedsNewerApp => crate::tr!("A data update needs a newer version of hwsight."),
+            Self::Invalid(e) => crate::tr!(
+                "The downloaded update was damaged ({}), so it wasn't installed.",
+                e
+            ),
+            Self::Write(e) => crate::tr!("Couldn't save the update: {}", e),
         }
     }
 }

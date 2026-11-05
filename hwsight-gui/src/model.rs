@@ -30,16 +30,22 @@ pub fn view(report: &ScanReport) -> View {
         + report.port_issues.len();
     let total = report.devices.len();
     let summary = match (total, problems) {
-        (0, _) => "No devices found".to_owned(),
-        (_, 0) => format!("{total} devices, no problems found"),
-        (_, 1) => format!("{total} devices, 1 problem"),
-        (_, n) => format!("{total} devices, {n} problems"),
+        (0, _) => hwsight_core::tr!("No devices found"),
+        (_, 0) => {
+            let devices = hwsight_core::tr!("1 device" | "{n} devices" % total);
+            hwsight_core::tr!("{}, no problems found", devices)
+        }
+        (_, _) => {
+            let devices = hwsight_core::tr!("1 device" | "{n} devices" % total);
+            let problems = hwsight_core::tr!("1 problem" | "{n} problems" % problems);
+            hwsight_core::tr!("{}, {}", devices, problems)
+        }
     };
 
     let mut notes: Vec<String> = report
         .port_issues
         .iter()
-        .map(|p| format!("{}: {}", p.port, p.issue.message()))
+        .map(|p| hwsight_core::tr!("{}: {}", p.port, p.issue.message()))
         .collect();
     notes.extend(report.firmware_note.iter().cloned());
     notes.extend(report.notes.iter().map(|n| n.message()));
@@ -150,7 +156,10 @@ fn device_item(d: &Device) -> DeviceItem {
     let mut why: Vec<String> = Vec::new();
     if d.status.is_problem() {
         if let Some(what) = &d.missing_interface {
-            why.push(format!("The driver is loaded, but no {what} was created."));
+            why.push(hwsight_core::tr!(
+                "The driver is loaded, but no {} was created.",
+                what
+            ));
         }
         why.extend(d.log_issues.iter().map(LogIssue::message));
     }
@@ -178,9 +187,9 @@ fn device_item(d: &Device) -> DeviceItem {
         hardware_id: d.hardware_id.clone().into(),
         address: d.address.clone().into(),
         bus: match d.bus {
-            hwsight_core::Bus::Pci => "PCI",
-            hwsight_core::Bus::Usb => "USB",
-            _ => "Other",
+            hwsight_core::Bus::Pci => hwsight_core::tr!("PCI"),
+            hwsight_core::Bus::Usb => hwsight_core::tr!("USB"),
+            _ => hwsight_core::tr!("Other"),
         }
         .into(),
         why: why.join("\n").into(),
