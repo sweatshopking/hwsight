@@ -926,3 +926,311 @@ this task's Done notes. This task is allowed to edit `hwsight-core/data/`.
 
   ALL CHECKS PASSED
   ```
+
+---
+
+## Claude 12: details for every level, from beginners to experts (planned, owner asked 2026-11-03)
+
+Owner: "usable for dummies but deep enough for nerds. should cover the spectrum
+entirely." Expands item 6 (hardware details) in CLAUDE.md. Build after packaging and the
+first release.
+
+### Three levels in the same details panel
+
+1. **Simple (default):** what we show today. Status, What it does, What's wrong, and How
+   to fix, in plain English. No numbers a beginner has to interpret.
+2. **More details (one click, "Show more"):** the key specs in plain words with units and
+   a verdict, e.g. "16 GB video memory", "Connected at full speed (PCIe 5.0 x16)",
+   "Battery holds 82% of its original charge". Every number that can be judged is judged
+   (good / reduced / problem) using the same rules as diagnosis.
+3. **Technical (toggle, remembered between runs):** everything we can read, raw values
+   and units, grouped by source, with the sysfs path or file each value came from. Every
+   label has a tooltip in plain English ("ASPM: PCIe power saving"). Copy buttons per
+   group, plus "Copy all" and "Save report" (shares code with the in-app bug report).
+   A setting "Always show technical details" for experts.
+
+Admin-only data sits behind a "Read more (needs your password)" button in the technical
+level: a small read-only polkit helper, never run at startup, never required.
+
+CLI mirrors the levels: `hwsight` (simple), `hwsight --details <address>` (all levels as
+text), and `--json` always includes everything.
+
+### What to read, per device type (no admin unless marked)
+
+- **Any PCI device:** current vs max link speed and width (flag downgraded links), ASPM
+  and D-state (power saving), IRQ / MSI / MSI-X, BARs and memory ranges
+  (`resource`), IOMMU group (VM passthrough), NUMA node, AER error counters
+  (`aer_dev_correctable` etc.), runtime power status, ROM presence, physical slot.
+  Full config space / extended capabilities (`lspci -vvv` level): admin.
+- **USB devices:** negotiated speed vs device's max (a 3.x device stuck at USB 2.0 is a
+  verdict), bMaxPower draw, configurations, interfaces and their classes, endpoints,
+  port path and hub tree, autosuspend state, `authorized`, serial (hidden by default,
+  privacy).
+- **Drivers:** module name and version, srcversion, in-tree vs DKMS / out-of-tree vs
+  taint flags, module parameters and their current values, firmware files actually
+  loaded this boot (kernel log), signed or not.
+- **CPU:** model, codename (specs data / libcpuid tables), cores and threads, topology,
+  caches, live and max clocks per core, governor and EPP, boost, microcode version vs
+  latest known, flags (AVX-512 etc.), `vulnerabilities/` with plain-English meaning,
+  temperatures (hwmon k10temp / coretemp), throttling counters.
+- **GPU:** VRAM size and use, clocks, load, temperature, fan, power draw and limit,
+  driver and firmware versions, Vulkan / OpenGL / OpenCL versions, display outputs, ReBAR
+  (BAR size), PCIe link. AMD/Intel from sysfs + hwmon, NVIDIA via NVML.
+- **Memory:** total, used, swap and zram, speed. Per-stick slot, size, speed, rated
+  EXPO/XMP vs actual, timings, maker and part number: admin (SMBIOS type 17, SPD via
+  `spd5118` / `ee1004`).
+- **Board and BIOS:** maker, model, revision, BIOS vendor, version and date, Secure Boot
+  state, boot mode (UEFI / legacy), TPM version.
+- **Drives:** model, firmware, capacity, interface and link speed, NVMe health
+  (percentage used, spare, temperature, power-on hours, media errors) from sysfs/ioctl
+  where readable; full SMART history: admin. Partitions and filesystems summary.
+- **Monitors (EDID, `/sys/class/drm/*/edid`):** maker, model, serial (hidden by default),
+  manufacture week and year, size, native and supported modes and refresh rates, HDR and
+  colour support, VRR range, which port and cable link rate.
+- **Battery:** design vs full capacity (wear), cycle count, charge and discharge rate,
+  voltage, technology, charge limit / thresholds if supported.
+- **Network:** link speed and duplex, MAC (hidden by default), Wi-Fi standard, band,
+  channel width, signal and bitrate, supported features (from nl80211), driver firmware.
+- **Audio:** codec chip (`/proc/asound/card*/codec#*`), outputs and inputs, jack state,
+  HDMI audio ELD (which formats the TV/receiver accepts).
+- **Input:** device type, capabilities (`/proc/bus/input/devices`), battery level for
+  wireless devices where exposed.
+- **Sensors:** every hwmon temperature, fan, voltage, and power sensor, with board-specific
+  labels where known (specs data).
+- **Platform / laptop internals:** ACPI path, I2C / platform devices, thermal zones,
+  platform profile (power mode), firmware attributes where the vendor exposes them.
+
+### Rules
+
+- Plain-English first, raw second: never show a raw value at levels 1 and 2 without a
+  verdict or explanation.
+- Privacy: serial numbers, MAC addresses, and UUIDs are hidden behind a "show" eye icon
+  and left out of copied reports unless the user ticks them.
+- Every value records its source so experts can verify it and we can debug wrong readings.
+- Unknown is fine: show the raw value instead of hiding it (same principle as unknown
+  devices).
+- Live values (clocks, temps, load) refresh only while the panel is open.
+
+---
+
+# Feature roadmap after Claude 12 (owner approved all, 2026-11-03)
+
+Owner picked every idea below. Order inside each group is a suggestion; the five marked
+**(first)** were recommended to come first after Claude 12. Each becomes its own Claude or
+Copilot task with steps and tests when we get to it. All follow the existing rules: works
+on every distro, data not code where it ages, plain English first, nothing changes the
+system without asking.
+
+## Catch problems before or right after they happen
+
+- **"What changed?" after updates (first).** Save a small hardware snapshot each boot
+  (`$XDG_STATE_HOME/hwsight/snapshots/`, keep the last N): devices, drivers, statuses,
+  firmware loaded, kernel and driver versions. Compare with the previous one and explain
+  differences in plain English, e.g. "After the kernel update on Tuesday your Wi-Fi card
+  lost its driver (it used rtw89, now nothing)". Link to the package/kernel change when the
+  package manager log shows one.
+- **Driver mismatch checks.** NVIDIA kernel module vs user-space libraries version,
+  Flatpak `org.freedesktop.Platform.GL.nvidia-*` runtime vs the running driver (the owner
+  hit this with Heroic in 2026-10), DKMS module not built for the running kernel, Mesa vs
+  kernel too old for a new GPU.
+- **Secure Boot blocking a driver.** Detect "module verification failed" / lockdown
+  refusals in the kernel log for unsigned DKMS or NVIDIA modules; explain MOK enrolment
+  step by step, never automatically.
+- **Optional background checker.** A small user service or autostart tray item, off by
+  default: notifies when a device breaks after an update, and on hotplug ("New device:
+  works" / "New device: needs a driver"). Uses udev monitor, no polling.
+
+## Long-term health
+
+- **Health history (first).** Record drive SMART/NVMe health, battery capacity and cycle
+  count, and temperatures over time (small local database). Show trends and warn early,
+  e.g. "this drive's reallocated sectors went from 0 to 40 this month".
+- **Firmware updates through fwupd / LVFS (first).** Read fwupd over D-Bus: show available
+  BIOS, SSD, dock, mouse and other firmware updates per device, release notes, one-click
+  install through fwupd's own polkit flow. Explain when a device has no LVFS support.
+
+## Testing tools for beginners (first)
+
+"Is it broken or is it Linux?" tests, each a small page:
+speakers (left / right / surround channel test), microphone (live level meter and
+playback), webcam (preview, resolution, frame rate), keyboard (shows every key pressed,
+including media keys), gamepad (buttons, sticks, triggers, rumble), screen (dead pixel /
+colour fill, refresh rate check), USB port (real negotiated speed of a plugged-in device),
+drive read speed (non-destructive, read-only).
+
+## Common Linux pain points
+
+- **"Why won't my PC sleep, or why does it wake up?"** Inhibitors (systemd-logind / D-Bus),
+  wake-up sources (`/proc/acpi/wakeup`, USB `power/wakeup`), last wake reason, and what
+  failed during the last suspend.
+- **Laptop battery drain by device.** Powertop-style estimates per device and process, in
+  plain English, with runtime power-management status.
+- **Who is using it?** Which app has the webcam, microphone, GPU, or a serial/USB device
+  open right now (`/proc/*/fd`, PipeWire nodes, GPU fdinfo).
+- **Driver conflicts.** Two drivers competing for one device (nouveau vs nvidia), stale or
+  wrong blacklists, the wrong driver bound when a better one is installed.
+- **Hybrid graphics.** Which GPU each running app uses (fdinfo), how to run an app on the
+  other GPU (PRIME offload, `switcherooctl`), and why the dGPU won't power down.
+- **Bluetooth diagnosis.** Adapter state, rfkill blocks, firmware load, pairing failures,
+  audio codec in use, controllers dropping. Test case: the owner's Switch Pro controller.
+
+## Getting help
+
+- **"Ask for help" button (first).** Builds a forum-ready report (Markdown for Reddit,
+  distro forums, and GitHub) for one device or the whole system, with private details
+  removed by default. Shares code with the in-app bug report and Claude 12's "Save report".
+- **"Does this work on Linux?" lookup.** Check a device ID against public compatibility
+  data (linux-hardware.org probes, plus our own rules data), both for installed hardware
+  and for a product the user is thinking of buying (search by name or ID).
+- **Help a friend.** Diagnose another computer: run the CLI over SSH and show its results
+  in the GUI, or open a report file someone sent. Test case: the owner's LVbox HTPC.
+
+## Polish that matters for everyone
+
+- **Translations from day one** (same `tr!` approach as DriveDeck), and screen-reader /
+  keyboard accessibility in the Slint UI.
+- **Undo for every fix.** Every change hwsight makes is logged with the exact steps to
+  reverse it, and a one-click "Undo" where possible.
+
+---
+
+# "Ask for help" batch (2026-11-06)
+
+First item from the roadmap's "Getting help" group: a report people can paste into a
+forum post (Reddit, distro forums, GitHub issues) for one device or the whole computer,
+with private details removed. Claude does packaging and the first release in parallel.
+One task at a time, in order.
+
+## Copilot 11: forum report in core, and `hwsight --report`
+
+**Files you may change:** new file `hwsight-core/src/report.rs`; `hwsight-core/src/lib.rs`
+(only the line `pub mod report;`, placed in alphabetical order with the other `pub mod`
+lines); `hwsight-cli/src/main.rs`; this task's Done notes. Nothing else.
+
+**Steps (do all of them):**
+
+1. In `report.rs` add `pub struct Privacy { pub home: Option<String>, pub user: Option<String>, pub host: Option<String> }`
+   with `impl Privacy { pub fn system() -> Self }` reading `$HOME`, `$USER`, and the host
+   name from `/etc/hostname` (trimmed; `None` when missing or empty). Never panic.
+2. Add `pub fn scrub(text: &str, privacy: &Privacy) -> String`: replaces, in this order,
+   the home folder with `~`, the host name with `<computer>`, and the user name with
+   `<user>`. Values shorter than 3 characters are not replaced (a user called "jo"
+   would wreck every "joystick"). The user name is replaced only as a whole word
+   (letters, digits, `_`, `-` on either side don't count as a match).
+3. Add `pub fn device_markdown(device: &Device) -> String`: a section for one device,
+   exactly this shape (lines with no value are left out; no trailing spaces):
+   ```
+   ### <display_name>
+   - Status: <status.summary()>
+   - Type: <category.label()>
+   - Maker: <vendor_name>
+   - Hardware ID: `<hardware_id>` (<bus as "PCI" or "USB">, address `<address>`)
+   - Driver in use: `<driver>`            (or "Driver in use: none")
+   - Drivers that support it: `a`, `b`   (only when driver_candidates is not empty;
+                                          add " (turned off by a setting)" after a
+                                          blocked one, " (loaded)" after a loaded one)
+   - What's wrong: <missing_interface>    (only when set)
+   - Note: <note>                         (only when set)
+
+   Kernel log:                            (only when status.is_problem() and
+   - <issue.message()>                     log_issues is not empty; one line each)
+   ```
+   Read `DriverCandidate` in `modules.rs` for its field names; don't change it.
+4. Add `pub fn markdown(report: &ScanReport, only: Option<&str>, privacy: &Privacy) -> String`:
+   - First line `## hwsight report`, a blank line, then
+     `- Computer: <distro.name>` (add ` (read-only system)` when `distro.immutable`),
+     `- Kernel: <release>` from `/proc/sys/kernel/osrelease` (left out if unreadable;
+     put the reading in a small private function so tests don't depend on it: tests
+     call `markdown_with_kernel` below),
+     `- hwsight: <env!("CARGO_PKG_VERSION")>`, `- Data: rules <rules_version>`.
+   - `only = Some(address)`: just that device's `device_markdown`. If no device has
+     that address, the body is the line `No device with address <address> was found.`
+   - `only = None`: a line `<N> devices, <P> with problems.`, then every problem
+     device's section, then `#### Working devices` with one line per other device:
+     `- <display_name> (<category.label()>, `<hardware_id>`)`. Then, if there are any,
+     `#### USB port problems` (`- <port>: <issue.message()>`) and
+     `#### Scan notes` (`- <note.message()>`).
+   - The whole text goes through `scrub` last. Ends with exactly one `\n`.
+   - Make the public `markdown` call `pub(crate) fn markdown_with_kernel(report, only,
+     privacy, kernel: Option<&str>)`, which does all the work.
+5. CLI: add `--report [ADDRESS]` to `HELP` in the same style ("Print a report to paste
+   into a forum post or bug report. Private details are removed."). The next argument
+   is the address when it exists and doesn't start with `-`. It prints
+   `report::markdown(&scan, address, &Privacy::system())` and nothing else, ignores
+   `--problems`, `--ids`, and colour. `--report` together with `--json` is an error:
+   `hwsight: --report and --json can't be used together` and exit code 2.
+
+**Tests (all required, in `report.rs`; build `Device` and `ScanReport` values by hand,
+no real scans):**
+- `scrub_replaces_home_host_and_user`
+- `scrub_skips_short_values` (user "jo", text "joystick" stays the same)
+- `scrub_user_only_as_whole_word` (user "josh", "joshua" stays, "/josh/" changes)
+- `device_section_for_a_broken_device` (full expected string with `assert_eq!`)
+- `device_section_leaves_out_empty_lines`
+- `whole_report_lists_problems_then_working`
+- `report_for_one_address`
+- `report_for_unknown_address`
+- `report_ends_with_one_newline`
+- in `main.rs`: `report_and_json_conflict` (make the argument parsing a function that
+  returns a result if it isn't one already, so this can be tested without running a scan).
+
+**Done when:**
+
+- [ ] steps 1 to 5 done; every test above exists and passes
+- [ ] `hwsight --report` and `hwsight --report <a real address from hwsight --ids>` run
+      on this computer; paste the first 15 lines of each into Done notes
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
+
+---
+
+## Copilot 12: "Copy for a forum post" button in the app
+
+**Only after Copilot 11 is reviewed.** Follow the "GUI batch" rules above.
+
+**Files you may change:** `hwsight-gui/ui/app.slint`,
+`hwsight-gui/ui/components/details-panel.slint`, a new
+`hwsight-gui/ui/components/copy-text.slint`, `hwsight-gui/src/main.rs`, this task's Done
+notes. Nothing else.
+
+**Steps (do all of them):**
+
+1. `copy-text.slint`: `export component CopyText` containing a `TextInput` that is not
+   visible to the user (`width: 0px; height: 0px; opacity: 0;` and not focusable by
+   Tab), with `public function copy(text: string)` that sets the input's text, calls
+   `select-all()` and then `copy()` on it, and then clears the text again. This is the
+   only way to reach the clipboard without adding a crate; don't add one.
+2. Details panel: below the fix steps, a secondary button "Copy for a forum post"
+   (reuse the existing button style in the panel, Theme only) with
+   `callback copy-report()`. Under it, a `Theme.text-muted` line, word-wrapped: "Copies
+   a short report about this device. Your user name and computer name are removed."
+   After a click the button text changes to "Copied" for 2 seconds (`Timer`), then back.
+3. `app.slint`: add `callback device-report(string) -> string` (argument: the device address; returns
+   the Markdown), and a header button "Copy report for all devices" next to Refresh,
+   same style as Refresh, which calls `device-report("")`. Both buttons pass the
+   returned text to one `CopyText` instance in the window.
+4. `main.rs`: handle `device-report`: keep the last `ScanReport` (it is already
+   produced by the refresh code; store it in an `Rc<RefCell<Option<ScanReport>>>` or
+   whatever the existing code uses for shared state), and return
+   `report::markdown(&scan, (!address.is_empty()).then_some(address), &Privacy::system())`.
+   Before the first scan finishes it returns an empty string, and the buttons do nothing
+   with an empty string.
+
+**Tests:** none new in Rust (the logic is in core and tested there). Instead, after
+`tools/check.sh` passes, run the app, click both buttons, and paste the first 10 lines of
+`wl-paste` (Wayland) or `xclip -o -selection clipboard` (X11) after each click into Done
+notes. If the clipboard is empty after a click, that's a failure: write `BLOCKED:` with
+what you saw, don't work around it.
+
+**Done when:**
+
+- [ ] steps 1 to 4 done
+- [ ] clipboard output after each button pasted below
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [ ] nothing pushed, and no co-author line
+
+**Done notes:**
