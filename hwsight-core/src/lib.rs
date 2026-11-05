@@ -13,6 +13,7 @@ pub mod kernel_log;
 pub mod modules;
 mod pci;
 pub mod pci_ids;
+pub mod report;
 pub mod rules;
 pub mod update;
 mod usb;

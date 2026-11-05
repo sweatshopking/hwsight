@@ -1176,14 +1176,72 @@ no real scans):**
 
 **Done when:**
 
-- [ ] steps 1 to 5 done; every test above exists and passes
-- [ ] `hwsight --report` and `hwsight --report <a real address from hwsight --ids>` run
+- [x] steps 1 to 5 done; every test above exists and passes
+- [x] `hwsight --report` and `hwsight --report <a real address from hwsight --ids>` run
       on this computer; paste the first 15 lines of each into Done notes
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
-- [ ] one `Step N: done in <file> - <what>` line per numbered step in Done notes
-- [ ] nothing pushed, and no co-author line
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted below)
+- [x] one `Step N: done in <file> - <what>` line per numbered step in Done notes
+- [x] nothing pushed, and no co-author line
 
 **Done notes:**
+- Step 1: done in `hwsight-core/src/report.rs` - added system privacy collection for home, user, and hostname without panics.
+- Step 2: done in `hwsight-core/src/report.rs` - added ordered home, host, and whole-word user scrubbing with short-value protection.
+- Step 3: done in `hwsight-core/src/report.rs` - added device Markdown sections with status, hardware, driver, candidate, note, and kernel-log details.
+- Step 4: done in `hwsight-core/src/report.rs` - added whole-report and single-device Markdown generation with metadata, ordering, notes, port problems, and final scrubbing.
+- Step 5: done in `hwsight-cli/src/main.rs` - added `--report [ADDRESS]`, parser validation, JSON conflict handling, and report-only output.
+- Report tests: all 9 required tests pass.
+- CLI test: `report_and_json_conflict` passes.
+- Review fixes (Claude): host name is replaced only as a whole word and the header is not scrubbed (computer name "CachyOS" had blanked the distro line); CLI uses print! so output ends with one newline; new test computer_name_same_as_distro_keeps_the_distro.
+- `hwsight --report` first 15 lines:
+  ```
+  ## hwsight report
+
+  - Computer: <computer>
+  - Kernel: 7.3.1-1-cachyos
+  - hwsight: 0.1.0
+  - Data: rules 2026.11.03
+
+  50 devices, 0 with problems.
+
+  #### Working devices
+  - GeForce RTX 5070 Ti (Graphics, `10de:2c05`)
+  - Radeon 610M (Graphics, `1002:164e`)
+  - GB203 High Definition Audio Controller (Sound, `10de:22e9`)
+  - Radeon High Definition Audio Controller (Sound, `1002:1640`)
+  ```
+- `hwsight --report 0000:01:00.0` first 15 lines:
+  ```
+  ## hwsight report
+
+  - Computer: <computer>
+  - Kernel: 7.3.1-1-cachyos
+  - hwsight: 0.1.0
+  - Data: rules 2026.11.03
+
+  ### GeForce RTX 5070 Ti
+  - Status: Working
+  - Type: Graphics
+  - Maker: NVIDIA Corporation
+  - Hardware ID: `10de:2c05` (PCI, address `0000:01:00.0`)
+  - Driver in use: `nvidia`
+  - Drivers that support it: `nouveau` (turned off by a setting), `nvidia_drm` (loaded), `nvidia` (loaded)
+  ```
+- `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```
 
 ---
 

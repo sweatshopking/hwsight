@@ -25,56 +25,52 @@ Options:
   --check-update
                See whether a newer version of hwsight is out
   --update     Download and install the newest version of hwsight
+  --report [ADDRESS]
+               Print a report to paste into a forum post or bug report. Private details are removed.
   -h, --help   Show this help
   -V, --version
 ";
 
 struct Options {
+    command: Command,
     kernel_log: Option<std::path::PathBuf>,
     json: bool,
     no_color: bool,
     problems_only: bool,
     show_ids: bool,
+    report: Option<Option<String>>,
+}
+
+enum Command {
+    Scan,
+    Help,
+    Version,
+    UpdateData,
+    CheckUpdate,
+    Update,
 }
 
 fn main() -> ExitCode {
-    let mut opts = Options {
-        kernel_log: None,
-        json: false,
-        no_color: false,
-        problems_only: false,
-        show_ids: false,
-    };
-    let mut args = std::env::args().skip(1);
-    while let Some(arg) = args.next() {
-        match arg.as_str() {
-            "--kernel-log" => match args.next() {
-                Some(path) => opts.kernel_log = Some(path.into()),
-                None => {
-                    eprintln!("hwsight: --kernel-log needs a file name");
-                    return ExitCode::from(2);
-                }
-            },
-            "--json" => opts.json = true,
-            "--no-color" => opts.no_color = true,
-            "--problems" => opts.problems_only = true,
-            "--ids" => opts.show_ids = true,
-            "-h" | "--help" => {
-                print!("{HELP}");
-                return ExitCode::SUCCESS;
-            }
-            "--update-data" => return update_data(),
-            "--check-update" => return check_update(),
-            "--update" => return update_app(),
-            "-V" | "--version" => {
-                println!("hwsight {}", env!("CARGO_PKG_VERSION"));
-                return ExitCode::SUCCESS;
-            }
-            other => {
-                eprintln!("hwsight: unknown option `{other}`\n\n{HELP}");
-                return ExitCode::from(2);
-            }
+    let opts = match parse_args(std::env::args().skip(1)) {
+        Ok(opts) => opts,
+        Err(e) => {
+            eprintln!("{e}");
+            return ExitCode::from(2);
         }
+    };
+    match opts.command {
+        Command::Help => {
+            print!("{HELP}");
+            return ExitCode::SUCCESS;
+        }
+        Command::Version => {
+            println!("hwsight {}", env!("CARGO_PKG_VERSION"));
+            return ExitCode::SUCCESS;
+        }
+        Command::UpdateData => return update_data(),
+        Command::CheckUpdate => return check_update(),
+        Command::Update => return update_app(),
+        Command::Scan => {}
     }
 
     let mut scanner = hwsight_core::Scanner::system();
@@ -94,6 +90,17 @@ fn main() -> ExitCode {
         }
     }
     let report = scanner.scan();
+    if let Some(address) = &opts.report {
+        print!(
+            "{}",
+            hwsight_core::report::markdown(
+                &report,
+                address.as_deref(),
+                &hwsight_core::report::Privacy::system()
+            )
+        );
+        return ExitCode::SUCCESS;
+    }
     let color = use_color(
         io::stdout().is_terminal(),
         std::env::var("NO_COLOR").ok().as_deref(),
@@ -113,6 +120,48 @@ fn main() -> ExitCode {
             ExitCode::FAILURE
         }
     }
+}
+
+fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Options, String> {
+    let mut opts = Options {
+        command: Command::Scan,
+        kernel_log: None,
+        json: false,
+        no_color: false,
+        problems_only: false,
+        show_ids: false,
+        report: None,
+    };
+    let mut args = args.into_iter().peekable();
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--kernel-log" => match args.next() {
+                Some(path) => opts.kernel_log = Some(path.into()),
+                None => return Err("hwsight: --kernel-log needs a file name".to_owned()),
+            },
+            "--json" => opts.json = true,
+            "--no-color" => opts.no_color = true,
+            "--problems" => opts.problems_only = true,
+            "--ids" => opts.show_ids = true,
+            "--report" => {
+                let address = args.peek().filter(|next| !next.starts_with('-')).cloned();
+                if address.is_some() {
+                    args.next();
+                }
+                opts.report = Some(address);
+            }
+            "-h" | "--help" => opts.command = Command::Help,
+            "--update-data" => opts.command = Command::UpdateData,
+            "--check-update" => opts.command = Command::CheckUpdate,
+            "--update" => opts.command = Command::Update,
+            "-V" | "--version" => opts.command = Command::Version,
+            other => return Err(format!("hwsight: unknown option `{other}`\n\n{HELP}")),
+        }
+    }
+    if opts.json && opts.report.is_some() {
+        return Err("hwsight: --report and --json can't be used together".to_owned());
+    }
+    Ok(opts)
 }
 
 fn check_update_text(
@@ -412,6 +461,15 @@ mod tests {
     #[test]
     fn paint_on_wraps_and_resets() {
         assert_eq!(paint("hello", "\x1b[32m", true), "\x1b[32mhello\x1b[0m");
+    }
+
+    #[test]
+    fn report_and_json_conflict() {
+        let result = parse_args(["--report", "--json"].into_iter().map(str::to_owned));
+        assert!(matches!(
+            result,
+            Err(e) if e == "hwsight: --report and --json can't be used together"
+        ));
     }
 
     #[test]
