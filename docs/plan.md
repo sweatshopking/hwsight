@@ -1434,12 +1434,12 @@ Add in `hwsight-core/src/device.rs`'s tests: `labels_and_summaries_are_english_b
 
 - [ ] steps 1 to 8 done
 - [ ] `python3 tools/check-slint-tr.py hwsight-gui/ui` prints nothing (paste "no output")
-- [ ] `grep -rnE 'tr!\("[^"]*\{[a-z_:?]' hwsight-*/src` prints nothing (no named or
-      formatted placeholders inside `tr!`; paste "no output")
+- [ ] `grep -rnE 'tr!\("[^"]*\{([a-mo-z_:?]|n[^}])' hwsight-*/src` prints nothing (no
+      named or formatted placeholders inside `tr!`; `{n}` is allowed; paste "no output")
 - [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted
       below; it now includes the translation checks)
-- [ ] `hwsight` and the app still show the same English text as before (paste the first
-      10 lines of `hwsight` output)
+- [ ] `cargo run -q -p hwsight-cli` and the app still show the same English text as
+      before (paste the first 10 lines of the CLI output)
 - [ ] one `Step N: done in <files> - <what>` line per numbered step in Done notes
 - [ ] nothing committed, nothing pushed, no co-author line
 
@@ -1478,8 +1478,8 @@ this task's Done notes. Nothing else. Don't edit `po/hwsight.pot`.
 
 - [ ] all 11 catalogs complete: `every_language_is_complete` passes (output pasted)
 - [ ] `tools/check.sh` printed `ALL CHECKS PASSED` (output pasted)
-- [ ] `LANGUAGE=de hwsight | head -5` and `LANGUAGE=ja hwsight | head -5` show
-      translated text (pasted)
+- [ ] `LANGUAGE=de cargo run -q -p hwsight-cli | head -5` and the same with
+      `LANGUAGE=ja` show translated text (pasted)
 - [ ] `LANGUAGE=fr target/debug/hwsight-gui` opened and the window is in French
       (say what the "Scan again" button reads)
 - [ ] nothing committed, nothing pushed, no co-author line
