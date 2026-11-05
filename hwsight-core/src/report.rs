@@ -182,18 +182,29 @@ pub(crate) fn markdown_with_kernel(
             }
             lines.push(String::new());
             lines.push("#### Working devices".to_owned());
+            // Identical lines (chipsets repeat the same bridge many times) are merged
+            // into one with a count, in the order they first appear.
+            let mut working: Vec<(String, usize)> = Vec::new();
             for device in report
                 .devices
                 .iter()
                 .filter(|device| !device.status.is_problem())
             {
-                lines.push(format!(
+                let line = format!(
                     "- {} ({}, `{}`)",
                     device.display_name,
                     device.category.label(),
                     device.hardware_id
-                ));
+                );
+                match working.iter_mut().find(|(seen, _)| *seen == line) {
+                    Some((_, count)) => *count += 1,
+                    None => working.push((line, 1)),
+                }
             }
+            lines.extend(working.into_iter().map(|(line, count)| match count {
+                1 => line,
+                n => format!("{line} x{n}"),
+            }));
             if !report.port_issues.is_empty() {
                 lines.push(String::new());
                 lines.push("#### USB port problems".to_owned());
@@ -390,6 +401,29 @@ mod tests {
             text.find("- Fine (Network, `1234:5678`)").unwrap()
                 > text.find("#### Working devices").unwrap()
         );
+    }
+
+    #[test]
+    fn identical_working_devices_are_merged() {
+        let mut other = device(Status::Working, "c");
+        other.display_name = "Other".to_owned();
+        let text = markdown_with_kernel(
+            &report(vec![
+                device(Status::Working, "a"),
+                other,
+                device(Status::Working, "b"),
+            ]),
+            None,
+            &Privacy {
+                home: None,
+                user: None,
+                host: None,
+            },
+            None,
+        );
+        assert!(text.contains(
+            "#### Working devices\n- Test device (Network, `1234:5678`) x2\n- Other (Network, `1234:5678`)\n"
+        ));
     }
 
     #[test]
