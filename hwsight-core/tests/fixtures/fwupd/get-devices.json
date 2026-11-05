@@ -1,0 +1,823 @@
+{
+  "Devices": [
+    {
+      "DeviceId": "57e35fbedc32c4e5e69c55e3d7810f7ae6f1427a",
+      "InstanceIds": [
+        "DRM\\VEN_MSI&DEV_30B2"
+      ],
+      "Guid": [
+        "92b4be54-0b1d-5c15-bb61-737f254dd51c"
+      ],
+      "Plugin": "linux_display",
+      "VendorIds": [
+        "PNP:MSI"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "DeviceId": "0785bd3eac5b152d9fc34e5549136304ca025e4c",
+      "InstanceIds": [
+        "GPIO\\ID_AMDIF031:00"
+      ],
+      "Guid": [
+        "bc9f6c6f-473f-5bc2-a0d1-3171c965d0d3"
+      ],
+      "Plugin": "gpio",
+      "Created": 1793921204
+    },
+    {
+      "Name": "ASUSTeK KEK Certificate",
+      "DeviceId": "364cc0a5c620e0e524aa15266840b1e147ed3b8f",
+      "ParentDeviceId": "2a4c23bfb79b5dabe474cb7b1b3e604645d6f9c6",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\CRT_B207CA37CA736AFD9836D12D447E02484F161578"
+      ],
+      "Guid": [
+        "4c15a15b-0baf-56d2-a110-5b60f3fa781a"
+      ],
+      "Plugin": "uefi_kek",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "needs-reboot",
+        "usable-during-update",
+        "updatable-hidden",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Version": "2011",
+      "VersionFormat": "number",
+      "VersionRaw": 2011,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207,
+      "UpdateError": "No vendor ID set"
+    },
+    {
+      "Name": "ASUSTeK PK Certificate",
+      "DeviceId": "6924110cde4fa051bfdc600a60620dc7aa9d3c6a",
+      "ParentDeviceId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\CRT_0DCA64D8DA495ECDD0F5570A8C3BC61192652C31"
+      ],
+      "Guid": [
+        "936f7922-3184-54b3-bbd5-f6af26ac6faa"
+      ],
+      "Summary": "UEFI Platform Key",
+      "Plugin": "uefi_pk",
+      "Flags": [
+        "internal"
+      ],
+      "Vendor": "Unknown",
+      "Version": "2011",
+      "VersionFormat": "number",
+      "VersionRaw": 2011,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "Alto Keys K98",
+      "DeviceId": "bfb48dc932b8bfa4089192a497adec4bcb777237",
+      "ParentDeviceId": "c6e2725df9973fb2506000cba825532cd3f5d044",
+      "CompositeId": "c6e2725df9973fb2506000cba825532cd3f5d044",
+      "InstanceIds": [
+        "HIDRAW\\VEN_046D&MOD_B38E00000000"
+      ],
+      "Guid": [
+        "897d58bb-9be4-5579-9e81-9ae942e3c61c"
+      ],
+      "Summary": "Unifying Keyboard",
+      "Plugin": "logitech_hidpp",
+      "Protocols": [
+        "com.logitech.unifyingsigned"
+      ],
+      "Flags": [
+        "updatable",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "RequestFlags": [
+        "allow-generic-message"
+      ],
+      "Vendor": "Logitech",
+      "VendorIds": [
+        "USB:0x046D",
+        "HIDRAW:0x046D"
+      ],
+      "Version": "RBK93.02_B0009",
+      "VersionBootloader": "BL237.02_B0009",
+      "VersionFormat": "plain",
+      "BatteryLevel": 100,
+      "BatteryThreshold": 20,
+      "Icons": [
+        "input-keyboard"
+      ],
+      "InstallDuration": 270,
+      "Created": 1793921206
+    },
+    {
+      "Name": "Bolt Receiver",
+      "DeviceId": "c6e2725df9973fb2506000cba825532cd3f5d044",
+      "InstanceIds": [
+        "UFY\\VID_046D&PID_C548",
+        "HIDRAW\\VEN_046D&DEV_C548"
+      ],
+      "Guid": [
+        "1a6daa47-6506-55db-8eaa-d25b1b4b1e4b",
+        "f70d9241-2656-546b-a8e4-211bac348667"
+      ],
+      "Summary": "Miniaturised USB wireless receiver",
+      "Plugin": "logitech_hidpp",
+      "Protocols": [
+        "com.logitech.unifyingsigned"
+      ],
+      "Flags": [
+        "updatable",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "RequestFlags": [
+        "allow-generic-message"
+      ],
+      "Vendor": "Logitech",
+      "VendorIds": [
+        "USB:0x046D",
+        "HIDRAW:0x046D"
+      ],
+      "Version": "MPR05.03_B0020",
+      "VersionBootloader": "BOT30.01_B0010",
+      "VersionFormat": "plain",
+      "Icons": [
+        "usb-receiver"
+      ],
+      "InstallDuration": 30,
+      "Created": 1793921204
+    },
+    {
+      "Name": "CT1000P310SSD8",
+      "DeviceId": "04e17fcf7d3de91da49a163ffe4907855c3648be",
+      "InstanceIds": [
+        "NVME\\VEN_C0A9&DEV_5427",
+        "NVME\\VEN_C0A9&DEV_5427&SUBSYS_C0A92100",
+        "CT1000P310SSD8"
+      ],
+      "Guid": [
+        "1332ef42-f2b5-5c0f-bb29-1e8edc9fe56a",
+        "560dbfd9-2642-574f-8f6b-d2f743aa25c2",
+        "8da78e38-0ef2-57a0-bacc-aa602302518d"
+      ],
+      "Summary": "NVM Express solid state drive",
+      "Plugin": "nvme",
+      "Protocols": [
+        "org.nvmexpress"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "require-ac",
+        "needs-reboot",
+        "usable-during-update",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Micron/Crucial Technology",
+      "VendorIds": [
+        "PCI:0xC0A9"
+      ],
+      "Version": "VACR001 ",
+      "VersionFormat": "plain",
+      "Icons": [
+        "drive-harddisk"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "Corsair MP600 PRO LPX",
+      "DeviceId": "20161e3870a2030fa932712e7b7dae8a2aec59c3",
+      "InstanceIds": [
+        "NVME\\VEN_1987&DEV_5018",
+        "NVME\\VEN_1987&DEV_5018&SUBSYS_19875018",
+        "NVME\\VEN_1987&DEV_5018&SNSUFFIX_42057F",
+        "NVME\\VEN_1987&DEV_5018&SNSUFFIX_42057F&NAME_Corsair-MP600-PRO-LPX",
+        "Corsair MP600 PRO LPX"
+      ],
+      "Guid": [
+        "59639c7d-1b5d-5b7f-82da-9fd6b369a461",
+        "b1fcba59-6797-58bd-af77-5ccb9be2493c",
+        "ca39f58a-8cd0-5c1f-b382-35e13c00c456",
+        "5768e48f-0748-5b3a-be8b-006962977037",
+        "134c555f-4e12-5be6-8fd6-cb2ca63a34f6"
+      ],
+      "Summary": "NVM Express solid state drive",
+      "Plugin": "nvme",
+      "Protocols": [
+        "org.nvmexpress"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "require-ac",
+        "needs-shutdown",
+        "usable-during-update",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Phison",
+      "VendorIds": [
+        "PCI:0x1987"
+      ],
+      "Version": "EIFM31.6",
+      "VersionFormat": "plain",
+      "Icons": [
+        "drive-harddisk"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "GPIO controller",
+      "DeviceId": "f685512aa07369c9e77742acef941d779d31e766",
+      "InstanceIds": [
+        "GPIO\\ID_AMDI0030:00"
+      ],
+      "Guid": [
+        "37b440a9-2473-5087-a39b-db84f32a8ed8"
+      ],
+      "Plugin": "gpio",
+      "Created": 1793921204
+    },
+    {
+      "Name": "KEK CA",
+      "DeviceId": "b7a1d3d90faa1f6275d9a98da4fb3be7118e61c7",
+      "ParentDeviceId": "2a4c23bfb79b5dabe474cb7b1b3e604645d6f9c6",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\VENDOR_Microsoft&NAME_Microsoft-KEK-CA",
+        "UEFI\\CRT_DEC64D7746D983DB3774829A00BF829D9F19E9CF"
+      ],
+      "Guid": [
+        "814e950f-1449-566a-a190-42c9d3a3a2df",
+        "cd94ec34-7163-5f27-8549-1bd4b7872ae8"
+      ],
+      "Plugin": "uefi_kek",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "usable-during-update",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Microsoft",
+      "VendorIds": [
+        "UEFI:Microsoft"
+      ],
+      "Version": "2023",
+      "VersionFormat": "number",
+      "VersionRaw": 2023,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "Logi M650",
+      "DeviceId": "10e9564e44e9985abe905e5e249c27783b17568b",
+      "ParentDeviceId": "c6e2725df9973fb2506000cba825532cd3f5d044",
+      "CompositeId": "c6e2725df9973fb2506000cba825532cd3f5d044",
+      "InstanceIds": [
+        "HIDRAW\\VEN_046D&MOD_B02A00000000"
+      ],
+      "Guid": [
+        "bb3fe644-ed3c-55a4-a506-191e65974b04"
+      ],
+      "Summary": "Unifying Mouse",
+      "Plugin": "logitech_hidpp",
+      "Protocols": [
+        "com.logitech.unifyingsigned"
+      ],
+      "Flags": [
+        "updatable",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "RequestFlags": [
+        "allow-generic-message"
+      ],
+      "Vendor": "Logitech",
+      "VendorIds": [
+        "USB:0x046D",
+        "HIDRAW:0x046D"
+      ],
+      "Version": "RBM16.10_B0014",
+      "VersionBootloader": "BL138.10_B0014",
+      "VersionFormat": "plain",
+      "BatteryLevel": 95,
+      "BatteryThreshold": 20,
+      "Icons": [
+        "input-mouse"
+      ],
+      "InstallDuration": 270,
+      "Created": 1793921206
+    },
+    {
+      "Name": "Master Certificate Authority",
+      "DeviceId": "b65c0cd650247407c92f4a79c27ce974137e91b0",
+      "ParentDeviceId": "2a4c23bfb79b5dabe474cb7b1b3e604645d6f9c6",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\VENDOR_Canonical&NAME_Canonical-Master-Certificate-Authority",
+        "UEFI\\CRT_297DD7064573A4EA645B17382CE506CF1C167287"
+      ],
+      "Guid": [
+        "b884b94e-0371-59db-a46e-d5bfe127f06d",
+        "159f42ba-2b4b-5bf4-84d9-87f1480ea4da"
+      ],
+      "Plugin": "uefi_kek",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "usable-during-update",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Canonical",
+      "VendorIds": [
+        "UEFI:Canonical"
+      ],
+      "Version": "2012",
+      "VersionFormat": "number",
+      "VersionRaw": 2012,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "Master Certificate Authority",
+      "DeviceId": "75c9d7ed3c46923c7a576ea1e58d83b8df0b4386",
+      "ParentDeviceId": "0352a8acc949c7df21fec16e566ba9a74e797a97",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\VENDOR_Canonical&NAME_Canonical-Master-Certificate-Authority",
+        "UEFI\\CRT_297DD7064573A4EA645B17382CE506CF1C167287"
+      ],
+      "Guid": [
+        "b884b94e-0371-59db-a46e-d5bfe127f06d",
+        "159f42ba-2b4b-5bf4-84d9-87f1480ea4da"
+      ],
+      "Plugin": "uefi_db",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Canonical",
+      "VendorIds": [
+        "UEFI:Canonical"
+      ],
+      "Version": "2012",
+      "VersionFormat": "number",
+      "VersionRaw": 2012,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "Ryzen 9 7900X 12-Core Processor",
+      "DeviceId": "4bde70ba4e39b28f9eab1628f9dd6e6244c03027",
+      "InstanceIds": [
+        "CPUID\\PRO_0&FAM_19&MOD_61",
+        "CPUID\\PRO_0&FAM_19&MOD_61&STP_2"
+      ],
+      "Guid": [
+        "16dd7d28-eade-5077-adb8-0775fdfbb2e5",
+        "6c9f4098-a058-5cd6-a1ce-36bfe27404fb"
+      ],
+      "Plugin": "cpu",
+      "Flags": [
+        "internal"
+      ],
+      "Vendor": "AMD",
+      "Version": "0x0a60120c",
+      "VersionFormat": "hex",
+      "VersionRaw": 174068236,
+      "Icons": [
+        "computer"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "Ryzen 9 7900X 12-Core Processor",
+      "DeviceId": "59fdb4840792b490058110f9228c05a14e30bd96",
+      "ParentDeviceId": "4bde70ba4e39b28f9eab1628f9dd6e6244c03027",
+      "CompositeId": "4bde70ba4e39b28f9eab1628f9dd6e6244c03027",
+      "InstanceIds": [
+        "AMD\\102-RAPHAE"
+      ],
+      "Guid": [
+        "ad9b8b0f-a109-511e-9ec4-2105530c4153"
+      ],
+      "Summary": "Raphael Generic VBIOS",
+      "Plugin": "amd_gpu",
+      "Flags": [
+        "internal",
+        "can-emulation-tag"
+      ],
+      "Vendor": "AMD",
+      "VendorIds": [
+        "PCI:0x1002"
+      ],
+      "Version": "8",
+      "VersionFormat": "number",
+      "VersionRaw": 8,
+      "Icons": [
+        "video-display"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "ST8000DM004-2CX188",
+      "DeviceId": "638013c92b966ebb29660653a0cf6f1e55ade88a",
+      "InstanceIds": [
+        "IDE\\ST8000DM004-2CX188______________________0001",
+        "IDE\\0ST8000DM004-2CX188______________________",
+        "ST8000DM004-2CX188"
+      ],
+      "Guid": [
+        "67ad3f24-85ee-521c-a04c-0359f409d575",
+        "9c652524-9820-5333-8d93-83b385ed55ce",
+        "36036d10-4cc7-5ad6-aa1d-9bab8bc7205a"
+      ],
+      "Summary": "ATA drive",
+      "Plugin": "ata",
+      "Protocols": [
+        "org.t13.ata"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "require-ac",
+        "needs-reboot",
+        "usable-during-update",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Seagate",
+      "VendorIds": [
+        "OUI:000c50",
+        "ATA:0x1BB1"
+      ],
+      "Version": "0001",
+      "VersionFormat": "plain",
+      "Icons": [
+        "drive-harddisk"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "ST8000VN002-2ZM188",
+      "DeviceId": "cac268eba9fb2581d6594e12f00fa61eee130d69",
+      "InstanceIds": [
+        "IDE\\ST8000VN002-2ZM188______________________SC60",
+        "IDE\\0ST8000VN002-2ZM188______________________",
+        "ST8000VN002-2ZM188"
+      ],
+      "Guid": [
+        "141dd1dd-3917-5d90-884d-f8049dd02f7d",
+        "69349f84-1044-5aeb-8a92-d39ac9e9f714",
+        "5d17cb51-cfae-51b0-abdf-48cb7c1314f3"
+      ],
+      "Summary": "ATA drive",
+      "Plugin": "ata",
+      "Protocols": [
+        "org.t13.ata"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "require-ac",
+        "needs-reboot",
+        "usable-during-update",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Seagate",
+      "VendorIds": [
+        "OUI:000c50",
+        "ATA:0x1BB1"
+      ],
+      "Version": "SC60",
+      "VersionFormat": "plain",
+      "Icons": [
+        "drive-harddisk"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "SW Key CA",
+      "DeviceId": "9cac85175cb8f6f3cf099813b990e9bc84be035e",
+      "ParentDeviceId": "0352a8acc949c7df21fec16e566ba9a74e797a97",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\CRT_A641CD31A73C32B74AF9C717F249F02AEE784990"
+      ],
+      "Guid": [
+        "3b9ed13d-f0dd-5932-87d3-6bc47a649834"
+      ],
+      "Plugin": "uefi_db",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "ASUS",
+      "VendorIds": [
+        "UEFI:ASUS"
+      ],
+      "Version": "2011",
+      "VersionFormat": "number",
+      "VersionRaw": 2011,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "Secure Processor",
+      "DeviceId": "c54ab0237d7a8db8c717b68e0be78e4374a2a079",
+      "ParentDeviceId": "4bde70ba4e39b28f9eab1628f9dd6e6244c03027",
+      "CompositeId": "4bde70ba4e39b28f9eab1628f9dd6e6244c03027",
+      "InstanceIds": [
+        "PCI\\VEN_1022&DEV_1649"
+      ],
+      "Guid": [
+        "9844da3e-1df2-52fe-9413-d4378af6221e"
+      ],
+      "Summary": "AGESA ComboAm5PI 1.2.0.3e",
+      "Plugin": "pci_psp",
+      "Flags": [
+        "internal",
+        "can-emulation-tag"
+      ],
+      "Vendor": "AMD",
+      "VendorIds": [
+        "PCI:0x1022"
+      ],
+      "Version": "00.42.00.1e",
+      "VersionBootloader": "00.42.00.1e",
+      "VersionFormat": "plain",
+      "Icons": [
+        "computer"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "System Firmware",
+      "DeviceId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "Guid": [
+        "30118484-f87c-5a10-8847-b5d571c0985e"
+      ],
+      "Summary": "UEFI System Resource Table device (Updated via capsule-on-disk)",
+      "Plugin": "uefi_capsule",
+      "Protocols": [
+        "org.uefi.capsule"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "require-ac",
+        "needs-reboot",
+        "can-verify",
+        "usable-during-update"
+      ],
+      "RequestFlags": [
+        "allow-generic-message"
+      ],
+      "Checksums": [
+        "bfa4cb966c8f1bcc2fbf5cd367c4f20b4006c8bd2d75df5c6efe1230d886d855"
+      ],
+      "Vendor": "ASUS",
+      "VendorIds": [
+        "DMI:American Megatrends Inc."
+      ],
+      "Version": "12899",
+      "VersionLowest": "12899",
+      "VersionFormat": "number",
+      "VersionRaw": 12899,
+      "VersionLowestRaw": 12899,
+      "Icons": [
+        "computer"
+      ],
+      "Created": 1793921204,
+      "UpdateState": 2
+    },
+    {
+      "Name": "TPM",
+      "DeviceId": "1d8d50a4dbc65618f5c399c2ae827b632b3ccc11",
+      "InstanceIds": [
+        "TPM\\VEN_AMD&DEV_0001",
+        "TPM\\VEN_AMD&MOD_AMD",
+        "TPM\\VEN_AMD&DEV_0001&VER_2.0",
+        "TPM\\VEN_AMD&MOD_AMD&VER_2.0"
+      ],
+      "Guid": [
+        "9305de1c-1e12-5665-81c4-37f8e51219b8",
+        "78a291ae-b499-5b0f-8f1d-74e1fefd0b1c",
+        "65a3fced-b423-563f-8098-bf5c329fc063",
+        "5e704f0d-83cb-5364-8384-f46d725a23b8"
+      ],
+      "Plugin": "tpm",
+      "Protocols": [
+        "org.trustedcomputinggroup.tpm2"
+      ],
+      "Flags": [
+        "internal",
+        "require-ac",
+        "needs-reboot",
+        "self-recovery",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "AMD",
+      "VendorIds": [
+        "TPM:AMD"
+      ],
+      "Version": "6.32.0.6",
+      "VersionFormat": "quad",
+      "VersionRaw": 1688987299217414,
+      "Icons": [
+        "computer"
+      ],
+      "Created": 1793921204
+    },
+    {
+      "Name": "UEFI CA",
+      "DeviceId": "5bc922b7bd1adb5b6f99592611404036bd9f42d0",
+      "ParentDeviceId": "0352a8acc949c7df21fec16e566ba9a74e797a97",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\VENDOR_Microsoft&NAME_Microsoft-UEFI-CA",
+        "UEFI\\CRT_7CD7437C555F89E7C2B50E21937E420C4E583E80"
+      ],
+      "Guid": [
+        "26f42cba-9bf6-5365-802b-e250eb757e96",
+        "308281c7-d0c5-52e0-8c1a-810540de03df"
+      ],
+      "Plugin": "uefi_db",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Microsoft",
+      "VendorIds": [
+        "UEFI:Microsoft"
+      ],
+      "Version": "2023",
+      "VersionFormat": "number",
+      "VersionRaw": 2023,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "UEFI Key Exchange Key",
+      "DeviceId": "2a4c23bfb79b5dabe474cb7b1b3e604645d6f9c6",
+      "ParentDeviceId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "Plugin": "uefi_kek",
+      "Flags": [
+        "internal"
+      ],
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "UEFI Signature Database",
+      "DeviceId": "0352a8acc949c7df21fec16e566ba9a74e797a97",
+      "ParentDeviceId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "Plugin": "uefi_db",
+      "Flags": [
+        "internal"
+      ],
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    },
+    {
+      "Name": "UEFI dbx",
+      "DeviceId": "362301da643102b9f38477387e2193e57abaa590",
+      "ParentDeviceId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\CRT_D7F66BE77CEF858C174BF4338A99263C8795B74E02026411F5F532F716AE3263&ARCH_X64",
+        "UEFI\\CRT_A1117F516A32CEFCBA3F2D1ACE10A87972FD6BBE8FE0D0B996E09E65D802A503&ARCH_X64",
+        "UEFI\\CRT_ED1FE72CB9CA31C9AF5B757AFCD733323D675825032E6CED7FE1AE9EB767998C&ARCH_X64",
+        "UEFI\\CRT_3CD3F0309EDAE228767A976DD40D9F4AFFC4FBD5218F2E8CC3C9DD97E8AC6F9D&ARCH_X64"
+      ],
+      "Guid": [
+        "f8ff0d50-c757-5dc3-951a-39d86e16f419",
+        "f8ba2887-9411-5c36-9cee-88995bb39731",
+        "0c7691e1-b6f2-5d71-bc9c-aabee364c916",
+        "d07ff664-b0e1-5f4e-a723-d7fbcbfcb94f"
+      ],
+      "Summary": "UEFI revocation database",
+      "Plugin": "uefi_dbx",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "usable-during-update",
+        "only-version-upgrade",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Checksums": [
+        "6a0e824654b7479152058cf738a378e629483874b6dbd67e0d8c3327b2fcac64"
+      ],
+      "Vendor": "Microsoft",
+      "VendorIds": [
+        "UEFI:Microsoft"
+      ],
+      "Version": "20230301",
+      "VersionLowest": "20230301",
+      "VersionFormat": "number",
+      "VersionRaw": 20230301,
+      "Icons": [
+        "application-certificate"
+      ],
+      "InstallDuration": 1,
+      "Created": 1793921207
+    },
+    {
+      "Name": "Windows UEFI CA",
+      "DeviceId": "d31da5f926c6d962ed810b284fab5a2ef623007b",
+      "ParentDeviceId": "0352a8acc949c7df21fec16e566ba9a74e797a97",
+      "CompositeId": "eb62d52f2d791386c3e92d520193b1ec41c93b3b",
+      "InstanceIds": [
+        "UEFI\\VENDOR_Microsoft&NAME_Windows-UEFI-CA",
+        "UEFI\\CRT_A794240D25F0CCB2EC8142DC2F7411890717DEAD"
+      ],
+      "Guid": [
+        "914015a8-9d92-5462-9a9b-f2b361e4faae",
+        "89a825bf-78b5-5f1c-905b-e982b2f02584"
+      ],
+      "Plugin": "uefi_db",
+      "Protocols": [
+        "org.uefi.dbx2"
+      ],
+      "Flags": [
+        "internal",
+        "updatable",
+        "needs-reboot",
+        "signed-payload",
+        "can-emulation-tag"
+      ],
+      "Vendor": "Microsoft",
+      "VendorIds": [
+        "UEFI:Microsoft"
+      ],
+      "Version": "2023",
+      "VersionFormat": "number",
+      "VersionRaw": 2023,
+      "Icons": [
+        "application-certificate"
+      ],
+      "Created": 1793921207
+    }
+  ]
+}

@@ -60,7 +60,12 @@ fn replace_word(text: &str, word: Option<&str>, replacement: &str) -> String {
     result
 }
 
+/// One device's report section. Always English (see `i18n::in_english`).
 pub fn device_markdown(device: &Device) -> String {
+    crate::i18n::in_english(|| device_section(device))
+}
+
+fn device_section(device: &Device) -> String {
     let mut lines = vec![
         format!("### {}", device.display_name),
         format!("- Status: {}", device.status.summary()),
@@ -127,7 +132,18 @@ pub fn markdown(report: &ScanReport, only: Option<&str>, privacy: &Privacy) -> S
     markdown_with_kernel(report, only, privacy, kernel.as_deref())
 }
 
+/// Like `markdown`, with the kernel release given. Always English: the people who
+/// answer forum posts and bug reports read English.
 pub(crate) fn markdown_with_kernel(
+    report: &ScanReport,
+    only: Option<&str>,
+    privacy: &Privacy,
+    kernel: Option<&str>,
+) -> String {
+    crate::i18n::in_english(|| build_markdown(report, only, privacy, kernel))
+}
+
+fn build_markdown(
     report: &ScanReport,
     only: Option<&str>,
     privacy: &Privacy,
@@ -160,7 +176,7 @@ pub(crate) fn markdown_with_kernel(
     match only {
         Some(address) => {
             if let Some(device) = report.devices.iter().find(|d| d.address == address) {
-                lines.push(device_markdown(device));
+                lines.push(device_section(device));
             } else {
                 lines.push(format!("No device with address {address} was found."));
             }
@@ -178,7 +194,7 @@ pub(crate) fn markdown_with_kernel(
             ));
             for device in problems {
                 lines.push(String::new());
-                lines.push(device_markdown(device));
+                lines.push(device_section(device));
             }
             lines.push(String::new());
             lines.push("#### Working devices".to_owned());

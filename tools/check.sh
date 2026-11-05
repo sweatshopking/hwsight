@@ -28,6 +28,30 @@ else
     fail "GUI opens and stays open" "no display available to run the app"
 fi
 
+# ---- Translations (po/README.md) ----
+# The catalog must list exactly the strings the code marks with tr! and @tr.
+tmp=$(mktemp -d)
+if command -v slint-tr-extractor >/dev/null && command -v msgmerge >/dev/null; then
+    slint-tr-extractor --no-default-translation-context -o "$tmp/fresh.pot" \
+        hwsight-gui/ui/app.slint hwsight-gui/ui/theme.slint hwsight-gui/ui/components/*.slint 2>"$tmp/err" \
+        && python3 -I tools/extract-rust-translations.py "$tmp/fresh.pot" 2>>"$tmp/err"
+    ids() { grep -E '^msgid ' "$1" | sort -u; }
+    if diff <(ids "$tmp/fresh.pot") <(ids po/hwsight.pot) >"$tmp/diff" 2>&1; then
+        pass "translation catalog up to date"
+    else
+        fail "translation catalog up to date" "run tools/update-translations.sh (< in code, > only in catalog):
+$(cat "$tmp/err" "$tmp/diff" | head -20)"
+    fi
+    missing=""
+    for catalog in po/*/LC_MESSAGES/hwsight-gui.po; do
+        diff -q <(ids po/hwsight.pot) <(ids "$catalog") >/dev/null || missing="$missing $catalog"
+    done
+    [[ -z $missing ]] && pass "every language catalog has every string" || fail "every language catalog has every string" "run tools/update-translations.sh:$missing"
+else
+    fail "translation catalog up to date" "needs gettext and: cargo install slint-tr-extractor --version 1.18.1"
+fi
+rm -rf "$tmp"
+
 # ---- GUI rules (docs/plan.md, "GUI batch") ----
 ui=hwsight-gui/ui
 comp=$ui/components

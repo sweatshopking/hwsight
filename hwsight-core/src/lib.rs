@@ -9,6 +9,7 @@ pub mod device;
 pub mod distro;
 pub mod firmware;
 pub mod fixes;
+pub mod i18n;
 pub mod kernel_log;
 pub mod modules;
 mod pci;
