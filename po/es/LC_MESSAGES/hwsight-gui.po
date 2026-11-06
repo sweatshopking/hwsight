@@ -61,7 +61,7 @@ msgstr "Copiar para un foro"
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr "Copies a short report about this dispositivo. Your user name y computer name son removed."
+msgstr "Copia un informe breve sobre este dispositivo. Se eliminan tu nombre de usuario y el del equipo."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
@@ -95,7 +95,7 @@ msgstr "Dirección"
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr "Este dispositivo isn't in el dispositivo database yet. Its hardware ID above can be searched for online."
+msgstr "Este dispositivo aún no está en la base de datos. Puedes buscar su ID de hardware en Internet."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
@@ -128,7 +128,7 @@ msgstr "hwsight está actualizado."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr "Este copy of hwsight es actualizaciónd through your package manager or from {}."
+msgstr "Esta copia de hwsight se actualiza mediante tu gestor de paquetes o desde {}."
 
 msgid "Couldn't update hwsight: {}"
 msgstr "No se pudo actualizar hwsight: {}"
@@ -256,113 +256,113 @@ msgstr "Reservado para una máquina virtual"
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr "Firmware file {} was falta when el computer started, but it's instalado now. Restarting should fix this."
+msgstr "El archivo de firmware {} faltaba al iniciar el equipo, pero ya está instalado. Reiniciar debería solucionarlo."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr "El controlador needs a firmware file that isn't instalado: {}. It comes in el {} package."
+msgstr "El controlador necesita el archivo de firmware {}. Está incluido en el paquete {}."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr "El controlador needs a firmware file that isn't instalado: {}"
+msgstr "El controlador necesita un archivo de firmware que no está instalado: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr "Un dispositivo plugged in here couldn't connect. Este es usually a bad cable, a faulty dispositivo, or no enough power. Try another cable or port."
+msgstr "Un dispositivo conectado aquí no pudo conectarse. Normalmente se debe a un cable defectuoso, un dispositivo averiado o falta de energía. Prueba otro cable o puerto."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr "Un dispositivo plugged in here couldn't connect ({}). Este es usually a bad cable, a faulty dispositivo, or no enough power. Try another cable or port."
+msgstr "Un dispositivo conectado aquí no pudo conectarse ({}). Normalmente se debe a un cable defectuoso, un dispositivo averiado o falta de energía. Prueba otro cable o puerto."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr "Este USB port reported drawing too much power. El dispositivo plugged into it may be faulty or need its own power supply."
+msgstr "Este puerto USB informó de un consumo excesivo. El dispositivo conectado puede estar averiado o necesitar su propia fuente de alimentación."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr "El {} controlador couldn't start this dispositivo ({})."
+msgstr "El controlador {} no pudo iniciar este dispositivo ({})."
 
 msgid "it wasn't allowed to"
-msgstr "it wasn't allowed to"
+msgstr "no se le permitió"
 
 msgid "a file it needs is missing"
-msgstr "a file it needs es falta"
+msgstr "falta un archivo necesario"
 
 msgid "the device didn't respond correctly"
-msgstr "el dispositivo didn't respond correctly"
+msgstr "el dispositivo no respondió correctamente"
 
 msgid "the device was temporarily unavailable"
-msgstr "el dispositivo was temporarily undisponible"
+msgstr "el dispositivo no estaba disponible temporalmente"
 
 msgid "the computer ran out of memory for it"
-msgstr "el computer ran out of memory for it"
+msgstr "el ordenador se quedó sin memoria"
 
 msgid "the device was already in use"
-msgstr "el dispositivo was already in use"
+msgstr "el dispositivo ya estaba en uso"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr "el dispositivo wasn't encontrado when el controlador looked for it"
+msgstr "el controlador no encontró el dispositivo"
 
 msgid "the device sent something the driver didn't expect"
-msgstr "el dispositivo sent something el controlador didn't expect"
+msgstr "el dispositivo envió algo inesperado al controlador"
 
 msgid "the device stopped responding"
-msgstr "el dispositivo stopped responding"
+msgstr "el dispositivo dejó de responder"
 
 msgid "the connection kept failing"
-msgstr "el connection kept failing"
+msgstr "la conexión fallaba continuamente"
 
 msgid "this device model isn't supported by the driver"
-msgstr "this dispositivo model isn't supported by el controlador"
+msgstr "el controlador no admite este modelo de dispositivo"
 
 msgid "the device didn't respond in time"
-msgstr "el dispositivo didn't respond in time"
+msgstr "el dispositivo no respondió a tiempo"
 
 msgid "it was waiting on another part that never became ready"
-msgstr "it was waiting on another part that never became ready"
+msgstr "estaba esperando otra parte que nunca estuvo lista"
 
 msgid "an unexpected error"
-msgstr "an unexpected error"
+msgstr "un error inesperado"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr "No se pudo read el kernel's list of controladors, so hwsight can't tell whether a controlador es disponible for dispositivos without one."
+msgstr "No se pudo leer la lista de controladores del kernel, así que hwsight no puede saber si hay un controlador disponible para los dispositivos que no tienen uno."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr "No se pudo read el kernel log, so hwsight can't say why a dispositivo isn't working. On some systems only administrators can read it."
+msgstr "No se pudo leer el registro del kernel, así que hwsight no puede decir por qué un dispositivo no funciona. En algunos sistemas solo los administradores pueden leerlo."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr "No se pudo read el USB dispositivo list: {}"
+msgstr "No se pudo leer la lista de dispositivos USB: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr "No se pudo read el PCI dispositivo list: {}"
+msgstr "No se pudo leer la lista de dispositivos PCI: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr "Un data actualización ({}) needs a newer version of hwsight. Update hwsight to use it."
+msgstr "Una actualización de datos ({}) necesita una versión más reciente de hwsight. Actualiza hwsight para usarla."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr "Un damaged data file ({}) was skipped, so el built-in copy es used instead. Details: {}"
+msgstr "Se omitió un archivo de datos dañado ({}), así que se usa la copia integrada. Detalles: {}"
 
 msgid "USB bus {}, port {}"
-msgstr "USB bus {}, port {}"
+msgstr "Bus USB {}, puerto {}"
 
 msgid "{}, then hub port {}"
-msgstr "{}, then hub port {}"
+msgstr "{}, después el puerto {} del concentrador"
 
 msgid "Unknown {} {}"
-msgstr "Unknown {} {}"
+msgstr "{} {} desconocido"
 
 msgid "Unknown {}"
-msgstr "Unknown {}"
+msgstr "{} desconocido"
 
 msgid "Data updates aren't available in this version."
 msgstr "Las actualizaciones de datos no están disponibles en esta versión."
@@ -372,24 +372,24 @@ msgstr "No se pudo descargar la actualización: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr "El downloaded actualización falló its security check, so it wasn't instalado."
+msgstr "La actualización descargada no superó la comprobación de seguridad, así que no se instaló."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr "Un data actualización needs a newer version of hwsight."
+msgstr "Una actualización de datos necesita una versión más reciente de hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr "El downloaded actualización was damaged ({}), so it wasn't instalado."
+msgstr "La actualización descargada estaba dañada ({}), así que no se instaló."
 
 msgid "Couldn't save the update: {}"
-msgstr "No se pudo save el actualización: {}"
+msgstr "No se pudo guardar la actualización: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr "Este dispositivo was blocked by el computer's USB security settings, so nothing es allowed to use it."
+msgstr "Este dispositivo está bloqueado por la configuración de seguridad USB del equipo, así que nada puede usarlo."
 
 msgid "USB device"
-msgstr "USB dispositivo"
+msgstr "dispositivo USB"
 
 msgid "{} {}"
 msgstr "{} {}"
@@ -399,13 +399,13 @@ msgstr "USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr "hwsight {} es disponible (you have {}). Run hwsight --actualización to install it."
+msgstr "hwsight {} está disponible (tienes {}). Ejecuta hwsight --update para instalarla."
 
 msgid "hwsight {} is the newest version."
-msgstr "hwsight {} es el newest version."
+msgstr "hwsight {} es la versión más reciente."
 
 msgid "Couldn't check for updates: {}"
-msgstr "No se pudo check for actualizacións: {}"
+msgstr "No se pudieron buscar actualizaciones: {}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "No se encontró dónde está instalado hwsight."
@@ -414,25 +414,25 @@ msgid "{}, driver: {}"
 msgstr "{}, controlador: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr "{}, {} blocked in {}"
+msgstr "{}, {} bloqueado en {}"
 
 msgid "{}, available: {}"
 msgstr "{}, disponible: {}"
 
 msgid "{}, not in the device database yet"
-msgstr "{}, no in el dispositivo database yet"
+msgstr "{}, todavía no está en la base de datos de dispositivos"
 
 msgid "Why:"
 msgstr "Motivo:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr "El controlador es loaded, but no {} was created."
+msgstr "El controlador está cargado, pero no se creó ningún {}."
 
 msgid "Fix:"
 msgstr "Solución:"
 
 msgid "Fix {}:"
-msgstr "Fix {}:"
+msgstr "Solucionar {}:"
 
 msgid "USB ports"
 msgstr "Puertos USB"
@@ -449,7 +449,7 @@ msgstr[0] "1 dispositivo"
 msgstr[1] "{n} dispositivos"
 
 msgid "{}, no problems found."
-msgstr "{}, no problemas encontrado."
+msgstr "{}, no se encontraron problemas."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
@@ -469,18 +469,18 @@ msgid "Updated {} to {}"
 msgstr "{} actualizado a {}"
 
 msgid "hwsight {} is available."
-msgstr "hwsight {} es disponible."
+msgstr "hwsight {} está disponible."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr "hwsight {} es disponible. Update it con your package manager, or download it from el website."
+msgstr "hwsight {} está disponible. Actualízala con tu gestor de paquetes o descárgala del sitio web."
 
 msgid "No devices found"
-msgstr "No dispositivos encontrado"
+msgstr "No se encontraron dispositivos"
 
 msgid "{}, no problems found"
-msgstr "{}, no problemas encontrado"
+msgstr "{}, no se encontraron problemas"
 
 msgid "{}, {}"
 msgstr "{}, {}"
@@ -495,4 +495,4 @@ msgid "USB"
 msgstr "USB"
 
 msgid "Other"
-msgstr "Other"
+msgstr "Otros"

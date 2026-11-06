@@ -62,7 +62,7 @@ msgstr "Копировать для сообщения на форуме"
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr "Системное сообщение: Copies a short report about this device. Your user name and computer name are removed."
+msgstr "Копируется краткий отчёт об устройстве. Имя пользователя и компьютера удаляются."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
@@ -96,7 +96,7 @@ msgstr "Адрес"
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr "Системное сообщение: This device isn't in the device database yet. Its hardware ID above can be searched for online."
+msgstr "Этого устройства пока нет в базе данных. Найдите его идентификатор оборудования в интернете."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
@@ -129,7 +129,7 @@ msgstr "hwsight обновлён."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr "Системное сообщение: This copy of hwsight is updated through your package manager or from {}."
+msgstr "Эта копия hwsight обновляется через менеджер пакетов или из {}."
 
 msgid "Couldn't update hwsight: {}"
 msgstr "Не удалось обновить hwsight: {}"
@@ -257,183 +257,183 @@ msgstr "Зарезервировано для виртуальной машин�
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr "Системное сообщение: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
+msgstr "При запуске компьютера не было файла прошивки {}, но теперь он установлен. Перезапуск должен решить проблему."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr "Системное сообщение: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
+msgstr "Драйверу нужен файл прошивки {}, который входит в пакет {}."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr "Системное сообщение: The driver needs a firmware file that isn't installed: {}"
+msgstr "Драйверу нужен неустановленный файл прошивки: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr "Системное сообщение: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "Подключённое сюда устройство не удалось подключить. Обычно причина в плохом кабеле, неисправном устройстве или нехватке питания. Попробуйте другой кабель или порт."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr "Системное сообщение: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "Подключённое сюда устройство не удалось подключить ({}). Обычно причина в плохом кабеле, неисправном устройстве или нехватке питания. Попробуйте другой кабель или порт."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr "Системное сообщение: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
+msgstr "Этот USB-порт сообщил о слишком большом потреблении энергии. Устройство может быть неисправно или нуждаться в отдельном питании."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr "Системное сообщение: The {} driver couldn't start this device ({})."
+msgstr "Драйвер {} не смог запустить это устройство ({})."
 
 msgid "it wasn't allowed to"
-msgstr "Системное сообщение: it wasn't allowed to"
+msgstr "ему не разрешили"
 
 msgid "a file it needs is missing"
-msgstr "Системное сообщение: a file it needs is missing"
+msgstr "отсутствует нужный файл"
 
 msgid "the device didn't respond correctly"
-msgstr "Системное сообщение: the device didn't respond correctly"
+msgstr "устройство ответило неправильно"
 
 msgid "the device was temporarily unavailable"
-msgstr "Системное сообщение: the device was temporarily unavailable"
+msgstr "устройство было временно недоступно"
 
 msgid "the computer ran out of memory for it"
-msgstr "Системное сообщение: the computer ran out of memory for it"
+msgstr "на компьютере закончилась память"
 
 msgid "the device was already in use"
-msgstr "Системное сообщение: the device was already in use"
+msgstr "устройство уже использовалось"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr "Системное сообщение: the device wasn't found when the driver looked for it"
+msgstr "драйвер не нашёл устройство"
 
 msgid "the device sent something the driver didn't expect"
-msgstr "Системное сообщение: the device sent something the driver didn't expect"
+msgstr "устройство отправило драйверу неожиданные данные"
 
 msgid "the device stopped responding"
-msgstr "Системное сообщение: the device stopped responding"
+msgstr "устройство перестало отвечать"
 
 msgid "the connection kept failing"
-msgstr "Системное сообщение: the connection kept failing"
+msgstr "соединение постоянно не устанавливалось"
 
 msgid "this device model isn't supported by the driver"
-msgstr "Системное сообщение: this device model isn't supported by the driver"
+msgstr "драйвер не поддерживает эту модель устройства"
 
 msgid "the device didn't respond in time"
-msgstr "Системное сообщение: the device didn't respond in time"
+msgstr "устройство не ответило вовремя"
 
 msgid "it was waiting on another part that never became ready"
-msgstr "Системное сообщение: it was waiting on another part that never became ready"
+msgstr "оно ждало другую часть, которая так и не была готова"
 
 msgid "an unexpected error"
-msgstr "Системное сообщение: an unexpected error"
+msgstr "непредвиденная ошибка"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr "Системное сообщение: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
+msgstr "Не удалось прочитать список драйверов ядра, поэтому hwsight не может определить, доступен ли драйвер для устройств без него."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr "Системное сообщение: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
+msgstr "Не удалось прочитать журнал ядра, поэтому hwsight не может сказать, почему устройство не работает. В некоторых системах его могут читать только администраторы."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr "Системное сообщение: Couldn't read the USB device list: {}"
+msgstr "Не удалось прочитать список USB-устройств: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr "Системное сообщение: Couldn't read the PCI device list: {}"
+msgstr "Не удалось прочитать список PCI-устройств: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr "Системное сообщение: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
+msgstr "Для обновления данных ({}) нужна более новая версия hwsight. Обновите hwsight, чтобы использовать его."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr "Системное сообщение: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
+msgstr "Повреждённый файл данных ({}) пропущен, поэтому используется встроенная копия. Подробности: {}"
 
 msgid "USB bus {}, port {}"
-msgstr "Системное сообщение: USB bus {}, port {}"
+msgstr "Шина USB {}, порт {}"
 
 msgid "{}, then hub port {}"
-msgstr "Системное сообщение: {}, then hub port {}"
+msgstr "{}, затем порт концентратора {}"
 
 msgid "Unknown {} {}"
-msgstr "Системное сообщение: Unknown {} {}"
+msgstr "Неизвестный {} {}"
 
 msgid "Unknown {}"
-msgstr "Системное сообщение: Unknown {}"
+msgstr "Неизвестный {}"
 
 msgid "Data updates aren't available in this version."
-msgstr "Обновление данных недоступно в этой версии."
+msgstr "Обновления данных недоступны в этой версии."
 
 msgid "Couldn't download the update: {}"
 msgstr "Не удалось скачать обновление: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr "Системное сообщение: The downloaded update failed its security check, so it wasn't installed."
+msgstr "Загруженное обновление не прошло проверку безопасности, поэтому оно не установлено."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr "Системное сообщение: A data update needs a newer version of hwsight."
+msgstr "Для обновления данных нужна более новая версия hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr "Системное сообщение: The downloaded update was damaged ({}), so it wasn't installed."
+msgstr "Загруженное обновление повреждено ({}), поэтому оно не установлено."
 
 msgid "Couldn't save the update: {}"
-msgstr "Системное сообщение: Couldn't save the update: {}"
+msgstr "Не удалось сохранить обновление: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr "Системное сообщение: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
+msgstr "Это устройство заблокировано настройками USB-безопасности компьютера, поэтому его нельзя использовать."
 
 msgid "USB device"
-msgstr "Системное сообщение: USB device"
+msgstr "USB-устройство"
 
 msgid "{} {}"
-msgstr "Системное сообщение: {} {}"
+msgstr "{} {}"
 
 msgid "USB {}"
-msgstr "Системное сообщение: USB {}"
+msgstr "USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr "Системное сообщение: hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgstr "Доступна hwsight {} (у вас {}). Выполните hwsight --update для установки."
 
 msgid "hwsight {} is the newest version."
-msgstr "Системное сообщение: hwsight {} is the newest version."
+msgstr "hwsight {} — последняя версия."
 
 msgid "Couldn't check for updates: {}"
-msgstr "Системное сообщение: Couldn't check for updates: {}"
+msgstr "Не удалось проверить обновления: {}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "Не удалось найти установленный hwsight."
 
 msgid "{}, driver: {}"
-msgstr "Системное сообщение: {}, driver: {}"
+msgstr "{}, драйвер: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr "Системное сообщение: {}, {} blocked in {}"
+msgstr "{}, {} заблокировано в {}"
 
 msgid "{}, available: {}"
-msgstr "Системное сообщение: {}, available: {}"
+msgstr "{}, доступно: {}"
 
 msgid "{}, not in the device database yet"
-msgstr "Системное сообщение: {}, not in the device database yet"
+msgstr "{}, ещё нет в базе данных устройств"
 
 msgid "Why:"
 msgstr "Причина:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr "Системное сообщение: The driver is loaded, but no {} was created."
+msgstr "Драйвер загружен, но {} не создано."
 
 msgid "Fix:"
 msgstr "Исправление:"
 
 msgid "Fix {}:"
-msgstr "Системное сообщение: Fix {}:"
+msgstr "Исправить {}:"
 
 msgid "USB ports"
 msgstr "Порты USB"
@@ -446,21 +446,21 @@ msgstr "Проблем не найдено."
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] "1 устройство"
+msgstr[0] "{n} устройство"
 msgstr[1] "{n} устройства"
-msgstr[2] "{n} устройства"
+msgstr[2] "{n} устройств"
 
 msgid "{}, no problems found."
-msgstr "Системное сообщение: {}, no problems found."
+msgstr "{}, проблем не найдено."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] "1 проблема"
+msgstr[0] "{n} проблема"
 msgstr[1] "{n} проблемы"
-msgstr[2] "{n} проблемы"
+msgstr[2] "{n} проблем"
 
 msgid "{}, {}."
-msgstr "Системное сообщение: {}, {}."
+msgstr "{}, {}."
 
 msgid "Note: {}"
 msgstr "Примечание: {}"
@@ -472,30 +472,30 @@ msgid "Updated {} to {}"
 msgstr "{} обновлено до {}"
 
 msgid "hwsight {} is available."
-msgstr "Системное сообщение: hwsight {} is available."
+msgstr "Доступна hwsight {}."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr "Системное сообщение: hwsight {} is available. Update it with your package manager, or download it from the website."
+msgstr "Доступна hwsight {}. Обновите её через менеджер пакетов или скачайте с сайта."
 
 msgid "No devices found"
-msgstr "Системное сообщение: No devices found"
+msgstr "Устройства не найдены"
 
 msgid "{}, no problems found"
-msgstr "Системное сообщение: {}, no problems found"
+msgstr "{}, проблем не найдено"
 
 msgid "{}, {}"
-msgstr "Системное сообщение: {}, {}"
+msgstr "{}, {}"
 
 msgid "{}: {}"
-msgstr "Системное сообщение: {}: {}"
+msgstr "{}: {}"
 
 msgid "PCI"
-msgstr "Системное сообщение: PCI"
+msgstr "PCI"
 
 msgid "USB"
-msgstr "Системное сообщение: USB"
+msgstr "USB"
 
 msgid "Other"
-msgstr "Системное сообщение: Other"
+msgstr "Другое"

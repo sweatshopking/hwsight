@@ -27,13 +27,14 @@ struct UpdateState {
 }
 
 fn main() -> Result<(), slint::PlatformError> {
+    let window = AppWindow::new()?;
+    // Slint only accepts this once a component exists.
     let language = hwsight_core::i18n::language();
     if language != "en"
         && let Err(e) = slint::select_bundled_translation(language)
     {
         eprintln!("hwsight: couldn't select the {language} translation: {e}");
     }
-    let window = AppWindow::new()?;
     let devices = Arc::new(Mutex::new(Vec::new()));
     let last_report = Arc::new(Mutex::new(None));
     let update_state = Arc::new(Mutex::new(UpdateState {

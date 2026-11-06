@@ -61,7 +61,7 @@ msgstr "Kopiëren voor een forumbericht"
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr "Systeemmelding: Copies a short report about this device. Your user name and computer name are removed."
+msgstr "Kopieert een kort rapport over dit apparaat. Je gebruikersnaam en computernaam worden verwijderd."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
@@ -95,7 +95,7 @@ msgstr "Adres"
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr "Systeemmelding: This device isn't in the device database yet. Its hardware ID above can be searched for online."
+msgstr "Dit apparaat staat nog niet in de apparaatdatabase. Je kunt de hardware-ID hierboven online opzoeken."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
@@ -128,7 +128,7 @@ msgstr "hwsight is bijgewerkt."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr "Systeemmelding: This copy of hwsight is updated through your package manager or from {}."
+msgstr "Deze versie van hwsight wordt bijgewerkt via je pakketbeheerder of vanaf {}."
 
 msgid "Couldn't update hwsight: {}"
 msgstr "Kan hwsight niet bijwerken: {}"
@@ -256,113 +256,113 @@ msgstr "Gereserveerd voor een virtuele machine"
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr "Systeemmelding: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
+msgstr "Firmwarebestand {} ontbrak bij het opstarten, maar is nu geïnstalleerd. Opnieuw starten zou dit moeten oplossen."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr "Systeemmelding: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
+msgstr "De driver heeft firmwarebestand {} nodig. Het staat in pakket {}."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr "Systeemmelding: The driver needs a firmware file that isn't installed: {}"
+msgstr "De driver heeft een firmwarebestand nodig dat niet is geïnstalleerd: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr "Systeemmelding: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "Een hier aangesloten apparaat kon geen verbinding maken. Meestal komt dit door een slechte kabel, een defect apparaat of te weinig stroom. Probeer een andere kabel of poort."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr "Systeemmelding: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "Een hier aangesloten apparaat kon geen verbinding maken ({}). Meestal komt dit door een slechte kabel, een defect apparaat of te weinig stroom. Probeer een andere kabel of poort."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr "Systeemmelding: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
+msgstr "Deze USB-poort meldde een te hoog stroomverbruik. Het aangesloten apparaat is mogelijk defect of heeft een eigen voeding nodig."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr "Systeemmelding: The {} driver couldn't start this device ({})."
+msgstr "De driver {} kon dit apparaat niet starten ({})."
 
 msgid "it wasn't allowed to"
-msgstr "Systeemmelding: it wasn't allowed to"
+msgstr "het mocht niet"
 
 msgid "a file it needs is missing"
-msgstr "Systeemmelding: a file it needs is missing"
+msgstr "een benodigd bestand ontbreekt"
 
 msgid "the device didn't respond correctly"
-msgstr "Systeemmelding: the device didn't respond correctly"
+msgstr "het apparaat reageerde niet goed"
 
 msgid "the device was temporarily unavailable"
-msgstr "Systeemmelding: the device was temporarily unavailable"
+msgstr "het apparaat was tijdelijk niet beschikbaar"
 
 msgid "the computer ran out of memory for it"
-msgstr "Systeemmelding: the computer ran out of memory for it"
+msgstr "de computer had onvoldoende geheugen"
 
 msgid "the device was already in use"
-msgstr "Systeemmelding: the device was already in use"
+msgstr "het apparaat was al in gebruik"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr "Systeemmelding: the device wasn't found when the driver looked for it"
+msgstr "de driver kon het apparaat niet vinden"
 
 msgid "the device sent something the driver didn't expect"
-msgstr "Systeemmelding: the device sent something the driver didn't expect"
+msgstr "het apparaat stuurde iets onverwachts naar de driver"
 
 msgid "the device stopped responding"
-msgstr "Systeemmelding: the device stopped responding"
+msgstr "het apparaat reageert niet meer"
 
 msgid "the connection kept failing"
-msgstr "Systeemmelding: the connection kept failing"
+msgstr "de verbinding bleef mislukken"
 
 msgid "this device model isn't supported by the driver"
-msgstr "Systeemmelding: this device model isn't supported by the driver"
+msgstr "dit apparaatmodel wordt niet ondersteund door de driver"
 
 msgid "the device didn't respond in time"
-msgstr "Systeemmelding: the device didn't respond in time"
+msgstr "het apparaat reageerde niet op tijd"
 
 msgid "it was waiting on another part that never became ready"
-msgstr "Systeemmelding: it was waiting on another part that never became ready"
+msgstr "het wachtte op een ander onderdeel dat nooit klaar werd"
 
 msgid "an unexpected error"
-msgstr "Systeemmelding: an unexpected error"
+msgstr "een onverwachte fout"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr "Systeemmelding: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
+msgstr "De lijst met kernelstuurprogramma’s kon niet worden gelezen. Daarom kan hwsight niet zien of er een stuurprogramma beschikbaar is voor apparaten zonder stuurprogramma."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr "Systeemmelding: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
+msgstr "Het kernel-logboek kon niet worden gelezen, dus hwsight kan niet zeggen waarom een apparaat niet werkt. Op sommige systemen kunnen alleen beheerders het lezen."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr "Systeemmelding: Couldn't read the USB device list: {}"
+msgstr "De lijst met USB-apparaten kon niet worden gelezen: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr "Systeemmelding: Couldn't read the PCI device list: {}"
+msgstr "De lijst met PCI-apparaten kon niet worden gelezen: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr "Systeemmelding: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
+msgstr "Een gegevensupdate ({}) vereist een nieuwere versie van hwsight. Werk hwsight bij om deze te gebruiken."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr "Systeemmelding: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
+msgstr "Een beschadigd gegevensbestand ({}) is overgeslagen, dus de ingebouwde kopie wordt gebruikt. Details: {}"
 
 msgid "USB bus {}, port {}"
-msgstr "Systeemmelding: USB bus {}, port {}"
+msgstr "USB-bus {}, poort {}"
 
 msgid "{}, then hub port {}"
-msgstr "Systeemmelding: {}, then hub port {}"
+msgstr "{}, daarna hubpoort {}"
 
 msgid "Unknown {} {}"
-msgstr "Systeemmelding: Unknown {} {}"
+msgstr "Onbekende {} {}"
 
 msgid "Unknown {}"
-msgstr "Systeemmelding: Unknown {}"
+msgstr "Onbekende {}"
 
 msgid "Data updates aren't available in this version."
 msgstr "Gegevensupdates zijn niet beschikbaar in deze versie."
@@ -372,67 +372,67 @@ msgstr "Kan de update niet downloaden: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr "Systeemmelding: The downloaded update failed its security check, so it wasn't installed."
+msgstr "De gedownloade update doorstond de beveiligingscontrole niet en is daarom niet geïnstalleerd."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr "Systeemmelding: A data update needs a newer version of hwsight."
+msgstr "Een gegevensupdate vereist een nieuwere versie van hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr "Systeemmelding: The downloaded update was damaged ({}), so it wasn't installed."
+msgstr "De gedownloade update was beschadigd ({}), dus is deze niet geïnstalleerd."
 
 msgid "Couldn't save the update: {}"
-msgstr "Systeemmelding: Couldn't save the update: {}"
+msgstr "De update kon niet worden opgeslagen: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr "Systeemmelding: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
+msgstr "Dit apparaat is geblokkeerd door de USB-beveiligingsinstellingen van de computer, dus niets mag het gebruiken."
 
 msgid "USB device"
-msgstr "Systeemmelding: USB device"
+msgstr "USB-apparaat"
 
 msgid "{} {}"
-msgstr "Systeemmelding: {} {}"
+msgstr "{} {}"
 
 msgid "USB {}"
-msgstr "Systeemmelding: USB {}"
+msgstr "USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr "Systeemmelding: hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgstr "hwsight {} is beschikbaar (je hebt {}). Voer hwsight --update uit om deze te installeren."
 
 msgid "hwsight {} is the newest version."
-msgstr "Systeemmelding: hwsight {} is the newest version."
+msgstr "hwsight {} is de nieuwste versie."
 
 msgid "Couldn't check for updates: {}"
-msgstr "Systeemmelding: Couldn't check for updates: {}"
+msgstr "Kan niet controleren op updates: {}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "Kan niet vinden waar hwsight is geïnstalleerd."
 
 msgid "{}, driver: {}"
-msgstr "Systeemmelding: {}, driver: {}"
+msgstr "{}, driver: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr "Systeemmelding: {}, {} blocked in {}"
+msgstr "{}, {} geblokkeerd in {}"
 
 msgid "{}, available: {}"
-msgstr "Systeemmelding: {}, available: {}"
+msgstr "{}, beschikbaar: {}"
 
 msgid "{}, not in the device database yet"
-msgstr "Systeemmelding: {}, not in the device database yet"
+msgstr "{}, nog niet in de apparaatdatabase"
 
 msgid "Why:"
 msgstr "Waarom:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr "Systeemmelding: The driver is loaded, but no {} was created."
+msgstr "De driver is geladen, maar er is geen {} aangemaakt."
 
 msgid "Fix:"
 msgstr "Oplossing:"
 
 msgid "Fix {}:"
-msgstr "Systeemmelding: Fix {}:"
+msgstr "{} oplossen:"
 
 msgid "USB ports"
 msgstr "USB-poorten"
@@ -449,7 +449,7 @@ msgstr[0] "1 apparaat"
 msgstr[1] "{n} apparaten"
 
 msgid "{}, no problems found."
-msgstr "Systeemmelding: {}, no problems found."
+msgstr "{}, geen problemen gevonden."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
@@ -457,7 +457,7 @@ msgstr[0] "1 probleem"
 msgstr[1] "{n} problemen"
 
 msgid "{}, {}."
-msgstr "Systeemmelding: {}, {}."
+msgstr "{}, {}."
 
 msgid "Note: {}"
 msgstr "Opmerking: {}"
@@ -469,30 +469,30 @@ msgid "Updated {} to {}"
 msgstr "{} bijgewerkt naar {}"
 
 msgid "hwsight {} is available."
-msgstr "Systeemmelding: hwsight {} is available."
+msgstr "hwsight {} is beschikbaar."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr "Systeemmelding: hwsight {} is available. Update it with your package manager, or download it from the website."
+msgstr "hwsight {} is beschikbaar. Werk het bij met je pakketbeheerder of download het van de website."
 
 msgid "No devices found"
-msgstr "Systeemmelding: No devices found"
+msgstr "Geen apparaten gevonden"
 
 msgid "{}, no problems found"
-msgstr "Systeemmelding: {}, no problems found"
+msgstr "{}, geen problemen gevonden"
 
 msgid "{}, {}"
-msgstr "Systeemmelding: {}, {}"
+msgstr "{}, {}"
 
 msgid "{}: {}"
-msgstr "Systeemmelding: {}: {}"
+msgstr "{}: {}"
 
 msgid "PCI"
-msgstr "Systeemmelding: PCI"
+msgstr "PCI"
 
 msgid "USB"
-msgstr "Systeemmelding: USB"
+msgstr "USB"
 
 msgid "Other"
-msgstr "Systeemmelding: Other"
+msgstr "Overig"

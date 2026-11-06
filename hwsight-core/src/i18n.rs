@@ -292,6 +292,19 @@ mod tests {
                         problems.push(format!("plural forms missing for {:?}", source.id));
                     }
                     for (index, translated) in &translation.plural_translations {
+                        // A form shown for any count but 1 must show the count, or "21"
+                        // (Russian), "0" (French), or every number (Japanese) reads as "1".
+                        let used_for_other_counts =
+                            (0..1000).any(|n| n != 1 && plural_index(language, n) == *index);
+                        if used_for_other_counts
+                            && plural.contains("{n}")
+                            && !translated.contains("{n}")
+                        {
+                            problems.push(format!(
+                                "plural form {index} for {:?} is used for counts other than 1 but has no {{n}}",
+                                source.id
+                            ));
+                        }
                         let source_form = if *index == 0 { &source.id } else { plural };
                         if translated.is_empty()
                             || plural_placeholders(source_form) != plural_placeholders(translated)

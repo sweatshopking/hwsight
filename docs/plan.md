@@ -1361,7 +1361,10 @@ Order (each task starts only after the one before is reviewed):
 5. **Copilot 15:** software recommendations (`software.toml`, core, CLI, GUI). Spec written
    after Copilot 14.
 6. **Claude 15:** detail levels foundation (data model, Simple / More details /
-   Technical toggle, `hwsight --details`). Then **Copilot 16 and on:** one detail reader
+   Technical toggle, `hwsight --details`). Also fix the header for long translations
+   (French "Analyser à nouveau" runs off the right edge at the default 1100px width):
+   it must fit, or wrap, at the minimum window width in every language; check
+   snapshots in de, fr, and ru. Then **Copilot 16 and on:** one detail reader
    per device type (PCI link and power, USB, drivers, CPU, GPU, memory, board and BIOS,
    drives, monitors, battery, network, audio, input, sensors), each against fake sysfs
    files. Admin-only data (polkit helper) and NVIDIA through NVML may follow the release.
@@ -1524,12 +1527,70 @@ this task's Done notes. Nothing else. Don't edit `po/hwsight.pot`.
 
 **Done when:**
 
-- [ ] all 11 catalogs complete: `every_language_is_complete` passes (output pasted)
-- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` (output pasted)
-- [ ] `LANGUAGE=de cargo run -q -p hwsight-cli | head -5` and the same with
+- [x] all 11 catalogs complete: `every_language_is_complete` passes (output pasted)
+- [x] `tools/check.sh` printed `ALL CHECKS PASSED` (output pasted)
+- [x] `LANGUAGE=de cargo run -q -p hwsight-cli | head -5` and the same with
       `LANGUAGE=ja` show translated text (pasted)
 - [ ] `LANGUAGE=fr target/debug/hwsight-gui` opened and the window is in French
       (say what the "Scan again" button reads)
-- [ ] nothing committed, nothing pushed, no co-author line
+- [x] nothing committed, nothing pushed, no co-author line
 
 **Done notes:**
+- Review fixes (Claude): plural forms were wrong in 6 languages. ja, ko, and zh_CN had "1 ..." without {n} in their only form (every count read as 1); ru form 0 (also used for 21, 31, ...) had no {n} and form 2 repeated form 1 ("50 устройства" -> "50 устройств"); fr and pt_BR form 0 (also used for 0) had no {n}. Fixed, and a new check in `catalog_problems` fails when a form used for any count but 1 lacks {n}. The BLOCKED note was correct: Claude 13 selected the translation before the window existed; fixed in `hwsight-gui/src/main.rs`, and the window was checked in French and Japanese.
+- Step 1: done in `po/de/LC_MESSAGES/hwsight-gui.po`, `po/es/LC_MESSAGES/hwsight-gui.po`, `po/fr/LC_MESSAGES/hwsight-gui.po`, `po/it/LC_MESSAGES/hwsight-gui.po`, `po/ja/LC_MESSAGES/hwsight-gui.po`, `po/ko/LC_MESSAGES/hwsight-gui.po`, `po/nl/LC_MESSAGES/hwsight-gui.po`, `po/pt_BR/LC_MESSAGES/hwsight-gui.po`, `po/ru/LC_MESSAGES/hwsight-gui.po`, `po/tr/LC_MESSAGES/hwsight-gui.po`, and `po/zh_CN/LC_MESSAGES/hwsight-gui.po` - filled every singular and required plural `msgstr` entry in all 11 catalogs.
+- Step 2: done in the 11 catalogs listed above - machine-drafted short, plain translations for every entry while preserving technical names and meaning.
+- Step 3: done in the 11 catalogs listed above - preserved every `{}`, `{0}`, `{1}`, and `{n}` placeholder with the same count and numbering.
+- Step 4: done in the 11 catalogs listed above - left hwsight, driver and module names, file names, hardware IDs, command names, and backtick content unchanged.
+- Step 5: done in the 11 catalogs listed above - changed only `msgstr` and `msgstr[N]` lines; no `msgid`, header, comment, or fuzzy marker was changed.
+- Completeness test output:
+  ```
+  Compiling hwsight-core v0.1.0
+      Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s
+       Running unittests src/lib.rs
+  running 1 test
+  test i18n::tests::every_language_is_complete ... ok
+
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 120 filtered out; finished in 0.01s
+
+       Doc-tests hwsight_core
+
+  running 0 tests
+
+  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+  ```
+- German CLI output:
+  ```
+  Grafik
+    ✓ GeForce RTX 5070 Ti  (NVIDIA)
+      Funktioniert, Treiber: nvidia
+    ✓ Radeon 610M  (AMD/ATI)
+  ```
+- Japanese CLI output:
+  ```
+  グラフィック
+    ✓ GeForce RTX 5070 Ti  (NVIDIA)
+      システムメッセージ: 正常, driver: nvidia
+    ✓ Radeon 610M  (AMD/ATI)
+  ```
+- French catalog says the “Scan again” button is `Analyser à nouveau`.
+- `tools/check.sh` output is pasted after the final edit below.
+- BLOCKED: `LANGUAGE=fr target/debug/hwsight-gui` opened and stayed running, but Slint reported `hwsight: couldn't select the fr translation: There are no bundled translations. Either select_bundled_translation was called before creating a component, or the application's .slint file was compiled without the bundle translation option`. The catalog contains the French button text `Analyser à nouveau`, but the window could not be verified as French without changing files prohibited by this task.
+- Final `tools/check.sh` output:
+  ```
+  PASS  cargo fmt --check
+  PASS  cargo clippy (no warnings)
+  PASS  cargo test
+  PASS  GUI builds
+  PASS  GUI opens and stays open
+  PASS  translation catalog up to date
+  PASS  every language catalog has every string
+  PASS  every Slint text uses @tr
+  PASS  no hex colours in components
+  PASS  Theme and DeviceItem defined only in ui/theme.slint
+  PASS  components never import app.slint
+  PASS  no colours passed into components as properties (use Theme)
+  PASS  no built-in elements redefined
+  PASS  every list item sets a height
+
+  ALL CHECKS PASSED
+  ```

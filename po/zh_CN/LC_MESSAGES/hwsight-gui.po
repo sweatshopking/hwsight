@@ -61,7 +61,7 @@ msgstr "复制用于论坛发帖"
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr "系统消息：Copies a short report about this device. Your user name and computer name are removed."
+msgstr "复制此设备的简短报告。报告中会删除用户名和计算机名。"
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
@@ -95,7 +95,7 @@ msgstr "地址"
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr "系统消息：This device isn't in the device database yet. Its hardware ID above can be searched for online."
+msgstr "此设备尚未收录在设备数据库中。你可以在线搜索上面的硬件 ID。"
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
@@ -128,7 +128,7 @@ msgstr "hwsight 已是最新版本。"
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr "系统消息：This copy of hwsight is updated through your package manager or from {}."
+msgstr "此版本 hwsight 通过软件包管理器或从 {} 更新。"
 
 msgid "Couldn't update hwsight: {}"
 msgstr "无法更新 hwsight：{}"
@@ -256,183 +256,183 @@ msgstr "已为虚拟机保留"
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr "系统消息：Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
+msgstr "计算机启动时缺少固件文件 {}，但现在已安装。重新启动应该可以解决问题。"
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr "系统消息：The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
+msgstr "驱动程序需要固件文件 {}，它包含在 {} 软件包中。"
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr "系统消息：The driver needs a firmware file that isn't installed: {}"
+msgstr "驱动程序需要未安装的固件文件：{}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr "系统消息：A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "插入此处的设备无法连接。通常是线缆损坏、设备故障或供电不足。请尝试其他线缆或端口。"
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr "系统消息：A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
+msgstr "插入此处的设备无法连接（{}）。通常是线缆损坏、设备故障或供电不足。请尝试其他线缆或端口。"
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr "系统消息：This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
+msgstr "此 USB 端口报告功耗过高。连接的设备可能有故障，或需要独立供电。"
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr "系统消息：The {} driver couldn't start this device ({})."
+msgstr "{} 驱动程序无法启动此设备（{}）。"
 
 msgid "it wasn't allowed to"
-msgstr "系统消息：it wasn't allowed to"
+msgstr "不允许"
 
 msgid "a file it needs is missing"
-msgstr "系统消息：a file it needs is missing"
+msgstr "缺少所需文件"
 
 msgid "the device didn't respond correctly"
-msgstr "系统消息：the device didn't respond correctly"
+msgstr "设备未正确响应"
 
 msgid "the device was temporarily unavailable"
-msgstr "系统消息：the device was temporarily unavailable"
+msgstr "设备暂时不可用"
 
 msgid "the computer ran out of memory for it"
-msgstr "系统消息：the computer ran out of memory for it"
+msgstr "计算机内存不足"
 
 msgid "the device was already in use"
-msgstr "系统消息：the device was already in use"
+msgstr "设备已在使用"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr "系统消息：the device wasn't found when the driver looked for it"
+msgstr "驱动程序找不到设备"
 
 msgid "the device sent something the driver didn't expect"
-msgstr "系统消息：the device sent something the driver didn't expect"
+msgstr "设备向驱动程序发送了意外内容"
 
 msgid "the device stopped responding"
-msgstr "系统消息：the device stopped responding"
+msgstr "设备停止响应"
 
 msgid "the connection kept failing"
-msgstr "系统消息：the connection kept failing"
+msgstr "连接不断失败"
 
 msgid "this device model isn't supported by the driver"
-msgstr "系统消息：this device model isn't supported by the driver"
+msgstr "驱动程序不支持此设备型号"
 
 msgid "the device didn't respond in time"
-msgstr "系统消息：the device didn't respond in time"
+msgstr "设备未及时响应"
 
 msgid "it was waiting on another part that never became ready"
-msgstr "系统消息：it was waiting on another part that never became ready"
+msgstr "它在等待另一个始终未就绪的部分"
 
 msgid "an unexpected error"
-msgstr "系统消息：an unexpected error"
+msgstr "意外错误"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr "系统消息：Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
+msgstr "无法读取内核驱动程序列表，因此 hwsight 无法判断没有驱动程序的设备是否有可用驱动程序。"
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr "系统消息：Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
+msgstr "无法读取内核日志，因此 hwsight 无法说明设备为何无法工作。在某些系统上只有管理员可以读取它。"
 
 msgid "Couldn't read the USB device list: {}"
-msgstr "系统消息：Couldn't read the USB device list: {}"
+msgstr "无法读取 USB 设备列表：{}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr "系统消息：Couldn't read the PCI device list: {}"
+msgstr "无法读取 PCI 设备列表：{}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr "系统消息：A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
+msgstr "数据更新（{}）需要更新版本的 hwsight。请更新 hwsight 后使用。"
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr "系统消息：A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
+msgstr "已跳过损坏的数据文件（{}），因此使用内置副本。详细信息：{}"
 
 msgid "USB bus {}, port {}"
-msgstr "系统消息：USB bus {}, port {}"
+msgstr "USB 总线 {}，端口 {}"
 
 msgid "{}, then hub port {}"
-msgstr "系统消息：{}, then hub port {}"
+msgstr "{}，然后是集线器端口 {}"
 
 msgid "Unknown {} {}"
-msgstr "系统消息：Unknown {} {}"
+msgstr "未知 {} {}"
 
 msgid "Unknown {}"
-msgstr "系统消息：Unknown {}"
+msgstr "未知 {}"
 
 msgid "Data updates aren't available in this version."
-msgstr "此版本不支持数据更新。"
+msgstr "此版本不提供数据更新。"
 
 msgid "Couldn't download the update: {}"
 msgstr "无法下载更新：{}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr "系统消息：The downloaded update failed its security check, so it wasn't installed."
+msgstr "下载的更新未通过安全检查，因此未安装。"
 
 msgid "A data update needs a newer version of hwsight."
-msgstr "系统消息：A data update needs a newer version of hwsight."
+msgstr "数据更新需要更新版本的 hwsight。"
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr "系统消息：The downloaded update was damaged ({}), so it wasn't installed."
+msgstr "下载的更新已损坏（{}），因此未安装。"
 
 msgid "Couldn't save the update: {}"
-msgstr "系统消息：Couldn't save the update: {}"
+msgstr "无法保存更新：{}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr "系统消息：This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
+msgstr "此设备被计算机的 USB 安全设置阻止，因此无法使用。"
 
 msgid "USB device"
-msgstr "系统消息：USB device"
+msgstr "USB 设备"
 
 msgid "{} {}"
-msgstr "系统消息：{} {}"
+msgstr "{} {}"
 
 msgid "USB {}"
-msgstr "系统消息：USB {}"
+msgstr "USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr "系统消息：hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgstr "hwsight {} 可用（当前为 {}）。运行 hwsight --update 进行安装。"
 
 msgid "hwsight {} is the newest version."
-msgstr "系统消息：hwsight {} is the newest version."
+msgstr "hwsight {} 是最新版本。"
 
 msgid "Couldn't check for updates: {}"
-msgstr "系统消息：Couldn't check for updates: {}"
+msgstr "无法检查更新：{}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "找不到 hwsight 的安装位置。"
 
 msgid "{}, driver: {}"
-msgstr "系统消息：{}, driver: {}"
+msgstr "{}，驱动程序：{}"
 
 msgid "{}, {} blocked in {}"
-msgstr "系统消息：{}, {} blocked in {}"
+msgstr "{}，{} 在 {} 中被阻止"
 
 msgid "{}, available: {}"
-msgstr "系统消息：{}, available: {}"
+msgstr "{}，可用：{}"
 
 msgid "{}, not in the device database yet"
-msgstr "系统消息：{}, not in the device database yet"
+msgstr "{}，尚未在设备数据库中"
 
 msgid "Why:"
 msgstr "原因："
 
 msgid "The driver is loaded, but no {} was created."
-msgstr "系统消息：The driver is loaded, but no {} was created."
+msgstr "驱动程序已加载，但未创建 {}。"
 
 msgid "Fix:"
 msgstr "修复："
 
 msgid "Fix {}:"
-msgstr "系统消息：Fix {}:"
+msgstr "修复 {}："
 
 msgid "USB ports"
 msgstr "USB 端口"
@@ -445,17 +445,17 @@ msgstr "未发现问题。"
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] "1 个设备"
+msgstr[0] "{n} 个设备"
 
 msgid "{}, no problems found."
-msgstr "系统消息：{}, no problems found."
+msgstr "{}，未发现问题。"
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] "1 个问题"
+msgstr[0] "{n} 个问题"
 
 msgid "{}, {}."
-msgstr "系统消息：{}, {}."
+msgstr "{}，{}。"
 
 msgid "Note: {}"
 msgstr "注意：{}"
@@ -467,30 +467,30 @@ msgid "Updated {} to {}"
 msgstr "已将 {} 更新到 {}"
 
 msgid "hwsight {} is available."
-msgstr "系统消息：hwsight {} is available."
+msgstr "hwsight {} 可用。"
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr "系统消息：hwsight {} is available. Update it with your package manager, or download it from the website."
+msgstr "hwsight {} 可用。请使用软件包管理器更新，或从网站下载。"
 
 msgid "No devices found"
-msgstr "系统消息：No devices found"
+msgstr "未找到设备"
 
 msgid "{}, no problems found"
-msgstr "系统消息：{}, no problems found"
+msgstr "{}，未发现问题"
 
 msgid "{}, {}"
-msgstr "系统消息：{}, {}"
+msgstr "{}，{}"
 
 msgid "{}: {}"
-msgstr "系统消息：{}: {}"
+msgstr "{}：{}"
 
 msgid "PCI"
-msgstr "系统消息：PCI"
+msgstr "PCI"
 
 msgid "USB"
-msgstr "系统消息：USB"
+msgstr "USB"
 
 msgid "Other"
-msgstr "系统消息：Other"
+msgstr "其他"
