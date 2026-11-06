@@ -1,22 +1,67 @@
 # hwsight
 
-**A friendly Device Manager for Linux.**
+**The Device Manager Linux has been missing.**
 
-hwsight shows every device in your computer, tells you which ones are working and which
-aren't, and explains any problem in plain English. No terminal knowledge needed, and plenty
-of depth for people who want it.
+Your computer is full of hardware, and most of the time you can't tell whether all of it is
+doing its job. hwsight looks at everything inside and plugged into your PC, tells you in plain
+English what's healthy and what isn't, and then goes further: it finds the problems you didn't
+know you had, explains why they happen, and shows you the fix for *your* distro.
 
 > **Status: early development.** There are no releases or packages yet. You can build it
 > from source (see below). Watch or star the repo to follow along.
 
-## Why it exists
+## Why hwsight
 
-Windows has Device Manager: one place that lists your hardware and says what's wrong. Linux
-has the pieces (`lspci`, `lsusb`, kernel logs, `dmesg`), but they speak in hardware IDs and
-error codes. hwsight puts them together and translates, so "no driver loaded" or "firmware
-file missing" becomes a sentence a non-technical person can act on.
+**It answers the question you actually have.** Not "what's the vendor ID of this chip?" but
+"is my stuff working, and if not, what do I do?" Every device gets a clear status, and every
+problem comes with what's wrong, why it matters, and the steps to fix it, with the exact
+package and command for Arch, Debian, Ubuntu, Fedora, or openSUSE.
 
-## What it does today
+**It finds problems you'd never think to look for.** Most hardware trouble isn't a red error,
+it's quietly lost performance. hwsight catches:
+
+- RAM running at 4800 MT/s when every stick is rated for 6000, and sticks spread unevenly
+  across channels
+- a graphics card stuck in a slow PCIe slot, or with Resizable BAR switched off
+- a fast USB drive plugged into a USB 2 port
+- a Wi-Fi 7 adapter held back to Wi-Fi 6 by the router, with a weak signal or the slow band
+- a cable that negotiated 100 Mb/s on a gigabit adapter
+- drives that are failing, running hot, or have firmware updates waiting
+- firmware update lists that went stale, and drivers that are installed but never loaded
+
+**It reads the kernel log so you don't have to.** When a driver fails, hwsight finds the real
+reason, such as the exact firmware file the driver is waiting for, and maps it to the package
+that provides it on your distro.
+
+**It's for beginners and for experts, at the same time.** One click switches between *Simple*
+(plain English), *More details* (the key numbers, each with a verdict), and *Technical*
+(everything it can read, with the exact file and raw value behind each one). Nothing is
+hidden from people who want it, and nothing is dumped on people who don't.
+
+**It shows its work.** In Technical view every value says where it came from, so you can
+check it yourself, and you can copy any group of details or a whole report for a forum post
+with your user name and computer name already removed.
+
+**It gets you through a firmware update safely.** It finds updates for drives, receivers, and
+more, installs them one device at a time after you confirm, and treats BIOS updates with
+the care they deserve: it tells you one exists and how to get it, but never installs it for you.
+
+**It asks before it changes anything.** hwsight reads by default. Anything that needs admin
+rights goes through your desktop's own password window, and it says so up front. It never
+sees your password and never reads serial numbers, MAC addresses, or Wi-Fi network names.
+
+**It stays current without waiting for a release.** Device names, rules, firmware packages,
+and translations live in signed data files that update on their own, so support for new
+hardware and new distros arrives as data, not as a new app.
+
+**It works everywhere.** Every major distro, read-only systems like Fedora Atomic, Bazzite,
+and SteamOS (it won't suggest things that can't work there), 12 languages, a modern window
+that looks the part, and a full command-line mode for scripts and servers.
+
+**It's free and open source,** GPL-3.0-or-later, with no accounts and no telemetry. The only
+network use is the optional check for updates, and it works fine offline.
+
+## The full feature list
 
 - **Lists every device**, grouped by type: graphics, network, sound, storage, USB, Bluetooth,
   displays, memory, processor, motherboard, and more.
