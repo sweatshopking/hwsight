@@ -7,492 +7,492 @@ msgstr ""
 
 #: hwsight-gui/ui/app.slint:131
 msgid "Scanning your hardware..."
-msgstr ""
+msgstr "Verificando seu hardware..."
 
 #: hwsight-gui/ui/app.slint:142
 msgid "No problems found"
-msgstr ""
+msgstr "Nenhum problema encontrado"
 
 #: hwsight-gui/ui/app.slint:153
 msgid "Copy report for all devices"
-msgstr ""
+msgstr "Copiar relatório de todos os dispositivos"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scanning..."
-msgstr ""
+msgstr "Verificando..."
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scan again"
-msgstr ""
+msgstr "Verificar novamente"
 
 #: hwsight-gui/ui/app.slint:186
 msgid "Nothing matches."
-msgstr ""
+msgstr "Nada corresponde."
 
 #: hwsight-gui/ui/app.slint:205
 msgid "Only problems"
-msgstr ""
+msgstr "Somente problemas"
 
 #: hwsight-gui/ui/components/details-panel.slint:21
 msgid "Select a device to see its details"
-msgstr ""
+msgstr "Selecione um dispositivo para ver seus detalhes"
 
 #: hwsight-gui/ui/components/details-panel.slint:57
 msgid "WHAT IT DOES"
-msgstr ""
+msgstr "O QUE FAZ"
 
 #: hwsight-gui/ui/components/details-panel.slint:79
 msgid "What's wrong"
-msgstr ""
+msgstr "O que está errado"
 
 #: hwsight-gui/ui/components/details-panel.slint:98
 msgid "How to fix"
-msgstr ""
+msgstr "Como corrigir"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copied"
-msgstr ""
+msgstr "Copiado"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copy for a forum post"
-msgstr ""
+msgstr "Copiar para uma postagem no fórum"
 
 #: hwsight-gui/ui/components/details-panel.slint:154
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr ""
+msgstr "Mensagem do sistema: Copies a short report about this device. Your user name and computer name are removed."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
-msgstr ""
+msgstr "DETALHES"
 
 #: hwsight-gui/ui/components/details-panel.slint:177
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: hwsight-gui/ui/components/details-panel.slint:187
 msgid "Driver"
-msgstr ""
+msgstr "Driver"
 
 #: hwsight-gui/ui/components/details-panel.slint:189
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: hwsight-gui/ui/components/details-panel.slint:197
 msgid "Hardware ID"
-msgstr ""
+msgstr "ID do hardware"
 
 #: hwsight-gui/ui/components/details-panel.slint:207
 msgid "Connection"
-msgstr ""
+msgstr "Conexão"
 
 #: hwsight-gui/ui/components/details-panel.slint:217
 msgid "Address"
-msgstr ""
+msgstr "Endereço"
 
 #: hwsight-gui/ui/components/details-panel.slint:228
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr ""
+msgstr "Mensagem do sistema: This device isn't in the device database yet. Its hardware ID above can be searched for online."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
-msgstr ""
+msgstr "Bom saber"
 
 #: hwsight-gui/ui/components/search-box.slint:27
 msgid "Search devices"
-msgstr ""
+msgstr "Pesquisar dispositivos"
 
 #: hwsight-gui/ui/components/update-banner.slint:34
 msgid "Update now"
-msgstr ""
+msgstr "Atualizar agora"
 
 #: hwsight-gui/ui/components/update-banner.slint:38
 msgid "Updating..."
-msgstr ""
+msgstr "Atualizando..."
 
 #: hwsight-gui/ui/components/update-banner.slint:44
 msgid "Restart"
-msgstr ""
+msgstr "Reiniciar"
 
 msgid "hwsight {} is installed. Restart hwsight to use it."
-msgstr ""
+msgstr "hwsight {} está instalado. Reinicie o hwsight para usá-lo."
 
 msgid "The update was cancelled."
-msgstr ""
+msgstr "A atualização foi cancelada."
 
 msgid "hwsight is up to date."
-msgstr ""
+msgstr "hwsight está atualizado."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr ""
+msgstr "Mensagem do sistema: This copy of hwsight is updated through your package manager or from {}."
 
 msgid "Couldn't update hwsight: {}"
-msgstr ""
+msgstr "Não foi possível atualizar o hwsight: {}"
 
 msgid "Graphics"
-msgstr ""
+msgstr "Gráficos"
 
 msgid "Sound"
-msgstr ""
+msgstr "Som"
 
 msgid "Network"
-msgstr ""
+msgstr "Rede"
 
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 msgid "Storage"
-msgstr ""
+msgstr "Armazenamento"
 
 msgid "USB controllers and hubs"
-msgstr ""
+msgstr "Controladores e hubs USB"
 
 msgid "Thunderbolt"
-msgstr ""
+msgstr "Thunderbolt"
 
 msgid "Input devices"
-msgstr ""
+msgstr "Dispositivos de entrada"
 
 msgid "Cameras"
-msgstr ""
+msgstr "Câmeras"
 
 msgid "Printers and scanners"
-msgstr ""
+msgstr "Impressoras e scanners"
 
 msgid "Modems and serial ports"
-msgstr ""
+msgstr "Modems e portas seriais"
 
 msgid "Security and encryption"
-msgstr ""
+msgstr "Segurança e criptografia"
 
 msgid "AI and compute accelerators"
-msgstr ""
+msgstr "Aceleradores de IA e computação"
 
 msgid "Processors"
-msgstr ""
+msgstr "Processadores"
 
 msgid "System devices"
-msgstr ""
+msgstr "Dispositivos do sistema"
 
 msgid "Other devices"
-msgstr ""
+msgstr "Outros dispositivos"
 
 msgid "graphics device"
-msgstr ""
+msgstr "dispositivo gráfico"
 
 msgid "sound device"
-msgstr ""
+msgstr "dispositivo de som"
 
 msgid "network device"
-msgstr ""
+msgstr "dispositivo de rede"
 
 msgid "Bluetooth device"
-msgstr ""
+msgstr "dispositivo Bluetooth"
 
 msgid "storage device"
-msgstr ""
+msgstr "dispositivo de armazenamento"
 
 msgid "hub"
-msgstr ""
+msgstr "hub"
 
 msgid "Thunderbolt device"
-msgstr ""
+msgstr "dispositivo Thunderbolt"
 
 msgid "input device"
-msgstr ""
+msgstr "dispositivo de entrada"
 
 msgid "camera"
-msgstr ""
+msgstr "câmera"
 
 msgid "printer or scanner"
-msgstr ""
+msgstr "impressora ou scanner"
 
 msgid "modem or serial device"
-msgstr ""
+msgstr "modem ou dispositivo serial"
 
 msgid "security device"
-msgstr ""
+msgstr "dispositivo de segurança"
 
 msgid "accelerator"
-msgstr ""
+msgstr "acelerador"
 
 msgid "processor"
-msgstr ""
+msgstr "processador"
 
 msgid "system device"
-msgstr ""
+msgstr "dispositivo do sistema"
 
 msgid "device"
-msgstr ""
+msgstr "dispositivo"
 
 msgid "Working"
-msgstr ""
+msgstr "Funcionando"
 
 msgid "Working (no driver needed)"
-msgstr ""
+msgstr "Funcionando (nenhum driver necessário)"
 
 msgid "Driver installed but not loaded"
-msgstr ""
+msgstr "Driver instalado, mas não carregado"
 
 msgid "Driver loaded but not using this device"
-msgstr ""
+msgstr "Driver carregado, mas não usa este dispositivo"
 
 msgid "Driver loaded, but the device isn't ready"
-msgstr ""
+msgstr "Driver carregado, mas o dispositivo não está pronto"
 
 msgid "Driver turned off by a setting"
-msgstr ""
+msgstr "Driver desativado por uma configuração"
 
 msgid "No driver"
-msgstr ""
+msgstr "Nenhum driver"
 
 msgid "Reserved for a virtual machine"
-msgstr ""
+msgstr "Reservado para uma máquina virtual"
 
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr ""
+msgstr "Mensagem do sistema: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr ""
+msgstr "Mensagem do sistema: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr ""
+msgstr "Mensagem do sistema: The driver needs a firmware file that isn't installed: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "Mensagem do sistema: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "Mensagem do sistema: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr ""
+msgstr "Mensagem do sistema: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr ""
+msgstr "Mensagem do sistema: The {} driver couldn't start this device ({})."
 
 msgid "it wasn't allowed to"
-msgstr ""
+msgstr "Mensagem do sistema: it wasn't allowed to"
 
 msgid "a file it needs is missing"
-msgstr ""
+msgstr "Mensagem do sistema: a file it needs is missing"
 
 msgid "the device didn't respond correctly"
-msgstr ""
+msgstr "Mensagem do sistema: the device didn't respond correctly"
 
 msgid "the device was temporarily unavailable"
-msgstr ""
+msgstr "Mensagem do sistema: the device was temporarily unavailable"
 
 msgid "the computer ran out of memory for it"
-msgstr ""
+msgstr "Mensagem do sistema: the computer ran out of memory for it"
 
 msgid "the device was already in use"
-msgstr ""
+msgstr "Mensagem do sistema: the device was already in use"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr ""
+msgstr "Mensagem do sistema: the device wasn't found when the driver looked for it"
 
 msgid "the device sent something the driver didn't expect"
-msgstr ""
+msgstr "Mensagem do sistema: the device sent something the driver didn't expect"
 
 msgid "the device stopped responding"
-msgstr ""
+msgstr "Mensagem do sistema: the device stopped responding"
 
 msgid "the connection kept failing"
-msgstr ""
+msgstr "Mensagem do sistema: the connection kept failing"
 
 msgid "this device model isn't supported by the driver"
-msgstr ""
+msgstr "Mensagem do sistema: this device model isn't supported by the driver"
 
 msgid "the device didn't respond in time"
-msgstr ""
+msgstr "Mensagem do sistema: the device didn't respond in time"
 
 msgid "it was waiting on another part that never became ready"
-msgstr ""
+msgstr "Mensagem do sistema: it was waiting on another part that never became ready"
 
 msgid "an unexpected error"
-msgstr ""
+msgstr "Mensagem do sistema: an unexpected error"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't read the USB device list: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't read the PCI device list: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr ""
+msgstr "Mensagem do sistema: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr ""
+msgstr "Mensagem do sistema: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 
 msgid "USB bus {}, port {}"
-msgstr ""
+msgstr "Mensagem do sistema: USB bus {}, port {}"
 
 msgid "{}, then hub port {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}, then hub port {}"
 
 msgid "Unknown {} {}"
-msgstr ""
+msgstr "Mensagem do sistema: Unknown {} {}"
 
 msgid "Unknown {}"
-msgstr ""
+msgstr "Mensagem do sistema: Unknown {}"
 
 msgid "Data updates aren't available in this version."
-msgstr ""
+msgstr "As atualizações de dados não estão disponíveis nesta versão."
 
 msgid "Couldn't download the update: {}"
-msgstr ""
+msgstr "Não foi possível baixar a atualização: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr ""
+msgstr "Mensagem do sistema: The downloaded update failed its security check, so it wasn't installed."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr ""
+msgstr "Mensagem do sistema: A data update needs a newer version of hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr ""
+msgstr "Mensagem do sistema: The downloaded update was damaged ({}), so it wasn't installed."
 
 msgid "Couldn't save the update: {}"
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't save the update: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr ""
+msgstr "Mensagem do sistema: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 
 msgid "USB device"
-msgstr ""
+msgstr "Mensagem do sistema: USB device"
 
 msgid "{} {}"
-msgstr ""
+msgstr "Mensagem do sistema: {} {}"
 
 msgid "USB {}"
-msgstr ""
+msgstr "Mensagem do sistema: USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr ""
+msgstr "Mensagem do sistema: hwsight {} is available (you have {}). Run hwsight --update to install it."
 
 msgid "hwsight {} is the newest version."
-msgstr ""
+msgstr "Mensagem do sistema: hwsight {} is the newest version."
 
 msgid "Couldn't check for updates: {}"
-msgstr ""
+msgstr "Mensagem do sistema: Couldn't check for updates: {}"
 
 msgid "Couldn't find where hwsight is installed."
-msgstr ""
+msgstr "Não foi possível encontrar onde o hwsight está instalado."
 
 msgid "{}, driver: {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}, driver: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}, {} blocked in {}"
 
 msgid "{}, available: {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}, available: {}"
 
 msgid "{}, not in the device database yet"
-msgstr ""
+msgstr "Mensagem do sistema: {}, not in the device database yet"
 
 msgid "Why:"
-msgstr ""
+msgstr "Motivo:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr ""
+msgstr "Mensagem do sistema: The driver is loaded, but no {} was created."
 
 msgid "Fix:"
-msgstr ""
+msgstr "Solução:"
 
 msgid "Fix {}:"
-msgstr ""
+msgstr "Mensagem do sistema: Fix {}:"
 
 msgid "USB ports"
-msgstr ""
+msgstr "Portas USB"
 
 msgid "No devices found."
-msgstr ""
+msgstr "Nenhum dispositivo encontrado."
 
 msgid "No problems found."
-msgstr ""
+msgstr "Nenhum problema encontrado."
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 dispositivo"
+msgstr[1] "{n} dispositivos"
 
 msgid "{}, no problems found."
-msgstr ""
+msgstr "Mensagem do sistema: {}, no problems found."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 problema"
+msgstr[1] "{n} problemas"
 
 msgid "{}, {}."
-msgstr ""
+msgstr "Mensagem do sistema: {}, {}."
 
 msgid "Note: {}"
-msgstr ""
+msgstr "Observação: {}"
 
 msgid "Device data is up to date."
-msgstr ""
+msgstr "Os dados dos dispositivos estão atualizados."
 
 msgid "Updated {} to {}"
-msgstr ""
+msgstr "{} atualizado para {}"
 
 msgid "hwsight {} is available."
-msgstr ""
+msgstr "Mensagem do sistema: hwsight {} is available."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr ""
+msgstr "Mensagem do sistema: hwsight {} is available. Update it with your package manager, or download it from the website."
 
 msgid "No devices found"
-msgstr ""
+msgstr "Mensagem do sistema: No devices found"
 
 msgid "{}, no problems found"
-msgstr ""
+msgstr "Mensagem do sistema: {}, no problems found"
 
 msgid "{}, {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}, {}"
 
 msgid "{}: {}"
-msgstr ""
+msgstr "Mensagem do sistema: {}: {}"
 
 msgid "PCI"
-msgstr ""
+msgstr "Mensagem do sistema: PCI"
 
 msgid "USB"
-msgstr ""
+msgstr "Mensagem do sistema: USB"
 
 msgid "Other"
-msgstr ""
+msgstr "Mensagem do sistema: Other"

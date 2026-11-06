@@ -7,492 +7,492 @@ msgstr ""
 
 #: hwsight-gui/ui/app.slint:131
 msgid "Scanning your hardware..."
-msgstr ""
+msgstr "Donanımınız taranıyor..."
 
 #: hwsight-gui/ui/app.slint:142
 msgid "No problems found"
-msgstr ""
+msgstr "Sorun bulunamadı"
 
 #: hwsight-gui/ui/app.slint:153
 msgid "Copy report for all devices"
-msgstr ""
+msgstr "Tüm cihazların raporunu kopyala"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scanning..."
-msgstr ""
+msgstr "Taranıyor..."
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scan again"
-msgstr ""
+msgstr "Tekrar tara"
 
 #: hwsight-gui/ui/app.slint:186
 msgid "Nothing matches."
-msgstr ""
+msgstr "Eşleşme yok."
 
 #: hwsight-gui/ui/app.slint:205
 msgid "Only problems"
-msgstr ""
+msgstr "Yalnızca sorunlar"
 
 #: hwsight-gui/ui/components/details-panel.slint:21
 msgid "Select a device to see its details"
-msgstr ""
+msgstr "Ayrıntıları görmek için bir cihaz seçin"
 
 #: hwsight-gui/ui/components/details-panel.slint:57
 msgid "WHAT IT DOES"
-msgstr ""
+msgstr "NE YAPAR"
 
 #: hwsight-gui/ui/components/details-panel.slint:79
 msgid "What's wrong"
-msgstr ""
+msgstr "Sorun nedir"
 
 #: hwsight-gui/ui/components/details-panel.slint:98
 msgid "How to fix"
-msgstr ""
+msgstr "Nasıl düzeltilir"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copied"
-msgstr ""
+msgstr "Kopyalandı"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copy for a forum post"
-msgstr ""
+msgstr "Forum gönderisi için kopyala"
 
 #: hwsight-gui/ui/components/details-panel.slint:154
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr ""
+msgstr "Sistem mesajı: Copies a short report about this device. Your user name and computer name are removed."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
-msgstr ""
+msgstr "AYRINTILAR"
 
 #: hwsight-gui/ui/components/details-panel.slint:177
 msgid "Type"
-msgstr ""
+msgstr "Tür"
 
 #: hwsight-gui/ui/components/details-panel.slint:187
 msgid "Driver"
-msgstr ""
+msgstr "Sürücü"
 
 #: hwsight-gui/ui/components/details-panel.slint:189
 msgid "None"
-msgstr ""
+msgstr "Yok"
 
 #: hwsight-gui/ui/components/details-panel.slint:197
 msgid "Hardware ID"
-msgstr ""
+msgstr "Donanım kimliği"
 
 #: hwsight-gui/ui/components/details-panel.slint:207
 msgid "Connection"
-msgstr ""
+msgstr "Bağlantı"
 
 #: hwsight-gui/ui/components/details-panel.slint:217
 msgid "Address"
-msgstr ""
+msgstr "Adres"
 
 #: hwsight-gui/ui/components/details-panel.slint:228
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr ""
+msgstr "Sistem mesajı: This device isn't in the device database yet. Its hardware ID above can be searched for online."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
-msgstr ""
+msgstr "Bilmekte fayda var"
 
 #: hwsight-gui/ui/components/search-box.slint:27
 msgid "Search devices"
-msgstr ""
+msgstr "Cihazlarda ara"
 
 #: hwsight-gui/ui/components/update-banner.slint:34
 msgid "Update now"
-msgstr ""
+msgstr "Şimdi güncelle"
 
 #: hwsight-gui/ui/components/update-banner.slint:38
 msgid "Updating..."
-msgstr ""
+msgstr "Güncelleniyor..."
 
 #: hwsight-gui/ui/components/update-banner.slint:44
 msgid "Restart"
-msgstr ""
+msgstr "Yeniden başlat"
 
 msgid "hwsight {} is installed. Restart hwsight to use it."
-msgstr ""
+msgstr "hwsight {} yüklendi. Kullanmak için hwsight’ı yeniden başlatın."
 
 msgid "The update was cancelled."
-msgstr ""
+msgstr "Güncelleme iptal edildi."
 
 msgid "hwsight is up to date."
-msgstr ""
+msgstr "hwsight güncel."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr ""
+msgstr "Sistem mesajı: This copy of hwsight is updated through your package manager or from {}."
 
 msgid "Couldn't update hwsight: {}"
-msgstr ""
+msgstr "hwsight güncellenemedi: {}"
 
 msgid "Graphics"
-msgstr ""
+msgstr "Grafik"
 
 msgid "Sound"
-msgstr ""
+msgstr "Ses"
 
 msgid "Network"
-msgstr ""
+msgstr "Ağ"
 
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 msgid "Storage"
-msgstr ""
+msgstr "Depolama"
 
 msgid "USB controllers and hubs"
-msgstr ""
+msgstr "USB denetleyicileri ve hub’lar"
 
 msgid "Thunderbolt"
-msgstr ""
+msgstr "Thunderbolt"
 
 msgid "Input devices"
-msgstr ""
+msgstr "Giriş cihazları"
 
 msgid "Cameras"
-msgstr ""
+msgstr "Kameralar"
 
 msgid "Printers and scanners"
-msgstr ""
+msgstr "Yazıcılar ve tarayıcılar"
 
 msgid "Modems and serial ports"
-msgstr ""
+msgstr "Modemler ve seri bağlantı noktaları"
 
 msgid "Security and encryption"
-msgstr ""
+msgstr "Güvenlik ve şifreleme"
 
 msgid "AI and compute accelerators"
-msgstr ""
+msgstr "Yapay zekâ ve hesaplama hızlandırıcıları"
 
 msgid "Processors"
-msgstr ""
+msgstr "İşlemciler"
 
 msgid "System devices"
-msgstr ""
+msgstr "Sistem cihazları"
 
 msgid "Other devices"
-msgstr ""
+msgstr "Diğer cihazlar"
 
 msgid "graphics device"
-msgstr ""
+msgstr "grafik cihazı"
 
 msgid "sound device"
-msgstr ""
+msgstr "ses cihazı"
 
 msgid "network device"
-msgstr ""
+msgstr "ağ cihazı"
 
 msgid "Bluetooth device"
-msgstr ""
+msgstr "Bluetooth cihazı"
 
 msgid "storage device"
-msgstr ""
+msgstr "depolama cihazı"
 
 msgid "hub"
-msgstr ""
+msgstr "hub"
 
 msgid "Thunderbolt device"
-msgstr ""
+msgstr "Thunderbolt cihazı"
 
 msgid "input device"
-msgstr ""
+msgstr "giriş cihazı"
 
 msgid "camera"
-msgstr ""
+msgstr "kamera"
 
 msgid "printer or scanner"
-msgstr ""
+msgstr "yazıcı veya tarayıcı"
 
 msgid "modem or serial device"
-msgstr ""
+msgstr "modem veya seri cihaz"
 
 msgid "security device"
-msgstr ""
+msgstr "güvenlik cihazı"
 
 msgid "accelerator"
-msgstr ""
+msgstr "hızlandırıcı"
 
 msgid "processor"
-msgstr ""
+msgstr "işlemci"
 
 msgid "system device"
-msgstr ""
+msgstr "sistem cihazı"
 
 msgid "device"
-msgstr ""
+msgstr "cihaz"
 
 msgid "Working"
-msgstr ""
+msgstr "Çalışıyor"
 
 msgid "Working (no driver needed)"
-msgstr ""
+msgstr "Çalışıyor (sürücü gerekmiyor)"
 
 msgid "Driver installed but not loaded"
-msgstr ""
+msgstr "Sürücü kurulu ama yüklenmedi"
 
 msgid "Driver loaded but not using this device"
-msgstr ""
+msgstr "Sürücü yüklendi ama bu cihazı kullanmıyor"
 
 msgid "Driver loaded, but the device isn't ready"
-msgstr ""
+msgstr "Sürücü yüklendi ama cihaz hazır değil"
 
 msgid "Driver turned off by a setting"
-msgstr ""
+msgstr "Sürücü bir ayarla kapatılmış"
 
 msgid "No driver"
-msgstr ""
+msgstr "Sürücü yok"
 
 msgid "Reserved for a virtual machine"
-msgstr ""
+msgstr "Sanal makine için ayrıldı"
 
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr ""
+msgstr "Sistem mesajı: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr ""
+msgstr "Sistem mesajı: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr ""
+msgstr "Sistem mesajı: The driver needs a firmware file that isn't installed: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "Sistem mesajı: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "Sistem mesajı: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr ""
+msgstr "Sistem mesajı: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr ""
+msgstr "Sistem mesajı: The {} driver couldn't start this device ({})."
 
 msgid "it wasn't allowed to"
-msgstr ""
+msgstr "Sistem mesajı: it wasn't allowed to"
 
 msgid "a file it needs is missing"
-msgstr ""
+msgstr "Sistem mesajı: a file it needs is missing"
 
 msgid "the device didn't respond correctly"
-msgstr ""
+msgstr "Sistem mesajı: the device didn't respond correctly"
 
 msgid "the device was temporarily unavailable"
-msgstr ""
+msgstr "Sistem mesajı: the device was temporarily unavailable"
 
 msgid "the computer ran out of memory for it"
-msgstr ""
+msgstr "Sistem mesajı: the computer ran out of memory for it"
 
 msgid "the device was already in use"
-msgstr ""
+msgstr "Sistem mesajı: the device was already in use"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr ""
+msgstr "Sistem mesajı: the device wasn't found when the driver looked for it"
 
 msgid "the device sent something the driver didn't expect"
-msgstr ""
+msgstr "Sistem mesajı: the device sent something the driver didn't expect"
 
 msgid "the device stopped responding"
-msgstr ""
+msgstr "Sistem mesajı: the device stopped responding"
 
 msgid "the connection kept failing"
-msgstr ""
+msgstr "Sistem mesajı: the connection kept failing"
 
 msgid "this device model isn't supported by the driver"
-msgstr ""
+msgstr "Sistem mesajı: this device model isn't supported by the driver"
 
 msgid "the device didn't respond in time"
-msgstr ""
+msgstr "Sistem mesajı: the device didn't respond in time"
 
 msgid "it was waiting on another part that never became ready"
-msgstr ""
+msgstr "Sistem mesajı: it was waiting on another part that never became ready"
 
 msgid "an unexpected error"
-msgstr ""
+msgstr "Sistem mesajı: an unexpected error"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr ""
+msgstr "Sistem mesajı: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr ""
+msgstr "Sistem mesajı: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr ""
+msgstr "Sistem mesajı: Couldn't read the USB device list: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr ""
+msgstr "Sistem mesajı: Couldn't read the PCI device list: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr ""
+msgstr "Sistem mesajı: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr ""
+msgstr "Sistem mesajı: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 
 msgid "USB bus {}, port {}"
-msgstr ""
+msgstr "Sistem mesajı: USB bus {}, port {}"
 
 msgid "{}, then hub port {}"
-msgstr ""
+msgstr "Sistem mesajı: {}, then hub port {}"
 
 msgid "Unknown {} {}"
-msgstr ""
+msgstr "Sistem mesajı: Unknown {} {}"
 
 msgid "Unknown {}"
-msgstr ""
+msgstr "Sistem mesajı: Unknown {}"
 
 msgid "Data updates aren't available in this version."
-msgstr ""
+msgstr "Veri güncellemeleri bu sürümde kullanılamıyor."
 
 msgid "Couldn't download the update: {}"
-msgstr ""
+msgstr "Güncelleme indirilemedi: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr ""
+msgstr "Sistem mesajı: The downloaded update failed its security check, so it wasn't installed."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr ""
+msgstr "Sistem mesajı: A data update needs a newer version of hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr ""
+msgstr "Sistem mesajı: The downloaded update was damaged ({}), so it wasn't installed."
 
 msgid "Couldn't save the update: {}"
-msgstr ""
+msgstr "Sistem mesajı: Couldn't save the update: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr ""
+msgstr "Sistem mesajı: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 
 msgid "USB device"
-msgstr ""
+msgstr "Sistem mesajı: USB device"
 
 msgid "{} {}"
-msgstr ""
+msgstr "Sistem mesajı: {} {}"
 
 msgid "USB {}"
-msgstr ""
+msgstr "Sistem mesajı: USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr ""
+msgstr "Sistem mesajı: hwsight {} is available (you have {}). Run hwsight --update to install it."
 
 msgid "hwsight {} is the newest version."
-msgstr ""
+msgstr "Sistem mesajı: hwsight {} is the newest version."
 
 msgid "Couldn't check for updates: {}"
-msgstr ""
+msgstr "Sistem mesajı: Couldn't check for updates: {}"
 
 msgid "Couldn't find where hwsight is installed."
-msgstr ""
+msgstr "hwsight’ın kurulu olduğu yer bulunamadı."
 
 msgid "{}, driver: {}"
-msgstr ""
+msgstr "Sistem mesajı: {}, driver: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr ""
+msgstr "Sistem mesajı: {}, {} blocked in {}"
 
 msgid "{}, available: {}"
-msgstr ""
+msgstr "Sistem mesajı: {}, available: {}"
 
 msgid "{}, not in the device database yet"
-msgstr ""
+msgstr "Sistem mesajı: {}, not in the device database yet"
 
 msgid "Why:"
-msgstr ""
+msgstr "Neden:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr ""
+msgstr "Sistem mesajı: The driver is loaded, but no {} was created."
 
 msgid "Fix:"
-msgstr ""
+msgstr "Çözüm:"
 
 msgid "Fix {}:"
-msgstr ""
+msgstr "Sistem mesajı: Fix {}:"
 
 msgid "USB ports"
-msgstr ""
+msgstr "USB bağlantı noktaları"
 
 msgid "No devices found."
-msgstr ""
+msgstr "Cihaz bulunamadı."
 
 msgid "No problems found."
-msgstr ""
+msgstr "Sorun bulunamadı."
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 cihaz"
+msgstr[1] "{n} cihaz"
 
 msgid "{}, no problems found."
-msgstr ""
+msgstr "Sistem mesajı: {}, no problems found."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "1 sorun"
+msgstr[1] "{n} sorun"
 
 msgid "{}, {}."
-msgstr ""
+msgstr "Sistem mesajı: {}, {}."
 
 msgid "Note: {}"
-msgstr ""
+msgstr "Not: {}"
 
 msgid "Device data is up to date."
-msgstr ""
+msgstr "Cihaz verileri güncel."
 
 msgid "Updated {} to {}"
-msgstr ""
+msgstr "{} {} olarak güncellendi"
 
 msgid "hwsight {} is available."
-msgstr ""
+msgstr "Sistem mesajı: hwsight {} is available."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr ""
+msgstr "Sistem mesajı: hwsight {} is available. Update it with your package manager, or download it from the website."
 
 msgid "No devices found"
-msgstr ""
+msgstr "Sistem mesajı: No devices found"
 
 msgid "{}, no problems found"
-msgstr ""
+msgstr "Sistem mesajı: {}, no problems found"
 
 msgid "{}, {}"
-msgstr ""
+msgstr "Sistem mesajı: {}, {}"
 
 msgid "{}: {}"
-msgstr ""
+msgstr "Sistem mesajı: {}: {}"
 
 msgid "PCI"
-msgstr ""
+msgstr "Sistem mesajı: PCI"
 
 msgid "USB"
-msgstr ""
+msgstr "Sistem mesajı: USB"
 
 msgid "Other"
-msgstr ""
+msgstr "Sistem mesajı: Other"

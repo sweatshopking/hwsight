@@ -7,490 +7,490 @@ msgstr ""
 
 #: hwsight-gui/ui/app.slint:131
 msgid "Scanning your hardware..."
-msgstr ""
+msgstr "ハードウェアをスキャンしています…"
 
 #: hwsight-gui/ui/app.slint:142
 msgid "No problems found"
-msgstr ""
+msgstr "問題はありません"
 
 #: hwsight-gui/ui/app.slint:153
 msgid "Copy report for all devices"
-msgstr ""
+msgstr "すべてのデバイスのレポートをコピー"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scanning..."
-msgstr ""
+msgstr "スキャン中…"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scan again"
-msgstr ""
+msgstr "再スキャン"
 
 #: hwsight-gui/ui/app.slint:186
 msgid "Nothing matches."
-msgstr ""
+msgstr "一致するものがありません。"
 
 #: hwsight-gui/ui/app.slint:205
 msgid "Only problems"
-msgstr ""
+msgstr "問題のみ"
 
 #: hwsight-gui/ui/components/details-panel.slint:21
 msgid "Select a device to see its details"
-msgstr ""
+msgstr "デバイスを選択すると詳細が表示されます"
 
 #: hwsight-gui/ui/components/details-panel.slint:57
 msgid "WHAT IT DOES"
-msgstr ""
+msgstr "機能"
 
 #: hwsight-gui/ui/components/details-panel.slint:79
 msgid "What's wrong"
-msgstr ""
+msgstr "問題"
 
 #: hwsight-gui/ui/components/details-panel.slint:98
 msgid "How to fix"
-msgstr ""
+msgstr "解決方法"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copied"
-msgstr ""
+msgstr "コピーしました"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copy for a forum post"
-msgstr ""
+msgstr "フォーラム用にコピー"
 
 #: hwsight-gui/ui/components/details-panel.slint:154
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr ""
+msgstr "システムメッセージ: Copies a short report about this device. Your user name and computer name are removed."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
-msgstr ""
+msgstr "詳細"
 
 #: hwsight-gui/ui/components/details-panel.slint:177
 msgid "Type"
-msgstr ""
+msgstr "種類"
 
 #: hwsight-gui/ui/components/details-panel.slint:187
 msgid "Driver"
-msgstr ""
+msgstr "ドライバー"
 
 #: hwsight-gui/ui/components/details-panel.slint:189
 msgid "None"
-msgstr ""
+msgstr "なし"
 
 #: hwsight-gui/ui/components/details-panel.slint:197
 msgid "Hardware ID"
-msgstr ""
+msgstr "ハードウェア ID"
 
 #: hwsight-gui/ui/components/details-panel.slint:207
 msgid "Connection"
-msgstr ""
+msgstr "接続"
 
 #: hwsight-gui/ui/components/details-panel.slint:217
 msgid "Address"
-msgstr ""
+msgstr "アドレス"
 
 #: hwsight-gui/ui/components/details-panel.slint:228
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr ""
+msgstr "システムメッセージ: This device isn't in the device database yet. Its hardware ID above can be searched for online."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
-msgstr ""
+msgstr "知っておくと便利"
 
 #: hwsight-gui/ui/components/search-box.slint:27
 msgid "Search devices"
-msgstr ""
+msgstr "デバイスを検索"
 
 #: hwsight-gui/ui/components/update-banner.slint:34
 msgid "Update now"
-msgstr ""
+msgstr "今すぐ更新"
 
 #: hwsight-gui/ui/components/update-banner.slint:38
 msgid "Updating..."
-msgstr ""
+msgstr "更新中…"
 
 #: hwsight-gui/ui/components/update-banner.slint:44
 msgid "Restart"
-msgstr ""
+msgstr "再起動"
 
 msgid "hwsight {} is installed. Restart hwsight to use it."
-msgstr ""
+msgstr "hwsight {} をインストールしました。hwsight を再起動して使用してください。"
 
 msgid "The update was cancelled."
-msgstr ""
+msgstr "更新をキャンセルしました。"
 
 msgid "hwsight is up to date."
-msgstr ""
+msgstr "hwsight は最新です。"
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr ""
+msgstr "システムメッセージ: This copy of hwsight is updated through your package manager or from {}."
 
 msgid "Couldn't update hwsight: {}"
-msgstr ""
+msgstr "hwsight を更新できませんでした: {}"
 
 msgid "Graphics"
-msgstr ""
+msgstr "グラフィック"
 
 msgid "Sound"
-msgstr ""
+msgstr "サウンド"
 
 msgid "Network"
-msgstr ""
+msgstr "ネットワーク"
 
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 msgid "Storage"
-msgstr ""
+msgstr "ストレージ"
 
 msgid "USB controllers and hubs"
-msgstr ""
+msgstr "USB コントローラーとハブ"
 
 msgid "Thunderbolt"
-msgstr ""
+msgstr "Thunderbolt"
 
 msgid "Input devices"
-msgstr ""
+msgstr "入力デバイス"
 
 msgid "Cameras"
-msgstr ""
+msgstr "カメラ"
 
 msgid "Printers and scanners"
-msgstr ""
+msgstr "プリンターとスキャナー"
 
 msgid "Modems and serial ports"
-msgstr ""
+msgstr "モデムとシリアルポート"
 
 msgid "Security and encryption"
-msgstr ""
+msgstr "セキュリティと暗号化"
 
 msgid "AI and compute accelerators"
-msgstr ""
+msgstr "AI と計算アクセラレーター"
 
 msgid "Processors"
-msgstr ""
+msgstr "プロセッサー"
 
 msgid "System devices"
-msgstr ""
+msgstr "システムデバイス"
 
 msgid "Other devices"
-msgstr ""
+msgstr "その他のデバイス"
 
 msgid "graphics device"
-msgstr ""
+msgstr "グラフィックデバイス"
 
 msgid "sound device"
-msgstr ""
+msgstr "サウンドデバイス"
 
 msgid "network device"
-msgstr ""
+msgstr "ネットワークデバイス"
 
 msgid "Bluetooth device"
-msgstr ""
+msgstr "Bluetooth デバイス"
 
 msgid "storage device"
-msgstr ""
+msgstr "ストレージデバイス"
 
 msgid "hub"
-msgstr ""
+msgstr "ハブ"
 
 msgid "Thunderbolt device"
-msgstr ""
+msgstr "Thunderbolt デバイス"
 
 msgid "input device"
-msgstr ""
+msgstr "入力デバイス"
 
 msgid "camera"
-msgstr ""
+msgstr "カメラ"
 
 msgid "printer or scanner"
-msgstr ""
+msgstr "プリンターまたはスキャナー"
 
 msgid "modem or serial device"
-msgstr ""
+msgstr "モデムまたはシリアルデバイス"
 
 msgid "security device"
-msgstr ""
+msgstr "セキュリティデバイス"
 
 msgid "accelerator"
-msgstr ""
+msgstr "アクセラレーター"
 
 msgid "processor"
-msgstr ""
+msgstr "プロセッサー"
 
 msgid "system device"
-msgstr ""
+msgstr "システムデバイス"
 
 msgid "device"
-msgstr ""
+msgstr "デバイス"
 
 msgid "Working"
-msgstr ""
+msgstr "正常"
 
 msgid "Working (no driver needed)"
-msgstr ""
+msgstr "正常（ドライバー不要）"
 
 msgid "Driver installed but not loaded"
-msgstr ""
+msgstr "ドライバーはインストール済みですが未読み込み"
 
 msgid "Driver loaded but not using this device"
-msgstr ""
+msgstr "ドライバーは読み込み済みですがこのデバイスを使用していません"
 
 msgid "Driver loaded, but the device isn't ready"
-msgstr ""
+msgstr "ドライバーは読み込み済みですがデバイスの準備ができていません"
 
 msgid "Driver turned off by a setting"
-msgstr ""
+msgstr "設定でドライバーが無効です"
 
 msgid "No driver"
-msgstr ""
+msgstr "ドライバーなし"
 
 msgid "Reserved for a virtual machine"
-msgstr ""
+msgstr "仮想マシン用に予約済み"
 
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr ""
+msgstr "システムメッセージ: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr ""
+msgstr "システムメッセージ: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr ""
+msgstr "システムメッセージ: The driver needs a firmware file that isn't installed: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "システムメッセージ: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "システムメッセージ: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr ""
+msgstr "システムメッセージ: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr ""
+msgstr "システムメッセージ: The {} driver couldn't start this device ({})."
 
 msgid "it wasn't allowed to"
-msgstr ""
+msgstr "システムメッセージ: it wasn't allowed to"
 
 msgid "a file it needs is missing"
-msgstr ""
+msgstr "システムメッセージ: a file it needs is missing"
 
 msgid "the device didn't respond correctly"
-msgstr ""
+msgstr "システムメッセージ: the device didn't respond correctly"
 
 msgid "the device was temporarily unavailable"
-msgstr ""
+msgstr "システムメッセージ: the device was temporarily unavailable"
 
 msgid "the computer ran out of memory for it"
-msgstr ""
+msgstr "システムメッセージ: the computer ran out of memory for it"
 
 msgid "the device was already in use"
-msgstr ""
+msgstr "システムメッセージ: the device was already in use"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr ""
+msgstr "システムメッセージ: the device wasn't found when the driver looked for it"
 
 msgid "the device sent something the driver didn't expect"
-msgstr ""
+msgstr "システムメッセージ: the device sent something the driver didn't expect"
 
 msgid "the device stopped responding"
-msgstr ""
+msgstr "システムメッセージ: the device stopped responding"
 
 msgid "the connection kept failing"
-msgstr ""
+msgstr "システムメッセージ: the connection kept failing"
 
 msgid "this device model isn't supported by the driver"
-msgstr ""
+msgstr "システムメッセージ: this device model isn't supported by the driver"
 
 msgid "the device didn't respond in time"
-msgstr ""
+msgstr "システムメッセージ: the device didn't respond in time"
 
 msgid "it was waiting on another part that never became ready"
-msgstr ""
+msgstr "システムメッセージ: it was waiting on another part that never became ready"
 
 msgid "an unexpected error"
-msgstr ""
+msgstr "システムメッセージ: an unexpected error"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr ""
+msgstr "システムメッセージ: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr ""
+msgstr "システムメッセージ: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr ""
+msgstr "システムメッセージ: Couldn't read the USB device list: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr ""
+msgstr "システムメッセージ: Couldn't read the PCI device list: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr ""
+msgstr "システムメッセージ: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr ""
+msgstr "システムメッセージ: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 
 msgid "USB bus {}, port {}"
-msgstr ""
+msgstr "システムメッセージ: USB bus {}, port {}"
 
 msgid "{}, then hub port {}"
-msgstr ""
+msgstr "システムメッセージ: {}, then hub port {}"
 
 msgid "Unknown {} {}"
-msgstr ""
+msgstr "システムメッセージ: Unknown {} {}"
 
 msgid "Unknown {}"
-msgstr ""
+msgstr "システムメッセージ: Unknown {}"
 
 msgid "Data updates aren't available in this version."
-msgstr ""
+msgstr "このバージョンではデータ更新を利用できません。"
 
 msgid "Couldn't download the update: {}"
-msgstr ""
+msgstr "更新をダウンロードできませんでした: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr ""
+msgstr "システムメッセージ: The downloaded update failed its security check, so it wasn't installed."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr ""
+msgstr "システムメッセージ: A data update needs a newer version of hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr ""
+msgstr "システムメッセージ: The downloaded update was damaged ({}), so it wasn't installed."
 
 msgid "Couldn't save the update: {}"
-msgstr ""
+msgstr "システムメッセージ: Couldn't save the update: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr ""
+msgstr "システムメッセージ: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 
 msgid "USB device"
-msgstr ""
+msgstr "システムメッセージ: USB device"
 
 msgid "{} {}"
-msgstr ""
+msgstr "システムメッセージ: {} {}"
 
 msgid "USB {}"
-msgstr ""
+msgstr "システムメッセージ: USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr ""
+msgstr "システムメッセージ: hwsight {} is available (you have {}). Run hwsight --update to install it."
 
 msgid "hwsight {} is the newest version."
-msgstr ""
+msgstr "システムメッセージ: hwsight {} is the newest version."
 
 msgid "Couldn't check for updates: {}"
-msgstr ""
+msgstr "システムメッセージ: Couldn't check for updates: {}"
 
 msgid "Couldn't find where hwsight is installed."
-msgstr ""
+msgstr "hwsight のインストール場所が見つかりません。"
 
 msgid "{}, driver: {}"
-msgstr ""
+msgstr "システムメッセージ: {}, driver: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr ""
+msgstr "システムメッセージ: {}, {} blocked in {}"
 
 msgid "{}, available: {}"
-msgstr ""
+msgstr "システムメッセージ: {}, available: {}"
 
 msgid "{}, not in the device database yet"
-msgstr ""
+msgstr "システムメッセージ: {}, not in the device database yet"
 
 msgid "Why:"
-msgstr ""
+msgstr "理由："
 
 msgid "The driver is loaded, but no {} was created."
-msgstr ""
+msgstr "システムメッセージ: The driver is loaded, but no {} was created."
 
 msgid "Fix:"
-msgstr ""
+msgstr "対処："
 
 msgid "Fix {}:"
-msgstr ""
+msgstr "システムメッセージ: Fix {}:"
 
 msgid "USB ports"
-msgstr ""
+msgstr "USB ポート"
 
 msgid "No devices found."
-msgstr ""
+msgstr "デバイスが見つかりません。"
 
 msgid "No problems found."
-msgstr ""
+msgstr "問題はありません。"
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] ""
+msgstr[0] "1 台のデバイス"
 
 msgid "{}, no problems found."
-msgstr ""
+msgstr "システムメッセージ: {}, no problems found."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] ""
+msgstr[0] "1 件の問題"
 
 msgid "{}, {}."
-msgstr ""
+msgstr "システムメッセージ: {}, {}."
 
 msgid "Note: {}"
-msgstr ""
+msgstr "注: {}"
 
 msgid "Device data is up to date."
-msgstr ""
+msgstr "デバイスデータは最新です。"
 
 msgid "Updated {} to {}"
-msgstr ""
+msgstr "{} を {} に更新しました"
 
 msgid "hwsight {} is available."
-msgstr ""
+msgstr "システムメッセージ: hwsight {} is available."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr ""
+msgstr "システムメッセージ: hwsight {} is available. Update it with your package manager, or download it from the website."
 
 msgid "No devices found"
-msgstr ""
+msgstr "システムメッセージ: No devices found"
 
 msgid "{}, no problems found"
-msgstr ""
+msgstr "システムメッセージ: {}, no problems found"
 
 msgid "{}, {}"
-msgstr ""
+msgstr "システムメッセージ: {}, {}"
 
 msgid "{}: {}"
-msgstr ""
+msgstr "システムメッセージ: {}: {}"
 
 msgid "PCI"
-msgstr ""
+msgstr "システムメッセージ: PCI"
 
 msgid "USB"
-msgstr ""
+msgstr "システムメッセージ: USB"
 
 msgid "Other"
-msgstr ""
+msgstr "システムメッセージ: Other"

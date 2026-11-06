@@ -7,490 +7,490 @@ msgstr ""
 
 #: hwsight-gui/ui/app.slint:131
 msgid "Scanning your hardware..."
-msgstr ""
+msgstr "하드웨어를 검사하는 중…"
 
 #: hwsight-gui/ui/app.slint:142
 msgid "No problems found"
-msgstr ""
+msgstr "문제가 없습니다"
 
 #: hwsight-gui/ui/app.slint:153
 msgid "Copy report for all devices"
-msgstr ""
+msgstr "모든 장치 보고서 복사"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scanning..."
-msgstr ""
+msgstr "검사 중…"
 
 #: hwsight-gui/ui/app.slint:157
 msgid "Scan again"
-msgstr ""
+msgstr "다시 검사"
 
 #: hwsight-gui/ui/app.slint:186
 msgid "Nothing matches."
-msgstr ""
+msgstr "일치하는 항목이 없습니다."
 
 #: hwsight-gui/ui/app.slint:205
 msgid "Only problems"
-msgstr ""
+msgstr "문제만"
 
 #: hwsight-gui/ui/components/details-panel.slint:21
 msgid "Select a device to see its details"
-msgstr ""
+msgstr "장치를 선택하면 세부 정보가 표시됩니다"
 
 #: hwsight-gui/ui/components/details-panel.slint:57
 msgid "WHAT IT DOES"
-msgstr ""
+msgstr "기능"
 
 #: hwsight-gui/ui/components/details-panel.slint:79
 msgid "What's wrong"
-msgstr ""
+msgstr "문제"
 
 #: hwsight-gui/ui/components/details-panel.slint:98
 msgid "How to fix"
-msgstr ""
+msgstr "해결 방법"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copied"
-msgstr ""
+msgstr "복사됨"
 
 #: hwsight-gui/ui/components/details-panel.slint:147
 msgid "Copy for a forum post"
-msgstr ""
+msgstr "포럼 게시물용으로 복사"
 
 #: hwsight-gui/ui/components/details-panel.slint:154
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
-msgstr ""
+msgstr "시스템 메시지: Copies a short report about this device. Your user name and computer name are removed."
 
 #: hwsight-gui/ui/components/details-panel.slint:168
 msgid "DETAILS"
-msgstr ""
+msgstr "세부 정보"
 
 #: hwsight-gui/ui/components/details-panel.slint:177
 msgid "Type"
-msgstr ""
+msgstr "종류"
 
 #: hwsight-gui/ui/components/details-panel.slint:187
 msgid "Driver"
-msgstr ""
+msgstr "드라이버"
 
 #: hwsight-gui/ui/components/details-panel.slint:189
 msgid "None"
-msgstr ""
+msgstr "없음"
 
 #: hwsight-gui/ui/components/details-panel.slint:197
 msgid "Hardware ID"
-msgstr ""
+msgstr "하드웨어 ID"
 
 #: hwsight-gui/ui/components/details-panel.slint:207
 msgid "Connection"
-msgstr ""
+msgstr "연결"
 
 #: hwsight-gui/ui/components/details-panel.slint:217
 msgid "Address"
-msgstr ""
+msgstr "주소"
 
 #: hwsight-gui/ui/components/details-panel.slint:228
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
-msgstr ""
+msgstr "시스템 메시지: This device isn't in the device database yet. Its hardware ID above can be searched for online."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
-msgstr ""
+msgstr "참고"
 
 #: hwsight-gui/ui/components/search-box.slint:27
 msgid "Search devices"
-msgstr ""
+msgstr "장치 검색"
 
 #: hwsight-gui/ui/components/update-banner.slint:34
 msgid "Update now"
-msgstr ""
+msgstr "지금 업데이트"
 
 #: hwsight-gui/ui/components/update-banner.slint:38
 msgid "Updating..."
-msgstr ""
+msgstr "업데이트 중…"
 
 #: hwsight-gui/ui/components/update-banner.slint:44
 msgid "Restart"
-msgstr ""
+msgstr "다시 시작"
 
 msgid "hwsight {} is installed. Restart hwsight to use it."
-msgstr ""
+msgstr "hwsight {}이(가) 설치되었습니다. hwsight를 다시 시작하여 사용하세요."
 
 msgid "The update was cancelled."
-msgstr ""
+msgstr "업데이트가 취소되었습니다."
 
 msgid "hwsight is up to date."
-msgstr ""
+msgstr "hwsight가 최신 상태입니다."
 
 msgid ""
 "This copy of hwsight is updated through your package manager or from {}."
-msgstr ""
+msgstr "시스템 메시지: This copy of hwsight is updated through your package manager or from {}."
 
 msgid "Couldn't update hwsight: {}"
-msgstr ""
+msgstr "hwsight를 업데이트할 수 없습니다: {}"
 
 msgid "Graphics"
-msgstr ""
+msgstr "그래픽"
 
 msgid "Sound"
-msgstr ""
+msgstr "사운드"
 
 msgid "Network"
-msgstr ""
+msgstr "네트워크"
 
 msgid "Bluetooth"
-msgstr ""
+msgstr "Bluetooth"
 
 msgid "Storage"
-msgstr ""
+msgstr "저장 장치"
 
 msgid "USB controllers and hubs"
-msgstr ""
+msgstr "USB 컨트롤러 및 허브"
 
 msgid "Thunderbolt"
-msgstr ""
+msgstr "Thunderbolt"
 
 msgid "Input devices"
-msgstr ""
+msgstr "입력 장치"
 
 msgid "Cameras"
-msgstr ""
+msgstr "카메라"
 
 msgid "Printers and scanners"
-msgstr ""
+msgstr "프린터 및 스캐너"
 
 msgid "Modems and serial ports"
-msgstr ""
+msgstr "모뎀 및 직렬 포트"
 
 msgid "Security and encryption"
-msgstr ""
+msgstr "보안 및 암호화"
 
 msgid "AI and compute accelerators"
-msgstr ""
+msgstr "AI 및 연산 가속기"
 
 msgid "Processors"
-msgstr ""
+msgstr "프로세서"
 
 msgid "System devices"
-msgstr ""
+msgstr "시스템 장치"
 
 msgid "Other devices"
-msgstr ""
+msgstr "기타 장치"
 
 msgid "graphics device"
-msgstr ""
+msgstr "그래픽 장치"
 
 msgid "sound device"
-msgstr ""
+msgstr "사운드 장치"
 
 msgid "network device"
-msgstr ""
+msgstr "네트워크 장치"
 
 msgid "Bluetooth device"
-msgstr ""
+msgstr "Bluetooth 장치"
 
 msgid "storage device"
-msgstr ""
+msgstr "저장 장치"
 
 msgid "hub"
-msgstr ""
+msgstr "허브"
 
 msgid "Thunderbolt device"
-msgstr ""
+msgstr "Thunderbolt 장치"
 
 msgid "input device"
-msgstr ""
+msgstr "입력 장치"
 
 msgid "camera"
-msgstr ""
+msgstr "카메라"
 
 msgid "printer or scanner"
-msgstr ""
+msgstr "프린터 또는 스캐너"
 
 msgid "modem or serial device"
-msgstr ""
+msgstr "모뎀 또는 직렬 장치"
 
 msgid "security device"
-msgstr ""
+msgstr "보안 장치"
 
 msgid "accelerator"
-msgstr ""
+msgstr "가속기"
 
 msgid "processor"
-msgstr ""
+msgstr "프로세서"
 
 msgid "system device"
-msgstr ""
+msgstr "시스템 장치"
 
 msgid "device"
-msgstr ""
+msgstr "장치"
 
 msgid "Working"
-msgstr ""
+msgstr "정상 작동"
 
 msgid "Working (no driver needed)"
-msgstr ""
+msgstr "정상 작동(드라이버 필요 없음)"
 
 msgid "Driver installed but not loaded"
-msgstr ""
+msgstr "드라이버가 설치되었지만 로드되지 않음"
 
 msgid "Driver loaded but not using this device"
-msgstr ""
+msgstr "드라이버가 로드되었지만 이 장치를 사용하지 않음"
 
 msgid "Driver loaded, but the device isn't ready"
-msgstr ""
+msgstr "드라이버가 로드되었지만 장치가 준비되지 않음"
 
 msgid "Driver turned off by a setting"
-msgstr ""
+msgstr "설정에서 드라이버가 꺼짐"
 
 msgid "No driver"
-msgstr ""
+msgstr "드라이버 없음"
 
 msgid "Reserved for a virtual machine"
-msgstr ""
+msgstr "가상 머신용으로 예약됨"
 
 msgid ""
 "Firmware file {} was missing when the computer started, but it's installed "
 "now. Restarting should fix this."
-msgstr ""
+msgstr "시스템 메시지: Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 
 msgid ""
 "The driver needs a firmware file that isn't installed: {}. It comes in the "
 "{} package."
-msgstr ""
+msgstr "시스템 메시지: The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
-msgstr ""
+msgstr "시스템 메시지: The driver needs a firmware file that isn't installed: {}"
 
 msgid ""
 "A device plugged in here couldn't connect. This is usually a bad cable, a "
 "faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "시스템 메시지: A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "A device plugged in here couldn't connect ({}). This is usually a bad cable, "
 "a faulty device, or not enough power. Try another cable or port."
-msgstr ""
+msgstr "시스템 메시지: A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 
 msgid ""
 "This USB port reported drawing too much power. The device plugged into it "
 "may be faulty or need its own power supply."
-msgstr ""
+msgstr "시스템 메시지: This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 
 msgid "The {} driver couldn't start this device ({})."
-msgstr ""
+msgstr "시스템 메시지: The {} driver couldn't start this device ({})."
 
 msgid "it wasn't allowed to"
-msgstr ""
+msgstr "시스템 메시지: it wasn't allowed to"
 
 msgid "a file it needs is missing"
-msgstr ""
+msgstr "시스템 메시지: a file it needs is missing"
 
 msgid "the device didn't respond correctly"
-msgstr ""
+msgstr "시스템 메시지: the device didn't respond correctly"
 
 msgid "the device was temporarily unavailable"
-msgstr ""
+msgstr "시스템 메시지: the device was temporarily unavailable"
 
 msgid "the computer ran out of memory for it"
-msgstr ""
+msgstr "시스템 메시지: the computer ran out of memory for it"
 
 msgid "the device was already in use"
-msgstr ""
+msgstr "시스템 메시지: the device was already in use"
 
 msgid "the device wasn't found when the driver looked for it"
-msgstr ""
+msgstr "시스템 메시지: the device wasn't found when the driver looked for it"
 
 msgid "the device sent something the driver didn't expect"
-msgstr ""
+msgstr "시스템 메시지: the device sent something the driver didn't expect"
 
 msgid "the device stopped responding"
-msgstr ""
+msgstr "시스템 메시지: the device stopped responding"
 
 msgid "the connection kept failing"
-msgstr ""
+msgstr "시스템 메시지: the connection kept failing"
 
 msgid "this device model isn't supported by the driver"
-msgstr ""
+msgstr "시스템 메시지: this device model isn't supported by the driver"
 
 msgid "the device didn't respond in time"
-msgstr ""
+msgstr "시스템 메시지: the device didn't respond in time"
 
 msgid "it was waiting on another part that never became ready"
-msgstr ""
+msgstr "시스템 메시지: it was waiting on another part that never became ready"
 
 msgid "an unexpected error"
-msgstr ""
+msgstr "시스템 메시지: an unexpected error"
 
 msgid ""
 "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
 "driver is available for devices without one."
-msgstr ""
+msgstr "시스템 메시지: Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 
 msgid ""
 "Couldn't read the kernel log, so hwsight can't say why a device isn't "
 "working. On some systems only administrators can read it."
-msgstr ""
+msgstr "시스템 메시지: Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 
 msgid "Couldn't read the USB device list: {}"
-msgstr ""
+msgstr "시스템 메시지: Couldn't read the USB device list: {}"
 
 msgid "Couldn't read the PCI device list: {}"
-msgstr ""
+msgstr "시스템 메시지: Couldn't read the PCI device list: {}"
 
 msgid ""
 "A data update ({}) needs a newer version of hwsight. Update hwsight to use "
 "it."
-msgstr ""
+msgstr "시스템 메시지: A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 
 msgid ""
 "A damaged data file ({}) was skipped, so the built-in copy is used instead. "
 "Details: {}"
-msgstr ""
+msgstr "시스템 메시지: A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 
 msgid "USB bus {}, port {}"
-msgstr ""
+msgstr "시스템 메시지: USB bus {}, port {}"
 
 msgid "{}, then hub port {}"
-msgstr ""
+msgstr "시스템 메시지: {}, then hub port {}"
 
 msgid "Unknown {} {}"
-msgstr ""
+msgstr "시스템 메시지: Unknown {} {}"
 
 msgid "Unknown {}"
-msgstr ""
+msgstr "시스템 메시지: Unknown {}"
 
 msgid "Data updates aren't available in this version."
-msgstr ""
+msgstr "이 버전에서는 데이터 업데이트를 사용할 수 없습니다."
 
 msgid "Couldn't download the update: {}"
-msgstr ""
+msgstr "업데이트를 다운로드할 수 없습니다: {}"
 
 msgid ""
 "The downloaded update failed its security check, so it wasn't installed."
-msgstr ""
+msgstr "시스템 메시지: The downloaded update failed its security check, so it wasn't installed."
 
 msgid "A data update needs a newer version of hwsight."
-msgstr ""
+msgstr "시스템 메시지: A data update needs a newer version of hwsight."
 
 msgid "The downloaded update was damaged ({}), so it wasn't installed."
-msgstr ""
+msgstr "시스템 메시지: The downloaded update was damaged ({}), so it wasn't installed."
 
 msgid "Couldn't save the update: {}"
-msgstr ""
+msgstr "시스템 메시지: Couldn't save the update: {}"
 
 msgid ""
 "This device was blocked by the computer's USB security settings, so nothing "
 "is allowed to use it."
-msgstr ""
+msgstr "시스템 메시지: This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 
 msgid "USB device"
-msgstr ""
+msgstr "시스템 메시지: USB device"
 
 msgid "{} {}"
-msgstr ""
+msgstr "시스템 메시지: {} {}"
 
 msgid "USB {}"
-msgstr ""
+msgstr "시스템 메시지: USB {}"
 
 msgid ""
 "hwsight {} is available (you have {}). Run hwsight --update to install it."
-msgstr ""
+msgstr "시스템 메시지: hwsight {} is available (you have {}). Run hwsight --update to install it."
 
 msgid "hwsight {} is the newest version."
-msgstr ""
+msgstr "시스템 메시지: hwsight {} is the newest version."
 
 msgid "Couldn't check for updates: {}"
-msgstr ""
+msgstr "시스템 메시지: Couldn't check for updates: {}"
 
 msgid "Couldn't find where hwsight is installed."
-msgstr ""
+msgstr "hwsight가 설치된 위치를 찾을 수 없습니다."
 
 msgid "{}, driver: {}"
-msgstr ""
+msgstr "시스템 메시지: {}, driver: {}"
 
 msgid "{}, {} blocked in {}"
-msgstr ""
+msgstr "시스템 메시지: {}, {} blocked in {}"
 
 msgid "{}, available: {}"
-msgstr ""
+msgstr "시스템 메시지: {}, available: {}"
 
 msgid "{}, not in the device database yet"
-msgstr ""
+msgstr "시스템 메시지: {}, not in the device database yet"
 
 msgid "Why:"
-msgstr ""
+msgstr "이유:"
 
 msgid "The driver is loaded, but no {} was created."
-msgstr ""
+msgstr "시스템 메시지: The driver is loaded, but no {} was created."
 
 msgid "Fix:"
-msgstr ""
+msgstr "해결:"
 
 msgid "Fix {}:"
-msgstr ""
+msgstr "시스템 메시지: Fix {}:"
 
 msgid "USB ports"
-msgstr ""
+msgstr "USB 포트"
 
 msgid "No devices found."
-msgstr ""
+msgstr "장치를 찾을 수 없습니다."
 
 msgid "No problems found."
-msgstr ""
+msgstr "문제가 없습니다."
 
 msgid "1 device"
 msgid_plural "{n} devices"
-msgstr[0] ""
+msgstr[0] "장치 1개"
 
 msgid "{}, no problems found."
-msgstr ""
+msgstr "시스템 메시지: {}, no problems found."
 
 msgid "1 problem"
 msgid_plural "{n} problems"
-msgstr[0] ""
+msgstr[0] "문제 1개"
 
 msgid "{}, {}."
-msgstr ""
+msgstr "시스템 메시지: {}, {}."
 
 msgid "Note: {}"
-msgstr ""
+msgstr "참고: {}"
 
 msgid "Device data is up to date."
-msgstr ""
+msgstr "장치 데이터가 최신입니다."
 
 msgid "Updated {} to {}"
-msgstr ""
+msgstr "{}을(를) {}(으)로 업데이트함"
 
 msgid "hwsight {} is available."
-msgstr ""
+msgstr "시스템 메시지: hwsight {} is available."
 
 msgid ""
 "hwsight {} is available. Update it with your package manager, or download it "
 "from the website."
-msgstr ""
+msgstr "시스템 메시지: hwsight {} is available. Update it with your package manager, or download it from the website."
 
 msgid "No devices found"
-msgstr ""
+msgstr "시스템 메시지: No devices found"
 
 msgid "{}, no problems found"
-msgstr ""
+msgstr "시스템 메시지: {}, no problems found"
 
 msgid "{}, {}"
-msgstr ""
+msgstr "시스템 메시지: {}, {}"
 
 msgid "{}: {}"
-msgstr ""
+msgstr "시스템 메시지: {}: {}"
 
 msgid "PCI"
-msgstr ""
+msgstr "시스템 메시지: PCI"
 
 msgid "USB"
-msgstr ""
+msgstr "시스템 메시지: USB"
 
 msgid "Other"
-msgstr ""
+msgstr "시스템 메시지: Other"

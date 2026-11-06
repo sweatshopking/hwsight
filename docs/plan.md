@@ -1372,6 +1372,10 @@ Order (each task starts only after the one before is reviewed):
    (it changes the system: confirmations, reboots for BIOS capsules, polkit).
 8. **Claude:** port DriveDeck's bug report when it's finished.
 9. **Claude:** packaging (deb, rpm, AppImage) and the first release.
+   Includes the **app icon** (owner, 2026-11-06: KDE currently shows WPS Office's "W"
+   because there is none): an SVG in the Sweet style (navy, purple-to-pink glow), the
+   window icon set in `app.slint`, and a `.desktop` file with `Icon=hwsight` and
+   `StartupWMClass` matching the window's app id, installed by every package.
 
 ## Copilot 13: mark every user-facing text for translation
 
