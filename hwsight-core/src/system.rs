@@ -1,4 +1,5 @@
-//! The parts of the computer that aren't plugged in: memory and the motherboard.
+//! The parts of the computer that aren't plugged in: the processor, memory, and the
+//! motherboard.
 
 use std::fs;
 use std::path::PathBuf;
@@ -17,6 +18,12 @@ pub struct SystemPaths {
     pub spd_dir: PathBuf,
     /// Exists when the computer started in UEFI mode.
     pub efi_dir: PathBuf,
+    /// `/sys/devices/system/cpu`: the processor's cores, caches, and speed settings.
+    pub cpu_dir: PathBuf,
+    /// `/proc/cpuinfo`: the processor's name and features.
+    pub cpuinfo: PathBuf,
+    /// `/sys/class/hwmon`: the kernel's temperature sensors.
+    pub hwmon_dir: PathBuf,
 }
 
 impl SystemPaths {
@@ -26,6 +33,9 @@ impl SystemPaths {
             udev_dmi_data: PathBuf::from("/run/udev/data/+dmi:id"),
             spd_dir: PathBuf::from("/sys/bus/i2c/drivers/spd5118"),
             efi_dir: PathBuf::from("/sys/firmware/efi"),
+            cpu_dir: PathBuf::from("/sys/devices/system/cpu"),
+            cpuinfo: PathBuf::from("/proc/cpuinfo"),
+            hwmon_dir: PathBuf::from("/sys/class/hwmon"),
         }
     }
 
@@ -37,6 +47,9 @@ impl SystemPaths {
             udev_dmi_data: nowhere.join("udev-dmi"),
             spd_dir: nowhere.join("spd"),
             efi_dir: nowhere.join("efi"),
+            cpu_dir: nowhere.join("cpu"),
+            cpuinfo: nowhere.join("cpuinfo"),
+            hwmon_dir: nowhere.join("hwmon"),
         }
     }
 }
@@ -64,6 +77,11 @@ pub(crate) fn clean(value: Option<&String>) -> Option<String> {
 /// The memory and the motherboard, when the firmware tells us about them.
 pub(crate) fn scan(paths: &SystemPaths, descriptions: &Descriptions) -> Vec<Device> {
     let mut devices = Vec::new();
+    devices.extend(crate::cpu::device(
+        &paths.cpu_dir,
+        &paths.cpuinfo,
+        &paths.hwmon_dir,
+    ));
     if let Ok(data) = fs::read_to_string(&paths.udev_dmi_data) {
         let spds = crate::spd::read_all(&paths.spd_dir);
         devices.extend(crate::memory::device(

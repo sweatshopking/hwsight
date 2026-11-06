@@ -316,6 +316,37 @@ fn resources(path: &Path) -> Vec<Detail> {
             )
             .technical(),
         );
+        // The group's other members decide whether this device can be passed to a
+        // virtual machine on its own (idea from Chassis, GPL-3.0).
+        let mut others: Vec<String> = fs::read_dir(path.join("iommu_group/devices"))
+            .map(|entries| {
+                entries
+                    .filter_map(Result::ok)
+                    .map(|e| e.file_name().to_string_lossy().into_owned())
+                    .collect()
+            })
+            .unwrap_or_default();
+        others.sort();
+        others.retain(|name| {
+            path.file_name()
+                .is_none_or(|own| own.to_string_lossy() != *name)
+        });
+        if !others.is_empty() {
+            items.push(
+                Detail::new(
+                    crate::tr!("Shares its IOMMU group with"),
+                    others.join(", "),
+                    source(path, "iommu_group/devices"),
+                )
+                .verdict(
+                    Verdict::Info,
+                    Some(crate::tr!(
+                        "To pass this device to a virtual machine, these have to be passed along with it."
+                    )),
+                )
+                .technical(),
+            );
+        }
     }
     if let Some(node) = read(path, "numa_node").and_then(|t| t.parse::<i32>().ok())
         && node >= 0
@@ -513,7 +544,10 @@ mod tests {
                  0x00000000f7000000 0x00000000f707ffff 0x0000000000000200\n",
             ),
         ]);
-        fs::create_dir_all(temp.path().join("groups/14")).expect("mkdir");
+        fs::create_dir_all(temp.path().join("groups/14/devices")).expect("mkdir");
+        fs::write(temp.path().join("groups/14/devices/0000:01:00.1"), "").expect("write");
+        let own_name = temp.path().file_name().expect("name").to_owned();
+        fs::write(temp.path().join("groups/14/devices").join(own_name), "").expect("write");
         std::os::unix::fs::symlink(
             temp.path().join("groups/14"),
             temp.path().join("iommu_group"),
@@ -527,6 +561,11 @@ mod tests {
         );
         assert_eq!(item(&groups, "Interrupt (IRQ)").value, "168");
         assert_eq!(item(&groups, "IOMMU group").value, "14");
+        assert_eq!(
+            item(&groups, "Shares its IOMMU group with").value,
+            "0000:01:00.1",
+            "the group's other members, not the device itself"
+        );
         assert_eq!(item(&groups, "Memory window 0").value, "16 MiB");
         assert_eq!(item(&groups, "I/O ports window 2").value, "128 bytes");
         assert_eq!(item(&groups, "Memory window 3").value, "512 KiB");

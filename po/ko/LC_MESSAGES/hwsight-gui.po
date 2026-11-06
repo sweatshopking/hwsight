@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 04:45+0000\n"
+"POT-Creation-Date: 2026-11-06 05:03+0000\n"
 "Language: ko\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -184,6 +184,161 @@ msgid "Motherboard"
 msgstr ""
 
 msgid "BIOS"
+msgstr ""
+
+msgid "Level 1 data cache"
+msgstr ""
+
+msgid "Level 1 instruction cache"
+msgstr ""
+
+msgid "Level 2 cache"
+msgstr ""
+
+msgid "Level 3 cache"
+msgstr ""
+
+msgid "Performance (always fast)"
+msgstr ""
+
+msgid "Power saving"
+msgstr ""
+
+msgid "Balanced (speeds up when busy)"
+msgstr ""
+
+msgid "On"
+msgstr ""
+
+msgid "Off"
+msgstr ""
+
+msgid "Not available"
+msgstr ""
+
+msgid "The processor is set to save power and may be held at its slowest speed. Switching the power mode to balanced or performance in your system's power settings would make it faster."
+msgstr ""
+
+msgid "Power mode"
+msgstr ""
+
+msgid "The processor isn't allowed to go above its normal speed. This is usually a setting in the BIOS or in a power-saving tool."
+msgstr ""
+
+msgid "Speed boost"
+msgstr ""
+
+msgid "Hyper-threading (SMT)"
+msgstr ""
+
+msgid "Lets each core work on two tasks at once, which helps when many programs run together."
+msgstr ""
+
+msgid "Speed control driver"
+msgstr ""
+
+msgid "Energy preference"
+msgstr ""
+
+msgid "Lowest speed"
+msgstr ""
+
+msgid "{} known security weaknesses affect this processor. The system protects against all of them. Some of those protections cost a little speed."
+msgstr ""
+
+msgid "None left open"
+msgstr ""
+
+msgid "{} not fully protected"
+msgstr ""
+
+msgid "These are not fully fixed: {}. Updating the system, the BIOS, or the processor's microcode may help."
+msgstr ""
+
+msgid "Known processor weaknesses"
+msgstr ""
+
+msgid "Microcode version"
+msgstr ""
+
+msgid "The processor's built-in fixes, updated by the system or the BIOS."
+msgstr ""
+
+msgid "Temperature when scanned"
+msgstr ""
+
+msgid "Idle temperatures are usually 30 to 55 °C. Under heavy load many modern processors safely reach 90 °C or more."
+msgstr ""
+
+msgid "1 core"
+msgid_plural "{n} cores"
+msgstr[0] ""
+
+msgid "1 thread"
+msgid_plural "{n} threads"
+msgstr[0] ""
+
+msgid "Cores and threads"
+msgstr ""
+
+msgid "{}, {}"
+msgstr "{}, {}"
+
+msgid "More cores let the computer do more things at once. Threads are how many tasks it can work on at the same moment."
+msgstr ""
+
+msgid "Processor sockets"
+msgstr ""
+
+msgid "Core types"
+msgstr ""
+
+msgid "{} performance, {} efficiency"
+msgstr ""
+
+msgid "Performance cores are faster. Efficiency cores use less power for lighter work."
+msgstr ""
+
+msgid "Highest speed"
+msgstr ""
+
+msgid "The fastest this processor runs when it's busy. It runs slower when idle to save power."
+msgstr ""
+
+msgid "Virtualization"
+msgstr ""
+
+msgid "Available ({})"
+msgstr ""
+
+msgid "Lets virtual machines run at close to full speed."
+msgstr ""
+
+msgid "Either this processor can't do it, or it's turned off in the BIOS (look for SVM or VT-x). It's needed to run virtual machines quickly."
+msgstr ""
+
+msgid "Processor"
+msgstr ""
+
+msgid "Speed and power"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Caches"
+msgstr ""
+
+msgid "Instruction sets"
+msgstr ""
+
+msgid "Family, model, stepping"
+msgstr ""
+
+msgid "Identity"
+msgstr ""
+
+msgid "The processor (CPU), the computer's main brain. It does the thinking for every program you run. More cores let it do more at once; a higher speed makes each task faster."
 msgstr ""
 
 msgid "Graphics"
@@ -576,6 +731,12 @@ msgstr ""
 msgid "Devices in the same group can only be passed through to a virtual machine together."
 msgstr ""
 
+msgid "Shares its IOMMU group with"
+msgstr ""
+
+msgid "To pass this device to a virtual machine, these have to be passed along with it."
+msgstr ""
+
 msgid "NUMA node"
 msgstr ""
 
@@ -724,9 +885,6 @@ msgstr "장치를 찾을 수 없음"
 
 msgid "{}, no problems found"
 msgstr "{}, 문제가 없습니다"
-
-msgid "{}, {}"
-msgstr "{}, {}"
 
 msgid "{}: {}"
 msgstr "{}: {}"

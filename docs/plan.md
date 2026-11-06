@@ -1727,13 +1727,23 @@ rating (flagged only if more than 400 MT/s short), mixed models, and uneven stic
 channel. Serial numbers are never read. On this PC it finds 4800 running, 6000 rated,
 mixed 6400/6000 sticks, and A:1 B:2 channels.
 
+The processor is done as well (`cpu.rs`): cores and threads (counted from the topology,
+each shared cache once), highest speed, performance vs efficiency cores (cores more than
+20% slower than the fastest), virtualization, power mode (flagged only when "powersave"
+runs on a plain frequency driver), speed boost (AMD `boost` or Intel `no_turbo`), SMT, a
+plain verdict on the kernel's CPU vulnerability list, microcode, caches, instruction sets,
+and the temperature at scan time (Info only: a Ryzen idles hot-looking numbers and
+boosts to 95 C by design). PCI devices now also list which other devices share their
+IOMMU group (idea from Chassis).
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the
   readers can settle first; `every_language_is_complete` fails until then). Do it in one
   batch after the next readers land, and read the machine output properly (see
   CLAUDE.md "Lessons").
-- Readers still to write, using `docs/learn-from-qldm.md`: CPU, drives (NVMe/SATA health via
+- Readers still to write, using `docs/learn-from-qldm.md`: peripheral batteries (not
+  buildable here: this PC has no power_supply entries to test on), drives (NVMe/SATA health via
   UDisks2), battery, monitors (EDID), USB speed vs port, network link, audio, per-stick RAM
   temperature (hwmon under spd5118; needs a slot mapping), EXPO speed decode, ReBAR verdict.
 - GUI: the Details block (Driver / Hardware ID / Connection / Address) still shows

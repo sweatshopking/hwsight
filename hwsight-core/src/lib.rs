@@ -4,6 +4,7 @@
 
 pub mod app_update;
 mod board;
+mod cpu;
 pub mod data;
 pub mod data_text;
 pub mod descriptions;
