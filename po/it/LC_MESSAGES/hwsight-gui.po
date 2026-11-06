@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:13+0000\n"
+"POT-Creation-Date: 2026-11-06 07:18+0000\n"
 "Language: it\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -192,6 +192,12 @@ msgstr "Questa copia di hwsight viene aggiornata tramite il gestore pacchetti o 
 msgid "Couldn't update hwsight: {}"
 msgstr "Impossibile aggiornare hwsight: {}"
 
+msgid "Sound chip"
+msgstr ""
+
+msgid "Chip (codec)"
+msgstr ""
+
 msgid "Maker"
 msgstr ""
 
@@ -222,6 +228,39 @@ msgstr ""
 msgid "BIOS"
 msgstr ""
 
+msgid "On"
+msgstr ""
+
+msgid "Only signed, trusted software can start the computer. Some programs, such as certain anti-cheat systems and Windows 11, ask for it."
+msgstr ""
+
+msgid "Off (no keys set up)"
+msgstr ""
+
+msgid "Secure Boot has no keys enrolled yet, so it can't protect the boot. Some programs, such as certain anti-cheat systems and Windows 11, ask for it."
+msgstr ""
+
+msgid "Off"
+msgstr ""
+
+msgid "Anything can start the computer. That's fine for most people, but some programs, such as certain anti-cheat systems and Windows 11, ask for Secure Boot to be on."
+msgstr ""
+
+msgid "Secure Boot"
+msgstr ""
+
+msgid "Security chip (TPM)"
+msgstr ""
+
+msgid "Version {}"
+msgstr ""
+
+msgid "A chip that keeps encryption keys safe. Disk encryption and Windows 11 can use it."
+msgstr ""
+
+msgid "Boot security"
+msgstr ""
+
 msgid "Level 1 data cache"
 msgstr ""
 
@@ -241,12 +280,6 @@ msgid "Power saving"
 msgstr ""
 
 msgid "Balanced (speeds up when busy)"
-msgstr ""
-
-msgid "On"
-msgstr ""
-
-msgid "Off"
 msgstr ""
 
 msgid "Not available"
@@ -844,6 +877,39 @@ msgstr ""
 msgid "Firmware"
 msgstr ""
 
+msgid "{} GB"
+msgstr ""
+
+msgid "{} MB"
+msgstr ""
+
+msgid "Driver version"
+msgstr ""
+
+msgid "Driver type"
+msgstr ""
+
+msgid "Open kernel module"
+msgstr ""
+
+msgid "Proprietary kernel module"
+msgstr ""
+
+msgid "Video BIOS version"
+msgstr ""
+
+msgid "Video memory"
+msgstr ""
+
+msgid "Video memory in use"
+msgstr ""
+
+msgid "Graphics load"
+msgstr ""
+
+msgid "Graphics driver"
+msgstr ""
+
 msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "Il file firmware {} mancava all’avvio, ma ora è installato. Riavviare dovrebbe risolvere il problema."
 
@@ -1093,6 +1159,24 @@ msgstr ""
 msgid "Network connection"
 msgstr ""
 
+msgid "hwsight can show which Wi-Fi generation (4, 5, 6, or 7) your connection uses and whether your adapter could do better."
+msgstr ""
+
+msgid "hwsight can show your Wi-Fi band and connection speed."
+msgstr ""
+
+msgid "hwsight can show firmware versions and tell you when drives, receivers, and other devices have updates."
+msgstr ""
+
+msgid "hwsight can show your drives' temperature, hours of use, and whether they're failing."
+msgstr ""
+
+msgid "{} To turn this on, install {}: {}"
+msgstr ""
+
+msgid "{} To turn this on, install {} with your system's package manager."
+msgstr ""
+
 msgid "Unknown {} {}"
 msgstr "{} {} sconosciuto"
 
@@ -1192,12 +1276,6 @@ msgstr ""
 msgid "Which group of processor cores and memory this device sits closest to."
 msgstr ""
 
-msgid "{} GB"
-msgstr ""
-
-msgid "{} MB"
-msgstr ""
-
 msgid "Resizable BAR"
 msgstr ""
 
@@ -1223,6 +1301,33 @@ msgid "Power"
 msgstr ""
 
 msgid "Resources"
+msgstr ""
+
+msgid "{} temperature"
+msgstr ""
+
+msgid "{} °C"
+msgstr ""
+
+msgid "This is within 5 °C of the highest temperature the maker allows ({} °C). Check that fans are spinning and vents are clear."
+msgstr ""
+
+msgid "Fan speed"
+msgstr ""
+
+msgid "{} speed"
+msgstr ""
+
+msgid "{} rpm"
+msgstr ""
+
+msgid "Power use"
+msgstr ""
+
+msgid "{} W"
+msgstr ""
+
+msgid "Sensors"
 msgstr ""
 
 msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."

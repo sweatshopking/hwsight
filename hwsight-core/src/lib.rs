@@ -3,7 +3,9 @@
 //! No UI code lives here, so the command line and graphical apps share one engine.
 
 pub mod app_update;
+mod audio;
 mod board;
+mod boot_security;
 mod cpu;
 pub mod data;
 pub mod data_text;
@@ -19,16 +21,19 @@ mod firmware_actions;
 mod firmware_updates;
 pub mod fixes;
 mod fwupd;
+mod gpu_extras;
 pub mod i18n;
 pub mod kernel_log;
 mod memory;
 pub mod modules;
 mod network;
+mod optional_tools;
 mod pci;
 mod pci_details;
 pub mod pci_ids;
 pub mod report;
 pub mod rules;
+mod sensors;
 pub mod software;
 mod spd;
 mod system;
@@ -102,6 +107,8 @@ pub enum ScanNote {
     DataNeedsNewerApp { path: PathBuf, schema: u32 },
     /// A data file was broken and skipped.
     DataInvalid { path: PathBuf, error: String },
+    /// A program that would let hwsight show more isn't installed.
+    MissingTool { tool: optional_tools::MissingTool },
 }
 
 impl ScanNote {
@@ -123,6 +130,7 @@ impl ScanNote {
                 "A data update ({}) needs a newer version of hwsight. Update hwsight to use it.",
                 file_name(path)
             ),
+            Self::MissingTool { tool } => tool.message(),
             Self::DataInvalid { path, error } => crate::tr!(
                 "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}",
                 file_name(path),
@@ -308,6 +316,14 @@ impl Scanner {
             Default::default()
         };
         network::attach(&mut devices, &self.system.proc_net_wireless, &wifi);
+        sensors::attach(&mut devices, &self.system.hwmon_dir);
+        gpu_extras::attach(&mut devices, &self.system.nvidia_proc);
+        audio::attach(
+            &mut devices,
+            &self.system.sound_dir,
+            &self.system.asound_dir,
+        );
+        boot_security::attach(&mut devices, &self.system.efi_dir, &self.system.tpm_dir);
         devices.sort_by(|a, b| {
             a.category
                 .cmp(&b.category)
@@ -391,6 +407,15 @@ impl Scanner {
             .flatten()
             .collect();
         port_issues.sort_by(|a, b| a.port.cmp(&b.port));
+
+        let services = self.system.fwupd && self.system.network_manager;
+        for tool in optional_tools::missing(
+            &optional_tools::wanted(&devices, &self.system.proc_net_wireless, services),
+            &optional_tools::path_dirs(),
+            &self.distro,
+        ) {
+            notes.push(ScanNote::MissingTool { tool });
+        }
 
         let firmware_note = devices
             .iter()

@@ -40,6 +40,14 @@ pub struct SystemPaths {
     pub proc_net_wireless: PathBuf,
     /// Ask NetworkManager about Wi-Fi bands and speeds (off in tests).
     pub network_manager: bool,
+    /// `/sys/class/tpm`: the security chip.
+    pub tpm_dir: PathBuf,
+    /// `/proc/driver/nvidia`: the NVIDIA driver's own information.
+    pub nvidia_proc: PathBuf,
+    /// `/sys/class/sound`: sound cards, linked to the devices they belong to.
+    pub sound_dir: PathBuf,
+    /// `/proc/asound`: each sound card's chips (codecs).
+    pub asound_dir: PathBuf,
 }
 
 impl SystemPaths {
@@ -60,6 +68,10 @@ impl SystemPaths {
             fwupd: true,
             proc_net_wireless: PathBuf::from("/proc/net/wireless"),
             network_manager: true,
+            tpm_dir: PathBuf::from("/sys/class/tpm"),
+            nvidia_proc: PathBuf::from("/proc/driver/nvidia"),
+            sound_dir: PathBuf::from("/sys/class/sound"),
+            asound_dir: PathBuf::from("/proc/asound"),
         }
     }
 
@@ -82,6 +94,10 @@ impl SystemPaths {
             fwupd: false,
             proc_net_wireless: nowhere.join("wireless"),
             network_manager: false,
+            tpm_dir: nowhere.join("tpm"),
+            nvidia_proc: nowhere.join("nvidia"),
+            sound_dir: nowhere.join("sound"),
+            asound_dir: nowhere.join("asound"),
         }
     }
 }
