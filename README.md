@@ -7,8 +7,24 @@ doing its job. hwsight looks at everything inside and plugged into your PC, tell
 English what's healthy and what isn't, and then goes further: it finds the problems you didn't
 know you had, explains why they happen, and shows you the fix for *your* distro.
 
-> **Status: first release coming shortly.** There are no packages yet, but you can build it
-> from source today (see below). Watch or star the repo to be there when it lands.
+> **Status: released.** [hwsight 0.1.0](https://github.com/sweatshopking/hwsight/releases/latest)
+> is out, with packages for x86_64 and arm64. See "Install" below.
+
+## Install
+
+Download the file for your system from the
+[latest release](https://github.com/sweatshopking/hwsight/releases/latest). Most PCs are
+x86_64 (amd64); Raspberry Pi and other ARM computers are aarch64 (arm64).
+
+| Your distro | File |
+| --- | --- |
+| Ubuntu, Linux Mint, Debian, Pop!_OS, Zorin | the `.deb` |
+| Fedora, openSUSE | the `.rpm` |
+| Arch, CachyOS, and anything else | the `.AppImage` (make it executable, then run it) |
+
+`SHA256SUMS.txt` on the release page lets you check your download. The packages are built
+on Ubuntu 22.04 and Fedora 41, so they run on those and anything newer. hwsight checks for
+new versions itself and can update an AppImage in place.
 
 ## See it
 
@@ -132,7 +148,7 @@ network use is the optional check for updates, and it works fine offline.
 Built for the major Linux distributions: Arch, Debian, Ubuntu, Fedora, and openSUSE and
 their relatives. Advice and install commands adapt to your distro, and read-only systems
 (Fedora Atomic, Bazzite, SteamOS) are recognised so hwsight doesn't suggest things that
-can't work there. Packages are planned as .deb, .rpm, and AppImage, plus an AUR package.
+can't work there. Packages come as .deb, .rpm, and AppImage; an AUR package is planned.
 
 ## Build from source
 
@@ -150,8 +166,9 @@ test that the window opens).
 
 ## What's next
 
-Packaging and a first release, help for devices that have no driver (suggesting the right
-package for your distro), more per-device explanations, and more translations review.
+An AUR package, more per-device explanations, and finishing the translations: about 360
+window texts are still in English in the non-English languages, and none of the translations
+have been reviewed by a native speaker.
 
 ## Built with
 
