@@ -339,6 +339,7 @@ fn device_item(d: &Device) -> DeviceItem {
         note: d.note.clone().unwrap_or_default().into(),
         description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
+        built_in: d.bus == hwsight_core::Bus::System,
     }
 }
 

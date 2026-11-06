@@ -185,6 +185,25 @@ fn main() -> Result<(), slint::PlatformError> {
         )
         .into()
     });
+    let group_state = last_report.clone();
+    window.on_group_report(move |address, group, level| {
+        let Ok(report) = group_state.lock() else {
+            return SharedString::default();
+        };
+        report
+            .as_ref()
+            .and_then(|r| r.devices.iter().find(|d| d.address == address.as_str()))
+            .map(|device| {
+                hwsight_core::report::group_markdown(
+                    device,
+                    group.max(0) as usize,
+                    hwsight_core::details::Level::from_index(level),
+                    &hwsight_core::report::Privacy::system(),
+                )
+            })
+            .unwrap_or_default()
+            .into()
+    });
     start_scan(window.as_weak(), devices.clone(), last_report.clone());
     check_for_data_update(window.as_weak(), devices, last_report);
     check_for_app_update(window.as_weak(), update_state.clone());

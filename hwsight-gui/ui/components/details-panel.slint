@@ -12,6 +12,8 @@ export component DetailsPanel inherits Rectangle {
     in property <int> level;
     callback set-level(int);
     callback copy-report();
+    callback copy-group(int);
+    in-out property <int> copied-group: -1;
     property <bool> copied;
     property <color> status-colour: root.device.status-kind == "ok" ? Theme.ok
         : root.device.status-kind == "warn" ? Theme.warn
@@ -275,16 +277,33 @@ export component DetailsPanel inherits Rectangle {
                     color: Theme.text-muted;
                     wrap: word-wrap;
                 }
-                for group in root.device.details : VerticalLayout {
+                for group[gi] in root.device.details : VerticalLayout {
                     if root.level >= 2 || group.more-count > 0 : VerticalLayout {
                         padding-top: Theme.gap;
                         spacing: 10px;
-                        Text {
-                            text: group.title;
-                            color: Theme.text-muted;
-                            font-size: Theme.font-small;
-                            font-weight: 700;
-                            letter-spacing: 1px;
+                        HorizontalLayout {
+                            spacing: 10px;
+                            Text {
+                                text: group.title;
+                                color: Theme.text-muted;
+                                font-size: Theme.font-small;
+                                font-weight: 700;
+                                letter-spacing: 1px;
+                                vertical-alignment: center;
+                            }
+                            Text {
+                                text: root.copied-group == gi ? @tr("Copied") : @tr("Copy");
+                                color: Theme.highlight;
+                                font-size: Theme.font-small;
+                                vertical-alignment: center;
+                                TouchArea {
+                                    clicked => {
+                                        root.copied-group = gi;
+                                        root.copy-group(gi);
+                                    }
+                                }
+                            }
+                            Rectangle { horizontal-stretch: 1; }
                         }
                         for item in group.items : VerticalLayout {
                             if root.level >= 2 || !item.technical : VerticalLayout {
@@ -367,8 +386,11 @@ export component DetailsPanel inherits Rectangle {
             }
             copy-timer := Timer {
                 interval: 2s;
-                running: root.copied;
-                triggered => { root.copied = false; }
+                running: root.copied || root.copied-group >= 0;
+                triggered => {
+                    root.copied = false;
+                    root.copied-group = -1;
+                }
             }
             VerticalLayout {
                 spacing: Theme.gap;
@@ -391,7 +413,7 @@ export component DetailsPanel inherits Rectangle {
                             font-size: Theme.font-body;
                         }
                     }
-                    Row {
+                    if !root.device.built-in || root.device.driver != "" : Row {
                         Text { text: @tr("Driver"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.driver == "" ? @tr("None") : root.device.driver;
@@ -402,7 +424,7 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: @tr("Hardware ID"); color: Theme.text-muted; }
+                        Text { text: root.device.built-in ? @tr("Model") : @tr("Hardware ID"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.hardware-id;
                             read-only: true;
@@ -422,7 +444,7 @@ export component DetailsPanel inherits Rectangle {
                         }
                     }
                     Row {
-                        Text { text: @tr("Address"); color: Theme.text-muted; }
+                        Text { text: root.device.built-in ? @tr("Name") : @tr("Address"); color: Theme.text-muted; }
                         TextInput {
                             text: root.device.address;
                             read-only: true;

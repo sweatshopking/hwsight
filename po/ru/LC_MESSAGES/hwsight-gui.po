@@ -1,119 +1,131 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:24+0000\n"
+"POT-Creation-Date: 2026-11-06 07:29+0000\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: hwsight-gui/ui/app.slint:153
+#: hwsight-gui/ui/app.slint:154
 msgid "Scanning your hardware..."
 msgstr "Сканирование оборудования…"
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "No problems found"
 msgstr "Проблем не найдено"
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "Copy report for all devices"
 msgstr "Копировать отчёт обо всех устройствах"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scanning..."
 msgstr "Сканирование…"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scan again"
 msgstr "Сканировать снова"
 
-#: hwsight-gui/ui/app.slint:226
+#: hwsight-gui/ui/app.slint:227
 msgid "Nothing matches."
 msgstr "Совпадений нет."
 
-#: hwsight-gui/ui/app.slint:245
+#: hwsight-gui/ui/app.slint:246
 msgid "Only problems"
 msgstr "Только проблемы"
 
-#: hwsight-gui/ui/components/details-panel.slint:26
+#: hwsight-gui/ui/components/details-panel.slint:28
 msgid "Select a device to see its details"
 msgstr "Выберите устройство, чтобы увидеть подробности"
 
-#: hwsight-gui/ui/components/details-panel.slint:66
+#: hwsight-gui/ui/components/details-panel.slint:68
 msgid "WHAT IT DOES"
 msgstr "НАЗНАЧЕНИЕ"
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:144
+#: hwsight-gui/ui/components/details-panel.slint:146
 msgid "What's wrong"
 msgstr "Что не так"
 
-#: hwsight-gui/ui/components/details-panel.slint:163
+#: hwsight-gui/ui/components/details-panel.slint:165
 msgid "How to fix"
 msgstr "Как исправить"
 
-#: hwsight-gui/ui/components/details-panel.slint:211
+#: hwsight-gui/ui/components/details-panel.slint:213
 msgid "USEFUL SOFTWARE"
 msgstr "ПОЛЕЗНЫЕ ПРОГРАММЫ"
 
-#: hwsight-gui/ui/components/details-panel.slint:230
+#: hwsight-gui/ui/components/details-panel.slint:232
 msgid "Installed"
 msgstr "Установлено"
 
-#: hwsight-gui/ui/components/details-panel.slint:274
+#: hwsight-gui/ui/components/details-panel.slint:276
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:335
-msgid "As read: {}"
-msgstr ""
-
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
 msgid "Copied"
 msgstr "Скопировано"
 
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
+msgid "Copy"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:354
+msgid "As read: {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:374
 msgid "Copy for a forum post"
 msgstr "Копировать для сообщения на форуме"
 
-#: hwsight-gui/ui/components/details-panel.slint:362
+#: hwsight-gui/ui/components/details-panel.slint:381
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Копируется краткий отчёт об устройстве. Имя пользователя и компьютера удаляются."
 
-#: hwsight-gui/ui/components/details-panel.slint:376
+#: hwsight-gui/ui/components/details-panel.slint:398
 msgid "DETAILS"
 msgstr "ПОДРОБНОСТИ"
 
-#: hwsight-gui/ui/components/details-panel.slint:385
+#: hwsight-gui/ui/components/details-panel.slint:407
 msgid "Type"
 msgstr "Тип"
 
-#: hwsight-gui/ui/components/details-panel.slint:395
+#: hwsight-gui/ui/components/details-panel.slint:417
 msgid "Driver"
 msgstr "Драйвер"
 
-#: hwsight-gui/ui/components/details-panel.slint:397
+#: hwsight-gui/ui/components/details-panel.slint:419
 msgid "None"
 msgstr "Нет"
 
-#: hwsight-gui/ui/components/details-panel.slint:405
+#: hwsight-gui/ui/components/details-panel.slint:427
+msgid "Model"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:427
 msgid "Hardware ID"
 msgstr "ID оборудования"
 
-#: hwsight-gui/ui/components/details-panel.slint:415
+#: hwsight-gui/ui/components/details-panel.slint:437
 msgid "Connection"
 msgstr "Подключение"
 
-#: hwsight-gui/ui/components/details-panel.slint:425
+#: hwsight-gui/ui/components/details-panel.slint:447
+msgid "Name"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:447
 msgid "Address"
 msgstr "Адрес"
 
-#: hwsight-gui/ui/components/details-panel.slint:436
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Этого устройства пока нет в базе данных. Найдите его идентификатор оборудования в интернете."
 
@@ -211,9 +223,6 @@ msgid "Chip (codec)"
 msgstr ""
 
 msgid "Maker"
-msgstr ""
-
-msgid "Model"
 msgstr ""
 
 msgid "Revision"

@@ -120,4 +120,7 @@ export struct DeviceItem {
     // What this kind of device does, in plain English.
     description: string,
     unrecognized: bool,
+    // A part of the computer itself (processor, drives, memory, board): it has no driver or
+    // bus address to show.
+    built-in: bool,
 }

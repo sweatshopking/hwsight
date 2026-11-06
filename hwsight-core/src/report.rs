@@ -60,6 +60,37 @@ fn replace_word(text: &str, word: Option<&str>, replacement: &str) -> String {
     result
 }
 
+/// One group of a device's details (for example "PCIe connection") as the lines shown at
+/// `level`, ready to paste into a forum post. Empty when the group doesn't exist or has
+/// nothing at that level. The text was written in the user's language when the scan ran.
+pub fn group_markdown(
+    device: &Device,
+    group: usize,
+    level: crate::details::Level,
+    privacy: &Privacy,
+) -> String {
+    let Some(group) = device.details.get(group) else {
+        return String::new();
+    };
+    let shown: Vec<_> = group.items.iter().filter(|d| level.shows(d)).collect();
+    if shown.is_empty() {
+        return String::new();
+    }
+    let mut lines = vec![format!("#### {}: {}", device.display_name, group.title)];
+    for item in shown {
+        lines.push(format!("- {}: {}", item.label, item.value));
+        if level == crate::details::Level::Technical
+            && let Some(raw) = item.raw.as_deref().filter(|r| *r != item.value)
+        {
+            lines.push(format!("  - As read: {raw}"));
+        }
+        if level == crate::details::Level::Technical && !item.source.is_empty() {
+            lines.push(format!("  - Source: `{}`", item.source));
+        }
+    }
+    scrub(&lines.join("\n"), privacy)
+}
+
 /// One device's report section. Always English (see `i18n::in_english`).
 pub fn device_markdown(device: &Device) -> String {
     crate::i18n::in_english(|| device_section(device))
@@ -302,6 +333,40 @@ mod tests {
             class_codes: vec![],
             fixes: vec![],
         }
+    }
+
+    #[test]
+    fn a_detail_group_copies_as_the_lines_shown_at_the_level() {
+        use crate::details::{Detail, DetailGroup, Level};
+        let mut d = device(Status::Working, "0000:01:00.0");
+        d.details = vec![DetailGroup {
+            title: "PCIe connection".to_owned(),
+            items: vec![
+                Detail::new(
+                    "Link speed".into(),
+                    "PCIe 4.0".into(),
+                    "/sys/x/speed".into(),
+                )
+                .raw("16.0 GT/s PCIe"),
+                Detail::new("Width".into(), "x16".into(), "/sys/x/width".into()).technical(),
+            ],
+        }];
+        let privacy = Privacy {
+            home: None,
+            user: None,
+            host: None,
+        };
+        let more = group_markdown(&d, 0, Level::More, &privacy);
+        assert_eq!(
+            more,
+            "#### Test device: PCIe connection\n- Link speed: PCIe 4.0"
+        );
+        let technical = group_markdown(&d, 0, Level::Technical, &privacy);
+        assert!(technical.contains("- Width: x16"));
+        assert!(technical.contains("  - As read: 16.0 GT/s PCIe"));
+        assert!(technical.contains("  - Source: `/sys/x/speed`"));
+        assert_eq!(group_markdown(&d, 0, Level::Simple, &privacy), "");
+        assert_eq!(group_markdown(&d, 5, Level::Technical, &privacy), "");
     }
 
     fn report(devices: Vec<Device>) -> ScanReport {

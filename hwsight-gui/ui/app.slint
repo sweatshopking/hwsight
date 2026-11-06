@@ -81,6 +81,7 @@ export component AppWindow inherits Window {
     callback filter-changed();
     callback move-selection(int);
     callback device-report(string) -> string;
+    callback group-report(string, int, int) -> string;
     callback update-now();
     callback restart-now();
     callback firmware-toggle(int, bool);
@@ -286,7 +287,8 @@ export component AppWindow inherits Window {
                         fixes: [],
                         note: "",
                         description: "",
-                        unrecognized: false
+                        unrecognized: false,
+                        built-in: false
                     };
                     has-device: root.selected >= 0;
                     level: root.detail-level;
@@ -295,6 +297,9 @@ export component AppWindow inherits Window {
                         root.level-changed(level);
                     }
                     horizontal-stretch: 3;
+                    copy-group(group) => {
+                        copy-text.copy(root.group-report(details.device.address, group, root.detail-level));
+                    }
                     copy-report => {
                         copy-text.copy(root.device-report(details.device.address));
                     }

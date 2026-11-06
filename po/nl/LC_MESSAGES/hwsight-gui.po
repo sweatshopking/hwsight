@@ -1,119 +1,131 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:24+0000\n"
+"POT-Creation-Date: 2026-11-06 07:29+0000\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: hwsight-gui/ui/app.slint:153
+#: hwsight-gui/ui/app.slint:154
 msgid "Scanning your hardware..."
 msgstr "Hardware wordt gescand..."
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "No problems found"
 msgstr "Geen problemen gevonden"
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "Copy report for all devices"
 msgstr "Rapport van alle apparaten kopiëren"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scanning..."
 msgstr "Bezig met scannen..."
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scan again"
 msgstr "Opnieuw scannen"
 
-#: hwsight-gui/ui/app.slint:226
+#: hwsight-gui/ui/app.slint:227
 msgid "Nothing matches."
 msgstr "Geen overeenkomsten."
 
-#: hwsight-gui/ui/app.slint:245
+#: hwsight-gui/ui/app.slint:246
 msgid "Only problems"
 msgstr "Alleen problemen"
 
-#: hwsight-gui/ui/components/details-panel.slint:26
+#: hwsight-gui/ui/components/details-panel.slint:28
 msgid "Select a device to see its details"
 msgstr "Selecteer een apparaat voor details"
 
-#: hwsight-gui/ui/components/details-panel.slint:66
+#: hwsight-gui/ui/components/details-panel.slint:68
 msgid "WHAT IT DOES"
 msgstr "FUNCTIE"
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:144
+#: hwsight-gui/ui/components/details-panel.slint:146
 msgid "What's wrong"
 msgstr "Wat is er mis"
 
-#: hwsight-gui/ui/components/details-panel.slint:163
+#: hwsight-gui/ui/components/details-panel.slint:165
 msgid "How to fix"
 msgstr "Oplossen"
 
-#: hwsight-gui/ui/components/details-panel.slint:211
+#: hwsight-gui/ui/components/details-panel.slint:213
 msgid "USEFUL SOFTWARE"
 msgstr "HANDIGE SOFTWARE"
 
-#: hwsight-gui/ui/components/details-panel.slint:230
+#: hwsight-gui/ui/components/details-panel.slint:232
 msgid "Installed"
 msgstr "Geïnstalleerd"
 
-#: hwsight-gui/ui/components/details-panel.slint:274
+#: hwsight-gui/ui/components/details-panel.slint:276
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:335
-msgid "As read: {}"
-msgstr ""
-
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
 msgid "Copied"
 msgstr "Gekopieerd"
 
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
+msgid "Copy"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:354
+msgid "As read: {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:374
 msgid "Copy for a forum post"
 msgstr "Kopiëren voor een forumbericht"
 
-#: hwsight-gui/ui/components/details-panel.slint:362
+#: hwsight-gui/ui/components/details-panel.slint:381
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Kopieert een kort rapport over dit apparaat. Je gebruikersnaam en computernaam worden verwijderd."
 
-#: hwsight-gui/ui/components/details-panel.slint:376
+#: hwsight-gui/ui/components/details-panel.slint:398
 msgid "DETAILS"
 msgstr "DETAILS"
 
-#: hwsight-gui/ui/components/details-panel.slint:385
+#: hwsight-gui/ui/components/details-panel.slint:407
 msgid "Type"
 msgstr "Type"
 
-#: hwsight-gui/ui/components/details-panel.slint:395
+#: hwsight-gui/ui/components/details-panel.slint:417
 msgid "Driver"
 msgstr "Stuurprogramma"
 
-#: hwsight-gui/ui/components/details-panel.slint:397
+#: hwsight-gui/ui/components/details-panel.slint:419
 msgid "None"
 msgstr "Geen"
 
-#: hwsight-gui/ui/components/details-panel.slint:405
+#: hwsight-gui/ui/components/details-panel.slint:427
+msgid "Model"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:427
 msgid "Hardware ID"
 msgstr "Hardware-ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:415
+#: hwsight-gui/ui/components/details-panel.slint:437
 msgid "Connection"
 msgstr "Verbinding"
 
-#: hwsight-gui/ui/components/details-panel.slint:425
+#: hwsight-gui/ui/components/details-panel.slint:447
+msgid "Name"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:447
 msgid "Address"
 msgstr "Adres"
 
-#: hwsight-gui/ui/components/details-panel.slint:436
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Dit apparaat staat nog niet in de apparaatdatabase. Je kunt de hardware-ID hierboven online opzoeken."
 
@@ -211,9 +223,6 @@ msgid "Chip (codec)"
 msgstr ""
 
 msgid "Maker"
-msgstr ""
-
-msgid "Model"
 msgstr ""
 
 msgid "Revision"

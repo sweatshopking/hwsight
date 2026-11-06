@@ -1,119 +1,131 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:24+0000\n"
+"POT-Creation-Date: 2026-11-06 07:29+0000\n"
 "Language: ko\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: hwsight-gui/ui/app.slint:153
+#: hwsight-gui/ui/app.slint:154
 msgid "Scanning your hardware..."
 msgstr "하드웨어를 검사하는 중…"
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "No problems found"
 msgstr "문제가 없습니다"
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "Copy report for all devices"
 msgstr "모든 장치 보고서 복사"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scanning..."
 msgstr "검사 중…"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scan again"
 msgstr "다시 검사"
 
-#: hwsight-gui/ui/app.slint:226
+#: hwsight-gui/ui/app.slint:227
 msgid "Nothing matches."
 msgstr "일치하는 항목이 없습니다."
 
-#: hwsight-gui/ui/app.slint:245
+#: hwsight-gui/ui/app.slint:246
 msgid "Only problems"
 msgstr "문제만"
 
-#: hwsight-gui/ui/components/details-panel.slint:26
+#: hwsight-gui/ui/components/details-panel.slint:28
 msgid "Select a device to see its details"
 msgstr "장치를 선택하면 세부 정보가 표시됩니다"
 
-#: hwsight-gui/ui/components/details-panel.slint:66
+#: hwsight-gui/ui/components/details-panel.slint:68
 msgid "WHAT IT DOES"
 msgstr "기능"
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:144
+#: hwsight-gui/ui/components/details-panel.slint:146
 msgid "What's wrong"
 msgstr "문제"
 
-#: hwsight-gui/ui/components/details-panel.slint:163
+#: hwsight-gui/ui/components/details-panel.slint:165
 msgid "How to fix"
 msgstr "해결 방법"
 
-#: hwsight-gui/ui/components/details-panel.slint:211
+#: hwsight-gui/ui/components/details-panel.slint:213
 msgid "USEFUL SOFTWARE"
 msgstr "유용한 소프트웨어"
 
-#: hwsight-gui/ui/components/details-panel.slint:230
+#: hwsight-gui/ui/components/details-panel.slint:232
 msgid "Installed"
 msgstr "설치됨"
 
-#: hwsight-gui/ui/components/details-panel.slint:274
+#: hwsight-gui/ui/components/details-panel.slint:276
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:335
-msgid "As read: {}"
-msgstr ""
-
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
 msgid "Copied"
 msgstr "복사됨"
 
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
+msgid "Copy"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:354
+msgid "As read: {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:374
 msgid "Copy for a forum post"
 msgstr "포럼 게시물용으로 복사"
 
-#: hwsight-gui/ui/components/details-panel.slint:362
+#: hwsight-gui/ui/components/details-panel.slint:381
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "이 장치의 간단한 보고서를 복사합니다. 사용자 이름과 컴퓨터 이름은 삭제됩니다."
 
-#: hwsight-gui/ui/components/details-panel.slint:376
+#: hwsight-gui/ui/components/details-panel.slint:398
 msgid "DETAILS"
 msgstr "세부 정보"
 
-#: hwsight-gui/ui/components/details-panel.slint:385
+#: hwsight-gui/ui/components/details-panel.slint:407
 msgid "Type"
 msgstr "종류"
 
-#: hwsight-gui/ui/components/details-panel.slint:395
+#: hwsight-gui/ui/components/details-panel.slint:417
 msgid "Driver"
 msgstr "드라이버"
 
-#: hwsight-gui/ui/components/details-panel.slint:397
+#: hwsight-gui/ui/components/details-panel.slint:419
 msgid "None"
 msgstr "없음"
 
-#: hwsight-gui/ui/components/details-panel.slint:405
+#: hwsight-gui/ui/components/details-panel.slint:427
+msgid "Model"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:427
 msgid "Hardware ID"
 msgstr "하드웨어 ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:415
+#: hwsight-gui/ui/components/details-panel.slint:437
 msgid "Connection"
 msgstr "연결"
 
-#: hwsight-gui/ui/components/details-panel.slint:425
+#: hwsight-gui/ui/components/details-panel.slint:447
+msgid "Name"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:447
 msgid "Address"
 msgstr "주소"
 
-#: hwsight-gui/ui/components/details-panel.slint:436
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "이 장치는 아직 장치 데이터베이스에 없습니다. 위의 하드웨어 ID를 온라인에서 검색할 수 있습니다."
 
@@ -211,9 +223,6 @@ msgid "Chip (codec)"
 msgstr ""
 
 msgid "Maker"
-msgstr ""
-
-msgid "Model"
 msgstr ""
 
 msgid "Revision"

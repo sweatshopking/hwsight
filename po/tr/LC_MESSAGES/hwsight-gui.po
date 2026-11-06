@@ -1,119 +1,131 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:24+0000\n"
+"POT-Creation-Date: 2026-11-06 07:29+0000\n"
 "Language: tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: hwsight-gui/ui/app.slint:153
+#: hwsight-gui/ui/app.slint:154
 msgid "Scanning your hardware..."
 msgstr "Donanımınız taranıyor..."
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "No problems found"
 msgstr "Sorun bulunamadı"
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "Copy report for all devices"
 msgstr "Tüm cihazların raporunu kopyala"
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scanning..."
 msgstr "Taranıyor..."
 
-#: hwsight-gui/ui/app.slint:179
+#: hwsight-gui/ui/app.slint:180
 msgid "Scan again"
 msgstr "Tekrar tara"
 
-#: hwsight-gui/ui/app.slint:226
+#: hwsight-gui/ui/app.slint:227
 msgid "Nothing matches."
 msgstr "Eşleşme yok."
 
-#: hwsight-gui/ui/app.slint:245
+#: hwsight-gui/ui/app.slint:246
 msgid "Only problems"
 msgstr "Yalnızca sorunlar"
 
-#: hwsight-gui/ui/components/details-panel.slint:26
+#: hwsight-gui/ui/components/details-panel.slint:28
 msgid "Select a device to see its details"
 msgstr "Ayrıntıları görmek için bir cihaz seçin"
 
-#: hwsight-gui/ui/components/details-panel.slint:66
+#: hwsight-gui/ui/components/details-panel.slint:68
 msgid "WHAT IT DOES"
 msgstr "NE YAPAR"
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:90
+#: hwsight-gui/ui/components/details-panel.slint:92
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:144
+#: hwsight-gui/ui/components/details-panel.slint:146
 msgid "What's wrong"
 msgstr "Sorun nedir"
 
-#: hwsight-gui/ui/components/details-panel.slint:163
+#: hwsight-gui/ui/components/details-panel.slint:165
 msgid "How to fix"
 msgstr "Nasıl düzeltilir"
 
-#: hwsight-gui/ui/components/details-panel.slint:211
+#: hwsight-gui/ui/components/details-panel.slint:213
 msgid "USEFUL SOFTWARE"
 msgstr "YARARLI YAZILIMLAR"
 
-#: hwsight-gui/ui/components/details-panel.slint:230
+#: hwsight-gui/ui/components/details-panel.slint:232
 msgid "Installed"
 msgstr "Yüklü"
 
-#: hwsight-gui/ui/components/details-panel.slint:274
+#: hwsight-gui/ui/components/details-panel.slint:276
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:335
-msgid "As read: {}"
-msgstr ""
-
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
 msgid "Copied"
 msgstr "Kopyalandı"
 
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:295
+msgid "Copy"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:354
+msgid "As read: {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:374
 msgid "Copy for a forum post"
 msgstr "Forum gönderisi için kopyala"
 
-#: hwsight-gui/ui/components/details-panel.slint:362
+#: hwsight-gui/ui/components/details-panel.slint:381
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Bu aygıt hakkında kısa bir rapor kopyalanır. Kullanıcı adınız ve bilgisayar adınız kaldırılır."
 
-#: hwsight-gui/ui/components/details-panel.slint:376
+#: hwsight-gui/ui/components/details-panel.slint:398
 msgid "DETAILS"
 msgstr "AYRINTILAR"
 
-#: hwsight-gui/ui/components/details-panel.slint:385
+#: hwsight-gui/ui/components/details-panel.slint:407
 msgid "Type"
 msgstr "Tür"
 
-#: hwsight-gui/ui/components/details-panel.slint:395
+#: hwsight-gui/ui/components/details-panel.slint:417
 msgid "Driver"
 msgstr "Sürücü"
 
-#: hwsight-gui/ui/components/details-panel.slint:397
+#: hwsight-gui/ui/components/details-panel.slint:419
 msgid "None"
 msgstr "Yok"
 
-#: hwsight-gui/ui/components/details-panel.slint:405
+#: hwsight-gui/ui/components/details-panel.slint:427
+msgid "Model"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:427
 msgid "Hardware ID"
 msgstr "Donanım kimliği"
 
-#: hwsight-gui/ui/components/details-panel.slint:415
+#: hwsight-gui/ui/components/details-panel.slint:437
 msgid "Connection"
 msgstr "Bağlantı"
 
-#: hwsight-gui/ui/components/details-panel.slint:425
+#: hwsight-gui/ui/components/details-panel.slint:447
+msgid "Name"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:447
 msgid "Address"
 msgstr "Adres"
 
-#: hwsight-gui/ui/components/details-panel.slint:436
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Bu aygıt henüz aygıt veritabanında yok. Yukarıdaki donanım kimliğini çevrimiçi arayabilirsiniz."
 
@@ -211,9 +223,6 @@ msgid "Chip (codec)"
 msgstr ""
 
 msgid "Maker"
-msgstr ""
-
-msgid "Model"
 msgstr ""
 
 msgid "Revision"
