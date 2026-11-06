@@ -169,6 +169,10 @@ fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Op
             any_update = true;
             let mut why = update.summary.clone().unwrap_or_default();
             if !why.is_empty() {
+                // Vendors often leave the full stop off their one-line summaries.
+                if !why.ends_with(['.', '!', '?']) {
+                    why.push('.');
+                }
                 why.push(' ');
             }
             why.push_str(&crate::tr!(
@@ -395,6 +399,23 @@ mod tests {
         assert!(
             g.items.iter().all(|i| i.label != "Firmware update check"),
             "no all-clear when there is an update"
+        );
+    }
+
+    #[test]
+    fn a_summary_without_a_full_stop_gets_one() {
+        let mut devices = computer();
+        let mut drive = fw("1", "CT1000P310SSD8", "nvme", Some("VACR001"));
+        drive.update = Some(Update {
+            version: "VACR002".into(),
+            summary: Some("UEFI revocation database".into()),
+        });
+        run(&mut devices, Catalog::Fresh, vec![drive]);
+        let g = group(&devices, "nvme0n1").expect("group");
+        let why = item(g, "Firmware update").explanation.clone().expect("why");
+        assert!(
+            why.starts_with("UEFI revocation database. Newer firmware"),
+            "{why}"
         );
     }
 
