@@ -17,6 +17,7 @@ mod pci;
 pub mod pci_ids;
 pub mod report;
 pub mod rules;
+pub mod software;
 pub mod update;
 mod usb;
 pub mod usb_ids;

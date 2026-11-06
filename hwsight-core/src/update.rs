@@ -57,6 +57,7 @@ const KNOWN_FILES: &[&str] = &[
     "firmware.toml",
     "descriptions.toml",
     "fixes.toml",
+    "software.toml",
     "pci.ids",
     "usb.ids",
     // Translated data text, one per language (data_text::LANGUAGES).
@@ -254,6 +255,9 @@ pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
         "fixes.toml" => data::parse_data::<crate::fixes::Table>(text)
             .map(|(v, _)| v)
             .map_err(|e| format!("{name}: {e:?}"))?,
+        "software.toml" => data::parse_data::<crate::software::Table>(text)
+            .map(|(v, _)| v)
+            .map_err(|e| format!("{name}: {e:?}"))?,
         _ if name.starts_with("text-") => data::parse_data::<crate::data_text::Table>(text)
             .map(|(v, _)| v)
             .map_err(|e| format!("{name}: {e:?}"))?,
@@ -304,6 +308,7 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
     let firmware = crate::firmware::FirmwarePackages::load(dirs).0.version;
     let descriptions = crate::descriptions::Descriptions::load(dirs).0.version;
     let fixes = crate::fixes::Fixes::load(dirs).0.version;
+    let software = crate::software::Software::load(dirs).0.version;
     let ids = |name: &str| {
         dirs.id_files(name)
             .iter()
@@ -325,6 +330,7 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
         "firmware.toml" => Some(firmware.clone()),
         "descriptions.toml" => Some(descriptions.clone()),
         "fixes.toml" => Some(fixes.clone()),
+        "software.toml" => Some(software.clone()),
         "pci.ids" => pci.clone(),
         "usb.ids" => usb.clone(),
         _ => text

@@ -1,0 +1,107 @@
+# Software worth having for a device, in plain English, for people who aren't technical.
+#
+# Built into hwsight and replaceable by a newer downloaded copy. `schema` is the file
+# format version; `version` is the data release date (YYYY.MM.DD), newest wins.
+#
+# Each [[software]] entry:
+#   id        short unique name, lowercase (e.g. "solaar")
+#   name      the program's own name, never translated
+#   what      what it does for this kind of device, one or two short sentences
+#             (translated through text-<language>.toml like descriptions)
+#   homepage  https link to the project
+#   commands  program names that mean it's installed if found on PATH (optional)
+#   flathub   Flathub app ID, if it's on Flathub (optional)
+#   packages  distro package names, same keys as firmware.toml (arch, debian, ubuntu,
+#             fedora, opensuse, plus release keys such as ubuntu-jammy). "none" means
+#             that release doesn't package it.
+#   search    what to type into an app store or search engine to find it (optional,
+#             default: name)
+#   get       how to get it when the user's distro has no package (optional, translated
+#             like `what`). Without it hwsight says to look for `search` in the app
+#             store or on Flathub, or to follow the install steps on `homepage`. With
+#             `flathub` set, hwsight offers the Flathub install command instead.
+#   [[software.match]]  which devices it's for. Same fields as descriptions.toml (bus,
+#             class, subclasses, prog_ifs, vendor, device; hex without "0x"). Any one
+#             match is enough.
+#
+# Only recommend free software that's maintained and that people actually use with this
+# device. Verification: package names are checked in containers like firmware.toml.
+schema = 1
+version = "2026.11.06"
+
+[[software]]
+id = "solaar"
+name = "Solaar"
+what = "Pairs Logitech wireless mice and keyboards with their receiver, and shows their battery level and settings."
+homepage = "https://pwr-solaar.github.io/Solaar/"
+commands = ["solaar"]
+flathub = "io.github.pwr_solaar.solaar"
+packages = { arch = "solaar", debian = "solaar", ubuntu = "solaar", fedora = "solaar", opensuse = "solaar" }
+# Logitech Bolt, Unifying, and Lightspeed receivers.
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c548"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c52b"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c532"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c534"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c539"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c53a"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c53f"
+[[software.match]]
+bus = "usb"
+vendor = "046d"
+device = "c547"
+
+[[software]]
+id = "liquidctl"
+name = "liquidctl"
+what = "Shows the temperature, pump, and fan speeds of liquid coolers and some power supplies, and lets you change their speeds and lights."
+homepage = "https://github.com/liquidctl/liquidctl"
+commands = ["liquidctl"]
+packages = { arch = "liquidctl", debian = "liquidctl", ubuntu = "liquidctl", fedora = "liquidctl", opensuse = "none" }
+get = "It's a command-line program. Its website has install steps for every distro, including one that works everywhere through Python's pipx."
+# NZXT coolers and controllers.
+[[software.match]]
+bus = "usb"
+vendor = "1e71"
+
+[[software]]
+id = "openrgb"
+name = "OpenRGB"
+what = "Controls the lights on RGB devices from many brands in one place, such as motherboards, memory, keyboards, and fans."
+homepage = "https://openrgb.org/"
+commands = ["openrgb"]
+flathub = "org.openrgb.OpenRGB"
+packages = { arch = "openrgb", debian = "none", ubuntu = "none", fedora = "openrgb", opensuse = "OpenRGB" }
+# ASUS Aura LED controllers.
+[[software.match]]
+bus = "usb"
+vendor = "0b05"
+device = "19af"
+[[software.match]]
+bus = "usb"
+vendor = "0b05"
+device = "1939"
+[[software.match]]
+bus = "usb"
+vendor = "0b05"
+device = "18f3"

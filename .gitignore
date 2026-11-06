@@ -1,3 +1,4 @@
 /target
 tools/.firmware-cache/
+tools/.software-cache/
 tools/.release/

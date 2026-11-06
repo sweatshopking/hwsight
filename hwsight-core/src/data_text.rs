@@ -1,4 +1,4 @@
-//! Translations of the text in hwsight's data files (descriptions, fix steps), one
+//! Translations of the text in hwsight's data files (descriptions, fix steps, software), one
 //! updatable `text-<language>.toml` per language, like the other data files.
 //!
 //! Each file maps the English text, exactly as written in the data file, to its
@@ -188,6 +188,7 @@ mod tests {
         crate::descriptions::Descriptions::english_texts()
             .into_iter()
             .chain(crate::fixes::Fixes::english_texts())
+            .chain(crate::software::Software::english_texts())
             .collect()
     }
 

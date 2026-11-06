@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Prints the data texts a language hasn't translated yet, as lines ready to paste
-under [text] in hwsight-core/data/text-<language>.toml:
+"""Prints the data texts (descriptions, fixes, software) a language hasn't translated
+yet, as lines ready to paste under [text] in hwsight-core/data/text-<language>.toml:
 
     "English text, exactly as in the data file" = ""
 
@@ -19,6 +19,9 @@ fixes = tomllib.loads((data / "fixes.toml").read_text())
 english = [entry["text"] for entry in descriptions.get("describe", [])]
 english += list(descriptions.get("category", {}).values())
 english += [fix["text"] for fix in fixes.get("fix", {}).values()]
+software = tomllib.loads((data / "software.toml").read_text())
+for program in software.get("software", []):
+    english += [program["what"]] + ([program["get"]] if "get" in program else [])
 done = tomllib.loads((data / f"text-{language}.toml").read_text()).get("text", {})
 seen = set()
 for text in english:
