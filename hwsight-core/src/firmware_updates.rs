@@ -165,6 +165,22 @@ fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Op
         if fw.updatable && matches!(catalog, Catalog::Fresh | Catalog::Stale { .. }) {
             checked = true;
         }
+        if fw.needs_restart {
+            any_update = true;
+            items.push(
+                Detail::new(
+                    crate::tr!("{} update", fw.name),
+                    crate::tr!("Installed, waiting for a restart"),
+                    source.clone(),
+                )
+                .verdict(
+                    Verdict::Reduced,
+                    Some(crate::tr!(
+                        "The update was installed but only takes effect after the computer restarts. Restart when it suits you."
+                    )),
+                ),
+            );
+        }
         if let Some(update) = &fw.update {
             any_update = true;
             let mut why = update.summary.clone().unwrap_or_default();
@@ -286,6 +302,7 @@ mod tests {
             ids: Vec::new(),
             battery: None,
             update: None,
+            needs_restart: false,
         }
     }
 
@@ -400,6 +417,19 @@ mod tests {
             g.items.iter().all(|i| i.label != "Firmware update check"),
             "no all-clear when there is an update"
         );
+    }
+
+    #[test]
+    fn an_installed_update_waiting_for_a_restart_is_an_amber_finding() {
+        let mut devices = computer();
+        let mut drive = fw("1", "CT1000P310SSD8", "nvme", Some("VACR002"));
+        drive.needs_restart = true;
+        run(&mut devices, Catalog::Fresh, vec![drive]);
+        let g = group(&devices, "nvme0n1").expect("group");
+        let waiting = item(g, "CT1000P310SSD8 update");
+        assert_eq!(waiting.value, "Installed, waiting for a restart");
+        assert_eq!(waiting.verdict, Verdict::Reduced);
+        assert_eq!(waiting.command, None);
     }
 
     #[test]

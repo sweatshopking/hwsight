@@ -56,6 +56,8 @@ pub(crate) struct FwupdDevice {
     /// (level percent, low-battery threshold percent) for wireless devices.
     pub battery: Option<(u64, u64)>,
     pub update: Option<Update>,
+    /// An update was installed but only takes effect after a restart.
+    pub needs_restart: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -92,6 +94,9 @@ fn strings(props: &Properties, key: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// fwupd's update state for a device that was updated and is waiting for a restart.
+const UPDATE_STATE_NEEDS_REBOOT: u64 = 4;
+
 /// fwupd's device flags: bit 1 means "can be updated".
 const FLAG_UPDATABLE: u64 = 1 << 1;
 
@@ -107,6 +112,7 @@ pub(crate) fn device_from(props: &Properties) -> Option<FwupdDevice> {
         ids: strings(props, "InstanceIds"),
         battery: level.map(|l| (l, number(props, "BatteryThreshold").unwrap_or(0))),
         update: None,
+        needs_restart: number(props, "UpdateState") == Some(UPDATE_STATE_NEEDS_REBOOT),
     })
 }
 
@@ -235,13 +241,16 @@ mod tests {
         assert_eq!(keyboard.battery, Some((100, 20)));
         assert_eq!(keyboard.ids, ["HIDRAW\\VEN_046D&MOD_B38E00000000"]);
         assert_eq!(keyboard.update, None);
+        assert!(!keyboard.needs_restart);
 
         let fixed = device_from(&props(vec![
             ("DeviceId", Value::from("x")),
             ("Name", Value::from("TPM")),
             ("Flags", Value::U64(1)),
+            ("UpdateState", Value::U32(4)),
         ]))
         .expect("device");
+        assert!(fixed.needs_restart, "update state 4 is needs-reboot");
         assert!(!fixed.updatable, "internal only");
         assert_eq!(fixed.battery, None);
         assert_eq!(fixed.version, None);
