@@ -59,7 +59,17 @@ text = "The {module} driver is running but didn't take this device. Restarting t
 text = "The driver started but didn't finish setting the device up. Restart the computer. If that doesn't help, the reason is usually shown above (often missing firmware)."
 
 [fix.no_driver]
-text = "No driver installed on this computer supports this device. Search online for its hardware ID ({hardware_id}) together with \"Linux driver\". A later version of hwsight will suggest driver packages for many devices."
+text = "No driver installed on this computer supports this device. Search online for its hardware ID ({hardware_id}) together with \"Linux driver\"."
+
+[fix.driver_package]
+text = "Your distro offers a driver for it: the package {package}. Install it with this command, then restart the computer."
+command = "{install}"
+
+[fix.driver_aur]
+text = "Your distro doesn't include a driver for it, but the Arch User Repository has one: {package}. It is made by volunteers and built on your computer when you install it, so read its page and build file first. Install it with your AUR helper (such as yay or paru), then restart the computer."
+
+[fix.driver_by_hand]
+text = "Your distro doesn't package a driver for it. The driver's project page explains how to install it by hand: {homepage}"
 
 [fix.usb_blocked]
 text = "This device was blocked by your USB security settings (such as USBGuard). If you trust it, allow it in those settings, then unplug it and plug it back in."

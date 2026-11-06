@@ -17,11 +17,12 @@ OUT="tools/.release"
 
 python3 tools/verify-firmware.py   # never publish firmware data that fails the check
 python3 tools/verify-software.py   # nor software data with wrong package names
+python3 tools/verify-drivers.py    # nor driver data with wrong package names
 
 rm -rf "$OUT" && mkdir -p "$OUT"
 cp hwsight-core/data/rules.toml hwsight-core/data/firmware.toml \
     hwsight-core/data/descriptions.toml hwsight-core/data/fixes.toml \
-    hwsight-core/data/software.toml \
+    hwsight-core/data/software.toml hwsight-core/data/drivers.toml \
     hwsight-core/data/text-*.toml "$OUT/"
 curl -fsSL --retry 3 https://pci-ids.ucw.cz/v2.2/pci.ids -o "$OUT/pci.ids"
 curl -fsSL --retry 3 https://usb-ids.gowdy.us/usb.ids -o "$OUT/usb.ids"

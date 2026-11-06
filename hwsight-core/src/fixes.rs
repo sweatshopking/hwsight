@@ -78,6 +78,7 @@ struct Values<'a> {
     install: Option<&'a str>,
     file: Option<&'a str>,
     hardware_id: Option<&'a str>,
+    homepage: Option<&'a str>,
 }
 
 impl Fixes {
@@ -251,6 +252,34 @@ impl Fixes {
         out
     }
 
+    /// The step that offers a third-party driver, led by what the driver is for. `None` if
+    /// the data has no matching template.
+    pub fn driver_fix(
+        &self,
+        what: &str,
+        source: &crate::drivers::Source,
+        homepage: &str,
+        install_command: Option<&str>,
+    ) -> Option<Fix> {
+        use crate::drivers::Source;
+        let (name, package) = match source {
+            Source::Repo(p) => ("driver_package", Some(*p)),
+            Source::Aur(p) => ("driver_aur", Some(*p)),
+            Source::ByHand => ("driver_by_hand", None),
+        };
+        let mut fix = self.render(
+            name,
+            &Values {
+                package,
+                install: install_command,
+                homepage: Some(homepage),
+                ..Values::default()
+            },
+        )?;
+        fix.text = format!("{what} {}", fix.text);
+        Some(fix)
+    }
+
     /// Fill in a template. `None` if the template is missing or a value it needs is
     /// missing or unsafe, so a step is never shown half-filled or with a risky command.
     fn render(&self, name: &str, v: &Values) -> Option<Fix> {
@@ -269,12 +298,14 @@ fn fill(template: &str, v: &Values, for_command: bool) -> Option<String> {
     let mut out = template.to_owned();
     // (placeholder, its value, the check a value must pass to go into a command)
     type Slot<'a> = (&'a str, Option<&'a str>, fn(&str) -> bool);
-    let pairs: [Slot; 5] = [
+    let pairs: [Slot; 6] = [
         ("{module}", v.module, is_name),
         ("{package}", v.package, is_name),
         ("{install}", v.install, is_install_command),
         ("{file}", v.file, |_| true),
         ("{hardware_id}", v.hardware_id, is_hardware_id),
+        // A link is text for the user to read, never part of a command.
+        ("{homepage}", v.homepage, |_| false),
     ];
     for (key, value, safe) in pairs {
         if !out.contains(key) {
@@ -374,6 +405,9 @@ mod tests {
             "driver_not_attached",
             "driver_not_ready",
             "no_driver",
+            "driver_package",
+            "driver_aur",
+            "driver_by_hand",
             "usb_blocked",
         ] {
             assert!(

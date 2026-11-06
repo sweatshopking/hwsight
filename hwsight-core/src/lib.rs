@@ -14,6 +14,7 @@ pub mod details;
 pub mod device;
 mod displays;
 pub mod distro;
+pub mod drivers;
 mod drives;
 mod edid;
 pub mod firmware;
@@ -51,6 +52,7 @@ pub use data_text::DataText;
 pub use descriptions::Descriptions;
 pub use device::{Bus, Category, Device, Status, short_vendor};
 pub use distro::{Distro, Family};
+pub use drivers::Drivers;
 pub use firmware::FirmwarePackages;
 pub use firmware_actions::{install_update, refresh_catalog};
 pub use firmware_updates::PendingUpdate;
@@ -251,7 +253,10 @@ impl Scanner {
         let fixes = fixes.with_text(text.clone());
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (software, problems) = software::Software::load(&self.data_dirs);
-        let software = software.with_text(text);
+        let software = software.with_text(text.clone());
+        notes.extend(problems.into_iter().map(ScanNote::from));
+        let (drivers, problems) = Drivers::load(&self.data_dirs);
+        let drivers = drivers.with_text(text);
         notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
@@ -388,6 +393,23 @@ impl Scanner {
                     ))
                 })
                 .unwrap_or((0, 0));
+            if device.status == Status::NoDriver {
+                // A known third-party driver comes before the generic "search online".
+                let offers = drivers
+                    .for_device(device.bus, vendor, product)
+                    .into_iter()
+                    .filter_map(|d| {
+                        let source = drivers.source(d, &self.distro);
+                        let install = match source {
+                            drivers::Source::Repo(p) => {
+                                self.distro.family.install_command(p, self.distro.immutable)
+                            }
+                            _ => None,
+                        };
+                        fixes.driver_fix(&drivers.what(d), &source, &d.homepage, install.as_deref())
+                    });
+                device.fixes.splice(0..0, offers.collect::<Vec<_>>());
+            }
             device.software = software
                 .for_device(device.bus, &device.class_codes, vendor, product)
                 .into_iter()
@@ -540,6 +562,77 @@ mod tests {
         let mut list = vec!["1-10", "1-9", "1-2.1", "1-2"];
         list.sort_by_key(|a| natural_address(a));
         assert_eq!(list, vec!["1-2", "1-2.1", "1-9", "1-10"]);
+    }
+
+    /// A Broadcom Wi-Fi card nothing in the kernel supports gets the driver for this distro
+    /// first, then the generic "search online" step.
+    #[test]
+    fn full_scan_offers_a_known_third_party_driver() {
+        for (os_release, first_step, command) in [
+            (
+                "ID=debian\n",
+                "the package broadcom-sta-dkms",
+                Some("sudo apt install broadcom-sta-dkms"),
+            ),
+            (
+                "ID=arch\n",
+                "the package broadcom-wl-dkms",
+                Some("sudo pacman -S broadcom-wl-dkms"),
+            ),
+            // No package on Fedora: the project page, and nothing to copy.
+            ("ID=fedora\n", "https://wiki.debian.org/wl", None),
+        ] {
+            let tmp = tempfile::tempdir().expect("tempdir");
+            let root = tmp.path();
+            let dev = root.join("pci/0000:03:00.0");
+            fs::create_dir_all(&dev).expect("mkdir");
+            for (file, value) in [
+                ("vendor", "0x14e4"),
+                ("device", "0x43a0"),
+                ("class", "0x028000"),
+                (
+                    "modalias",
+                    "pci:v000014E4d000043A0sv00001028sd00000010bc02sc80i00",
+                ),
+            ] {
+                fs::write(dev.join(file), value).expect("write");
+            }
+            let modules = root.join("modules");
+            fs::create_dir_all(&modules).expect("mkdir");
+            fs::write(modules.join("modules.alias"), "").expect("write");
+            fs::write(root.join("cmdline"), "quiet").expect("write");
+            let scanner = Scanner {
+                data_dirs: DataDirs::only(&root.join("data")),
+                pci_devices: root.join("pci"),
+                usb_devices: root.join("usb"),
+                kernel_modules: Some(modules.clone()),
+                loaded_modules: modules,
+                modprobe_dirs: Vec::new(),
+                kernel_cmdline: root.join("cmdline"),
+                kernel_log: KernelLogInput::Lines(Vec::new()),
+                firmware_dirs: vec![root.join("firmware")],
+                distro: Distro::from_os_release(os_release, false),
+                install_check: software::InstallCheck {
+                    path_dirs: vec![],
+                    flatpak_dirs: vec![],
+                },
+                system: SystemPaths::none(),
+            };
+            let report = scanner.scan();
+            let [card] = report.devices.as_slice() else {
+                panic!("expected one device, got {:?}", report.devices);
+            };
+            assert_eq!(card.status, Status::NoDriver, "{os_release}");
+            let [driver, search] = card.fixes.as_slice() else {
+                panic!("{os_release}: {:?}", card.fixes);
+            };
+            assert!(driver.text.contains(first_step), "{os_release}: {driver:?}");
+            assert_eq!(driver.command.as_deref(), command, "{os_release}");
+            assert!(
+                search.text.contains("14e4:43a0"),
+                "{os_release}: {search:?}"
+            );
+        }
     }
 
     /// A whole scan of a fake machine: one network card whose driver failed because of

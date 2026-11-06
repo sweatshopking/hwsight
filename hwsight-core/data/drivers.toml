@@ -1,0 +1,79 @@
+# Drivers Linux doesn't ship: which package (or project page) provides one for a device
+# that has no driver at all, per distro family.
+#
+# Built into hwsight and replaceable by a newer downloaded copy. `schema` is the file
+# format version; `version` is the data release date (YYYY.MM.DD), newest wins.
+#
+# A device is only offered an entry here when no driver the running kernel has supports
+# it, so entries are safe to keep after a kernel adds its own driver: they simply stop
+# showing for the people it no longer applies to.
+#
+# Each [[driver]] entry:
+#   id        short unique name, lowercase (e.g. "broadcom-wl")
+#   name      the driver's own name, never translated
+#   what      what the device is and what the driver does, one or two short sentences
+#             (translated through text-<language>.toml like descriptions)
+#   homepage  https link to the driver's project page. Shown when a distro has no
+#             package for it (the user follows the steps there).
+#   packages  per distro, same keys as firmware.toml (arch, debian, ubuntu, fedora,
+#             opensuse, plus release keys such as ubuntu-jammy). A value is either a
+#             package name in the distro's own software sources, `aur:<name>` for a
+#             package on the Arch User Repository (hwsight only explains these and never
+#             installs them: they are built from community-made recipes on the user's
+#             computer), or `none` / no key: no package, so the project page is shown.
+#   [[driver.match]]  exact hardware IDs it's for: `bus` (pci or usb, default pci),
+#             `vendor`, and `device` (hex without "0x"). No class or vendor-wide matches:
+#             third-party code must never be offered for a device it wasn't made for.
+#
+# Only list a driver when its source says it supports that exact ID, and when it is
+# maintained. Verification: tools/verify-drivers.py checks repo package names in
+# containers and AUR packages against the AUR.
+schema = 1
+version = "2026.11.07"
+
+[[driver]]
+id = "broadcom-wl"
+name = "Broadcom wl"
+what = "This is a Broadcom Wi-Fi card. Broadcom's own driver (called wl) makes it work, but Linux can't include it because it isn't open source."
+homepage = "https://wiki.debian.org/wl"
+packages = { arch = "broadcom-wl-dkms", debian = "broadcom-sta-dkms", ubuntu = "bcmwl-kernel-source" }
+# BCM4360 (two variants) and BCM4352 802.11ac cards.
+[[driver.match]]
+vendor = "14e4"
+device = "43a0"
+[[driver.match]]
+vendor = "14e4"
+device = "43a2"
+[[driver.match]]
+vendor = "14e4"
+device = "43b1"
+
+[[driver]]
+id = "rtl8812au"
+name = "rtl8812au"
+what = "This is a Realtek USB Wi-Fi adapter. Kernels older than 6.14 have no driver for it, so a separate community-made one is needed."
+homepage = "https://github.com/morrownr/8812au-20210820"
+packages = { arch = "aur:rtl8812au-dkms-git" }
+# RTL8812AU, RTL8821AU, and RTL8811AU adapters.
+[[driver.match]]
+bus = "usb"
+vendor = "0bda"
+device = "8812"
+[[driver.match]]
+bus = "usb"
+vendor = "0bda"
+device = "0811"
+[[driver.match]]
+bus = "usb"
+vendor = "0bda"
+device = "a811"
+
+[[driver]]
+id = "rtl8126"
+name = "r8126"
+what = "This is a Realtek 5 Gigabit network card. Kernels older than 6.13 have no driver for it, so Realtek's own one is needed."
+homepage = "https://www.realtek.com/Download/List?cate_id=584"
+packages = { arch = "aur:r8126-dkms" }
+[[driver.match]]
+vendor = "10ec"
+device = "8126"

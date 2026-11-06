@@ -189,6 +189,7 @@ mod tests {
             .into_iter()
             .chain(crate::fixes::Fixes::english_texts())
             .chain(crate::software::Software::english_texts())
+            .chain(crate::drivers::Drivers::english_texts())
             .collect()
     }
 
