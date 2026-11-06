@@ -1813,6 +1813,7 @@ dependencies = [
  "tempfile",
  "toml",
  "ureq",
+ "zbus",
 ]
 
 [[package]]

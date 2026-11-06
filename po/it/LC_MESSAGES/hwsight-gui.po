@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 05:03+0000\n"
+"POT-Creation-Date: 2026-11-06 05:11+0000\n"
 "Language: it\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -388,6 +388,9 @@ msgstr "Processori"
 msgid "Memory"
 msgstr ""
 
+msgid "Disk drives"
+msgstr ""
+
 msgid "Motherboard and BIOS"
 msgstr ""
 
@@ -442,6 +445,9 @@ msgstr "processore"
 msgid "memory"
 msgstr ""
 
+msgid "drive"
+msgstr ""
+
 msgid "motherboard"
 msgstr ""
 
@@ -474,6 +480,147 @@ msgstr "Nessun driver"
 
 msgid "Reserved for a virtual machine"
 msgstr "Riservato a una macchina virtuale"
+
+msgid "Drive reports a health problem"
+msgstr ""
+
+msgid "{} years ({} hours)"
+msgstr ""
+
+msgid "{} days ({} hours)"
+msgstr ""
+
+msgid "Time powered on"
+msgstr ""
+
+msgid "How long the drive has been switched on in its whole life."
+msgstr ""
+
+msgid "The drive is dangerously hot. Check the computer's airflow and fans."
+msgstr ""
+
+msgid "The drive is running warm. Better airflow around it would help it last longer."
+msgstr ""
+
+msgid "Temperature"
+msgstr ""
+
+msgid "The drive has raised a critical warning ({})."
+msgstr ""
+
+msgid "Its spare storage for replacing worn-out areas has run out."
+msgstr ""
+
+msgid "The drive has used up its rated lifetime of writes. It can keep working, but it's time to plan a replacement."
+msgstr ""
+
+msgid "The drive is getting close to the end of its rated lifetime of writes. Plan a replacement."
+msgstr ""
+
+msgid "How much of the drive's rated lifetime of writes has been used."
+msgstr ""
+
+msgid "Wear"
+msgstr ""
+
+msgid "{}% used"
+msgstr ""
+
+msgid "Spare capacity left"
+msgstr ""
+
+msgid "Extra storage the drive keeps to replace worn-out areas."
+msgstr ""
+
+msgid "Data written"
+msgstr ""
+
+msgid "The drive has found data it couldn't read back correctly. A few can happen; a growing number means it is wearing out."
+msgstr ""
+
+msgid "Data errors"
+msgstr ""
+
+msgid "Data read"
+msgstr ""
+
+msgid "Times switched on"
+msgstr ""
+
+msgid "Power cuts without a shutdown"
+msgstr ""
+
+msgid "The drive reports that it is failing."
+msgstr ""
+
+msgid "{} of its own health checks are failing."
+msgstr ""
+
+msgid "Parts of the drive have stopped working. A few are survivable, but if the number keeps growing the drive is failing."
+msgstr ""
+
+msgid "Bad sectors"
+msgstr ""
+
+msgid "Past warnings"
+msgstr ""
+
+msgid "Some of the drive's health checks have failed in the past, though they pass now."
+msgstr ""
+
+msgid "Cable errors"
+msgstr ""
+
+msgid "Data was corrupted on its way along the cable. Reseating or replacing the cable usually fixes this."
+msgstr ""
+
+msgid "Solid-state drive (NVMe)"
+msgstr ""
+
+msgid "Hard drive ({} rpm)"
+msgstr ""
+
+msgid "Hard drive"
+msgstr ""
+
+msgid "Solid-state drive (SATA)"
+msgstr ""
+
+msgid "Solid-state drive"
+msgstr ""
+
+msgid "The UDisks2 drive health service"
+msgstr ""
+
+msgid "Health"
+msgstr ""
+
+msgid "hwsight couldn't read this drive's health. That needs the UDisks service, which may not be running, or the drive may not report it (some USB drives don't)."
+msgstr ""
+
+msgid "No problems reported"
+msgstr ""
+
+msgid "The drive's own self-check reports nothing wrong."
+msgstr ""
+
+msgid "Failing"
+msgstr ""
+
+msgid "Capacity"
+msgstr ""
+
+msgid "Firmware version"
+msgstr ""
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "Drive"
+msgstr ""
+
+msgid "This drive reports a serious health problem. Back up anything important right away."
+msgstr ""
 
 msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "Il file firmware {} mancava all’avvio, ma ora è installato. Riavviare dovrebbe risolvere il problema."
@@ -901,6 +1048,3 @@ msgstr "USB"
 
 msgid "Built in"
 msgstr ""
-
-msgid "Other"
-msgstr "Altro"

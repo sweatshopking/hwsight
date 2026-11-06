@@ -238,6 +238,7 @@ impl Fixes {
                 }
             }
             Status::DriverNotReady => push("driver_not_ready", Values::default()),
+            Status::DriveFailing => push("drive_failing", Values::default()),
             Status::NoDriver => push(
                 "no_driver",
                 Values {
@@ -504,6 +505,20 @@ mod tests {
         let mut usb = device(Status::DriverBlocked);
         usb.bus = Bus::Usb;
         assert!(f.suggest(&usb)[0].text.contains("USB security"));
+    }
+
+    #[test]
+    fn a_failing_drive_is_told_to_back_up_with_no_command() {
+        let f = Fixes::embedded();
+        let steps = f.suggest(&device(Status::DriveFailing));
+        assert_eq!(steps.len(), 1);
+        assert!(
+            steps[0]
+                .text
+                .starts_with("Back up your important files now")
+        );
+        assert_eq!(steps[0].command, None, "nothing is run on a failing drive");
+        assert!(Status::DriveFailing.is_problem());
     }
 
     #[test]

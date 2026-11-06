@@ -1736,6 +1736,17 @@ and the temperature at scan time (Info only: a Ryzen idles hot-looking numbers a
 boosts to 95 C by design). PCI devices now also list which other devices share their
 IOMMU group (idea from Chassis).
 
+Disk drives are done (`drives.rs`, `udisks.rs`; new dependency `zbus`, blocking, 4 s limit
+per call so a stuck service can't freeze a scan): each drive from `/sys/block`, with health
+from UDisks2 over D-Bus (no password): temperature, time powered on, health, plus NVMe
+wear, spare, data written, data errors, and for SATA the bad sectors, past warnings, cable
+errors, and every SMART attribute at the Technical level. A drive that says it is failing
+(SATA failing flag or failing attributes, NVMe critical warning or spare below its limit)
+gets the new `Status::DriveFailing`: a real problem in the header, a note, and the fix step
+"Back up your important files now..." (no command). Heat and wear only get a verdict.
+Without UDisks (a container, no service) a drive says "Health: Not available".
+Not yet: partitions and filesystems, self-tests, spin state, drive link speed.
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the

@@ -148,7 +148,7 @@ pub fn status_kind(status: Status) -> &'static str {
         Status::DriverAvailableNotLoaded | Status::DriverNotAttached | Status::DriverNotReady => {
             "warn"
         }
-        Status::NoDriver | Status::DriverBlocked => "error",
+        Status::NoDriver | Status::DriverBlocked | Status::DriveFailing => "error",
     }
 }
 
@@ -439,6 +439,7 @@ mod tests {
             (Status::DriverNotAttached, "warn"),
             (Status::DriverNotReady, "warn"),
             (Status::NoDriver, "error"),
+            (Status::DriveFailing, "error"),
             (Status::DriverBlocked, "error"),
         ] {
             assert_eq!(status_kind(status), kind, "{status:?}");

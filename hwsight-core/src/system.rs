@@ -1,5 +1,5 @@
-//! The parts of the computer that aren't plugged in: the processor, memory, and the
-//! motherboard.
+//! The parts of the computer that aren't plugged in: the processor, memory, disk
+//! drives, and the motherboard.
 
 use std::fs;
 use std::path::PathBuf;
@@ -24,6 +24,10 @@ pub struct SystemPaths {
     pub cpuinfo: PathBuf,
     /// `/sys/class/hwmon`: the kernel's temperature sensors.
     pub hwmon_dir: PathBuf,
+    /// `/sys/block`: the disk drives.
+    pub block_dir: PathBuf,
+    /// Ask the UDisks2 service for drive health (off in tests).
+    pub udisks: bool,
 }
 
 impl SystemPaths {
@@ -36,6 +40,8 @@ impl SystemPaths {
             cpu_dir: PathBuf::from("/sys/devices/system/cpu"),
             cpuinfo: PathBuf::from("/proc/cpuinfo"),
             hwmon_dir: PathBuf::from("/sys/class/hwmon"),
+            block_dir: PathBuf::from("/sys/block"),
+            udisks: true,
         }
     }
 
@@ -50,6 +56,8 @@ impl SystemPaths {
             cpu_dir: nowhere.join("cpu"),
             cpuinfo: nowhere.join("cpuinfo"),
             hwmon_dir: nowhere.join("hwmon"),
+            block_dir: nowhere.join("block"),
+            udisks: false,
         }
     }
 }
@@ -92,6 +100,16 @@ pub(crate) fn scan(paths: &SystemPaths, descriptions: &Descriptions) -> Vec<Devi
             descriptions,
         ));
     }
+    let health = if paths.udisks {
+        crate::udisks::read_drives()
+    } else {
+        Vec::new()
+    };
+    devices.extend(crate::drives::devices(
+        &paths.block_dir,
+        &health,
+        descriptions,
+    ));
     devices.extend(crate::board::device(
         &paths.dmi_dir,
         &paths.efi_dir,

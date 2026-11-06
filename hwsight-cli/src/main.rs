@@ -345,7 +345,7 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             Status::DriverAvailableNotLoaded
             | Status::DriverNotAttached
             | Status::DriverNotReady => "\x1b[33m",
-            Status::NoDriver | Status::DriverBlocked => "\x1b[31m",
+            Status::NoDriver | Status::DriverBlocked | Status::DriveFailing => "\x1b[31m",
         };
         let mut line = format!(
             "  {} {}",
@@ -515,7 +515,7 @@ fn symbol(status: Status) -> &'static str {
         Status::DriverAvailableNotLoaded | Status::DriverNotAttached | Status::DriverNotReady => {
             "!"
         }
-        Status::NoDriver | Status::DriverBlocked => "✗",
+        Status::NoDriver | Status::DriverBlocked | Status::DriveFailing => "✗",
         Status::ReservedForVirtualMachine => "•",
     }
 }

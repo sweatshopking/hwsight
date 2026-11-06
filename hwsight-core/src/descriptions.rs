@@ -164,6 +164,7 @@ fn category_key(category: Category) -> &'static str {
         Category::Accelerators => "accelerators",
         Category::Processors => "processors",
         Category::Memory => "memory",
+        Category::Drives => "drives",
         Category::Motherboard => "motherboard",
         Category::SystemDevices => "system_devices",
         Category::Other => "other",
@@ -197,7 +198,7 @@ mod tests {
         );
     }
 
-    const ALL: [Category; 18] = [
+    const ALL: [Category; 19] = [
         Category::Graphics,
         Category::Sound,
         Category::Network,
@@ -213,6 +214,7 @@ mod tests {
         Category::Accelerators,
         Category::Processors,
         Category::Memory,
+        Category::Drives,
         Category::Motherboard,
         Category::SystemDevices,
         Category::Other,

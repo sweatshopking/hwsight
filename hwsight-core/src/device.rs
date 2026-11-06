@@ -37,6 +37,7 @@ pub enum Category {
     Accelerators,
     Processors,
     Memory,
+    Drives,
     Motherboard,
     SystemDevices,
     Other,
@@ -60,6 +61,7 @@ impl Category {
             Self::Accelerators => crate::tr!("AI and compute accelerators"),
             Self::Processors => crate::tr!("Processors"),
             Self::Memory => crate::tr!("Memory"),
+            Self::Drives => crate::tr!("Disk drives"),
             Self::Motherboard => crate::tr!("Motherboard and BIOS"),
             Self::SystemDevices => crate::tr!("System devices"),
             Self::Other => crate::tr!("Other devices"),
@@ -84,6 +86,7 @@ impl Category {
             Self::Accelerators => crate::tr!("accelerator"),
             Self::Processors => crate::tr!("processor"),
             Self::Memory => crate::tr!("memory"),
+            Self::Drives => crate::tr!("drive"),
             Self::Motherboard => crate::tr!("motherboard"),
             Self::SystemDevices => crate::tr!("system device"),
             Self::Other => crate::tr!("device"),
@@ -113,6 +116,8 @@ pub enum Status {
     NoDriver,
     /// Deliberately set aside for a virtual machine, so the host doesn't use it.
     ReservedForVirtualMachine,
+    /// A drive reports that it is failing (or that its spare storage has run out).
+    DriveFailing,
 }
 
 impl Status {
@@ -134,6 +139,7 @@ impl Status {
             Self::DriverBlocked => crate::tr!("Driver turned off by a setting"),
             Self::NoDriver => crate::tr!("No driver"),
             Self::ReservedForVirtualMachine => crate::tr!("Reserved for a virtual machine"),
+            Self::DriveFailing => crate::tr!("Drive reports a health problem"),
         }
     }
 }

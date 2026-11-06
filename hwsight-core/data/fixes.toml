@@ -63,3 +63,6 @@ text = "No driver installed on this computer supports this device. Search online
 
 [fix.usb_blocked]
 text = "This device was blocked by your USB security settings (such as USBGuard). If you trust it, allow it in those settings, then unplug it and plug it back in."
+
+[fix.drive_failing]
+text = "Back up your important files now, then plan to replace this drive. A drive that reports this can stop working without warning."
