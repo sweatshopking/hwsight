@@ -83,6 +83,7 @@ struct Values<'a> {
     install: Option<&'a str>,
     file: Option<&'a str>,
     hardware_id: Option<&'a str>,
+    section: Option<&'a str>,
     homepage: Option<&'a str>,
 }
 
@@ -285,6 +286,20 @@ impl Fixes {
         Some(fix)
     }
 
+    /// The step that switches on a software-sources section a driver's package needs.
+    /// `command` comes from hwsight's own check of the sources (`apt_sources`).
+    pub fn driver_section_fix(&self, section: &str, command: Option<&str>) -> Option<Fix> {
+        let mut fix = self.render(
+            "driver_needs_section",
+            &Values {
+                section: Some(section),
+                ..Values::default()
+            },
+        )?;
+        fix.command = command.map(str::to_owned);
+        Some(fix)
+    }
+
     /// Fill in a template. `None` if the template is missing or a value it needs is
     /// missing or unsafe, so a step is never shown half-filled or with a risky command.
     fn render(&self, name: &str, v: &Values) -> Option<Fix> {
@@ -307,12 +322,13 @@ fn fill(template: &str, v: &Values, for_command: bool) -> Option<String> {
     let mut out = template.to_owned();
     // (placeholder, its value, the check a value must pass to go into a command)
     type Slot<'a> = (&'a str, Option<&'a str>, fn(&str) -> bool);
-    let pairs: [Slot; 6] = [
+    let pairs: [Slot; 7] = [
         ("{module}", v.module, is_name),
         ("{package}", v.package, is_name),
         ("{install}", v.install, is_install_command),
         ("{file}", v.file, |_| true),
         ("{hardware_id}", v.hardware_id, is_hardware_id),
+        ("{section}", v.section, |_| false),
         // A link is text for the user to read, never part of a command.
         ("{homepage}", v.homepage, |_| false),
     ];
@@ -416,6 +432,7 @@ mod tests {
             "no_driver",
             "driver_package",
             "driver_aur",
+            "driver_needs_section",
             "driver_by_hand",
             "usb_blocked",
         ] {

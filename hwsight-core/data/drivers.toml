@@ -21,6 +21,9 @@
 #             package on the Arch User Repository (hwsight only explains these and never
 #             installs them: they are built from community-made recipes on the user's
 #             computer), or `none` / no key: no package, so the project page is shown.
+#   sections  optional, per distro: the software-sources section the package lives in
+#             when it isn't on by default (Debian: `non-free`). hwsight checks whether it
+#             is on and, if not, shows the command that turns it on first.
 #   [[driver.match]]  exact hardware IDs it's for: `bus` (pci or usb, default pci),
 #             `vendor`, and `device` (hex without "0x"). No class or vendor-wide matches:
 #             third-party code must never be offered for a device it wasn't made for.
@@ -37,6 +40,7 @@ name = "Broadcom wl"
 what = "This is a Broadcom Wi-Fi card. Broadcom's own driver (called wl) makes it work, but Linux can't include it because it isn't open source."
 homepage = "https://wiki.debian.org/wl"
 packages = { arch = "broadcom-wl-dkms", debian = "broadcom-sta-dkms", ubuntu = "bcmwl-kernel-source" }
+sections = { debian = "non-free" }
 # BCM4360 (two variants) and BCM4352 802.11ac cards.
 [[driver.match]]
 vendor = "14e4"

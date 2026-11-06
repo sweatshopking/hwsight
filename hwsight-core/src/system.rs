@@ -48,6 +48,8 @@ pub struct SystemPaths {
     pub sound_dir: PathBuf,
     /// `/proc/asound`: each sound card's chips (codecs).
     pub asound_dir: PathBuf,
+    /// `/etc/apt`: Debian's software sources.
+    pub apt_dir: PathBuf,
 }
 
 impl SystemPaths {
@@ -72,6 +74,7 @@ impl SystemPaths {
             nvidia_proc: PathBuf::from("/proc/driver/nvidia"),
             sound_dir: PathBuf::from("/sys/class/sound"),
             asound_dir: PathBuf::from("/proc/asound"),
+            apt_dir: PathBuf::from("/etc/apt"),
         }
     }
 
@@ -98,6 +101,7 @@ impl SystemPaths {
             nvidia_proc: nowhere.join("nvidia"),
             sound_dir: nowhere.join("sound"),
             asound_dir: nowhere.join("asound"),
+            apt_dir: nowhere.join("apt"),
         }
     }
 }

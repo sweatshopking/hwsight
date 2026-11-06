@@ -65,6 +65,9 @@ text = "No driver installed on this computer supports this device. Search online
 text = "Your distro offers a driver for it: the package {package}. Install it with this command, then restart the computer."
 command = "{install}"
 
+[fix.driver_needs_section]
+text = "The driver is in the \"{section}\" section of Debian's software sources, which is switched off on this computer, so installing it would fail with \"Unable to locate package\". Switch it on first with this command (it adds {section} to your software sources and refreshes the list), then scan again."
+
 [fix.driver_aur]
 text = "Your distro doesn't include a driver for it, but the Arch User Repository has one: {package}. It is made by volunteers and built on your computer when you install it, so read its page and build file first. Install it with your AUR helper (such as yay or paru), then restart the computer."
 

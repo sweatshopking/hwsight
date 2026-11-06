@@ -3,6 +3,7 @@
 //! No UI code lives here, so the command line and graphical apps share one engine.
 
 pub mod app_update;
+pub mod apt_sources;
 mod audio;
 mod board;
 mod boot_security;
@@ -402,30 +403,47 @@ impl Scanner {
                 .unwrap_or((0, 0));
             if device.status == Status::NoDriver {
                 // A known third-party driver comes before the generic "search online".
-                let offers = drivers
-                    .for_device(device.bus, vendor, product)
-                    .into_iter()
-                    .filter_map(|d| {
-                        let source = drivers.source(d, &self.distro);
-                        let install = match source {
-                            drivers::Source::Repo(p) => {
-                                self.distro.family.install_command(p, self.distro.immutable)
-                            }
-                            _ => None,
-                        };
-                        let mut fix = fixes.driver_fix(
-                            &drivers.what(d),
-                            &source,
-                            &d.homepage,
-                            install.as_deref(),
-                        )?;
-                        // Offer the button only where installing would actually work.
-                        if drivers.install_argv(&d.id, &self.distro).is_ok() {
-                            fix.driver = Some(d.id.clone());
+                let mut offers: Vec<Fix> = Vec::new();
+                for d in drivers.for_device(device.bus, vendor, product) {
+                    let source = drivers.source(d, &self.distro);
+                    let install = match source {
+                        drivers::Source::Repo(p) => {
+                            self.distro.family.install_command(p, self.distro.immutable)
                         }
-                        Some(fix)
-                    });
-                device.fixes.splice(0..0, offers.collect::<Vec<_>>());
+                        _ => None,
+                    };
+                    let Some(mut fix) = fixes.driver_fix(
+                        &drivers.what(d),
+                        &source,
+                        &d.homepage,
+                        install.as_deref(),
+                    ) else {
+                        continue;
+                    };
+                    // A package in a section that's switched off (Debian's non-free)
+                    // can't be installed yet: say so first, with the command that fixes
+                    // it, and hold back the install button until it's on.
+                    let section_off = match (&source, drivers.section(d, &self.distro)) {
+                        (drivers::Source::Repo(_), Some(section)) => {
+                            apt_sources::section_status(&self.system.apt_dir, section)
+                                .filter(|status| !status.enabled)
+                                .and_then(|status| {
+                                    fixes.driver_section_fix(
+                                        section,
+                                        status.enable_command.as_deref(),
+                                    )
+                                })
+                        }
+                        _ => None,
+                    };
+                    // Offer the button only where installing would actually work.
+                    if section_off.is_none() && drivers.install_argv(&d.id, &self.distro).is_ok() {
+                        fix.driver = Some(d.id.clone());
+                    }
+                    offers.extend(section_off);
+                    offers.push(fix);
+                }
+                device.fixes.splice(0..0, offers);
             }
             device.software = software
                 .for_device(device.bus, &device.class_codes, vendor, product)
@@ -651,6 +669,85 @@ mod tests {
                 search.text.contains("14e4:43a0"),
                 "{os_release}: {search:?}"
             );
+        }
+    }
+
+    /// On Debian the Broadcom package lives in "non-free": while that is off the user gets
+    /// the command to switch it on first and no install button; once on, the button.
+    #[test]
+    fn debian_non_free_must_be_on_before_the_driver_can_be_installed() {
+        const MAIN_ONLY: &str =
+            "Types: deb\nURIs: http://deb.debian.org/debian\nSuites: trixie\nComponents: main\n";
+        for (components, section_step) in [("main", true), ("main contrib non-free", false)] {
+            let tmp = tempfile::tempdir().expect("tempdir");
+            let root = tmp.path();
+            let dev = root.join("pci/0000:03:00.0");
+            fs::create_dir_all(&dev).expect("mkdir");
+            for (file, value) in [
+                ("vendor", "0x14e4"),
+                ("device", "0x43a0"),
+                ("class", "0x028000"),
+                (
+                    "modalias",
+                    "pci:v000014E4d000043A0sv00001028sd00000010bc02sc80i00",
+                ),
+            ] {
+                fs::write(dev.join(file), value).expect("write");
+            }
+            let modules = root.join("modules");
+            fs::create_dir_all(&modules).expect("mkdir");
+            fs::write(modules.join("modules.alias"), "").expect("write");
+            fs::write(root.join("cmdline"), "quiet").expect("write");
+            let apt = root.join("apt/sources.list.d");
+            fs::create_dir_all(&apt).expect("mkdir");
+            fs::write(
+                apt.join("debian.sources"),
+                MAIN_ONLY.replace("main", components),
+            )
+            .expect("write");
+            let mut system = SystemPaths::none();
+            system.apt_dir = root.join("apt");
+            let scanner = Scanner {
+                data_dirs: DataDirs::only(&root.join("data")),
+                pci_devices: root.join("pci"),
+                usb_devices: root.join("usb"),
+                kernel_modules: Some(modules.clone()),
+                loaded_modules: modules,
+                modprobe_dirs: Vec::new(),
+                kernel_cmdline: root.join("cmdline"),
+                kernel_log: KernelLogInput::Lines(Vec::new()),
+                firmware_dirs: vec![root.join("firmware")],
+                distro: Distro::from_os_release("ID=debian\n", false),
+                install_check: software::InstallCheck {
+                    path_dirs: vec![],
+                    flatpak_dirs: vec![],
+                },
+                system,
+            };
+            let report = scanner.scan();
+            let [card] = report.devices.as_slice() else {
+                panic!("expected one device, got {:?}", report.devices);
+            };
+            if section_step {
+                let [enable, driver, _search] = card.fixes.as_slice() else {
+                    panic!("{:?}", card.fixes);
+                };
+                assert!(enable.text.contains("\"non-free\""), "{enable:?}");
+                assert!(
+                    enable.command.as_deref().is_some_and(
+                        |c| c.contains("s/$/ non-free/") && c.ends_with("&& sudo apt update")
+                    ),
+                    "{enable:?}"
+                );
+                assert_eq!(enable.driver, None);
+                // The package step is still shown (the command to copy), just no button.
+                assert_eq!(driver.driver, None);
+            } else {
+                let [driver, _search] = card.fixes.as_slice() else {
+                    panic!("{:?}", card.fixes);
+                };
+                assert_eq!(driver.driver.as_deref(), Some("broadcom-wl"));
+            }
         }
     }
 

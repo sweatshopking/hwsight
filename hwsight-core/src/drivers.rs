@@ -43,6 +43,7 @@ pub struct DriverEntry {
     pub what: String,
     pub homepage: String,
     packages: HashMap<String, String>,
+    sections: HashMap<String, String>,
     matchers: Vec<Matcher>,
 }
 
@@ -67,6 +68,10 @@ struct RawDriver {
     homepage: String,
     #[serde(default)]
     packages: HashMap<String, String>,
+    /// The archive section a repo package lives in, per distro, when it isn't on by
+    /// default (Debian's `non-free`).
+    #[serde(default)]
+    sections: HashMap<String, String>,
     #[serde(rename = "match", default)]
     matches: Vec<RawMatch>,
 }
@@ -113,6 +118,13 @@ fn check(d: &RawDriver) -> Result<(), String> {
     if let Some(bad) = d.packages.values().find(|p| !check_package(p)) {
         return Err(format!("driver `{id}`: `{bad}` isn't a valid package"));
     }
+    if let Some(bad) = d
+        .sections
+        .values()
+        .find(|s| s.is_empty() || !s.chars().all(|c| c.is_ascii_lowercase() || c == '-'))
+    {
+        return Err(format!("driver `{id}`: `{bad}` isn't a valid section"));
+    }
     if d.matches.is_empty() {
         return Err(format!("driver `{id}` matches no devices"));
     }
@@ -146,6 +158,7 @@ impl DataFile for Table {
                 what: d.what,
                 homepage: d.homepage,
                 packages: d.packages,
+                sections: d.sections,
                 matchers,
             });
         }
@@ -250,6 +263,16 @@ impl Drivers {
     /// own window. The package comes from this file, never from the caller.
     pub fn install(&self, id: &str, distro: &Distro) -> Result<String, String> {
         crate::optional_tools::run_installer(&self.install_argv(id, distro)?)
+    }
+
+    /// The archive section `driver`'s package lives in on this distro, when it needs
+    /// switching on (e.g. Debian's `non-free`).
+    pub fn section<'a>(&self, driver: &'a DriverEntry, distro: &Distro) -> Option<&'a str> {
+        distro
+            .data_keys()
+            .iter()
+            .find_map(|k| driver.sections.get(k))
+            .map(String::as_str)
     }
 
     /// What the driver is for, in the user's language.
