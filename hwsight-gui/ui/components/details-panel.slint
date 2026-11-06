@@ -33,6 +33,9 @@ export component DetailsPanel inherits Rectangle {
             vertical-stretch: 1;
         }
         if root.has-device : ScrollView {
+            // Without this the content is as wide as its widest line (long paths, commands),
+            // which pushes the panel and window wider than the screen and clips the right side.
+            viewport-width: self.width - 14px;
         VerticalLayout {
             // Pack from the top; without this the items spread to fill the panel.
             alignment: start;

@@ -220,6 +220,14 @@ fn main() -> Result<(), slint::PlatformError> {
             window.set_selected(n);
         }
 
+        // HWSIGHT_SIZE=<width>x<height> shows the window at that size (for layout checks).
+        if let Some((w, h)) = std::env::var("HWSIGHT_SIZE").ok().and_then(|v| {
+            let (w, h) = v.split_once('x')?;
+            Some((w.parse::<f32>().ok()?, h.parse::<f32>().ok()?))
+        }) {
+            window.window().set_size(slint::LogicalSize::new(w, h));
+        }
+
         snapshot_when_ready(window.as_weak(), path.into());
     }
 

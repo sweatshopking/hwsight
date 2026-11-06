@@ -40,6 +40,11 @@ export component AppWindow inherits Window {
     // long translations (the list column can't shrink below about 430px).
     min-width: 960px;
     min-height: 520px;
+    // Without an explicit maximum the window's width is capped at the width it opens at:
+    // some child's layout limit became the window's limit and a corner drag only changed
+    // the height. A huge maximum lets the window grow like any other.
+    max-width: 100000px;
+    max-height: 100000px;
     background: Theme.background;
     // Slint's built-in widgets (the switch, scrollbars) default to a light scheme with
     // dark text, which is hard to read on our dark background.
