@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 05:36+0000\n"
+"POT-Creation-Date: 2026-11-06 05:39+0000\n"
 "Language: nl\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -966,6 +966,75 @@ msgstr ""
 msgid "Memory ({} GB)"
 msgstr ""
 
+msgid "Cable"
+msgstr ""
+
+msgid "Connected"
+msgstr ""
+
+msgid "No cable connected"
+msgstr ""
+
+msgid "The cable is only running at {}, which is much slower than modern network connections. A damaged or very old cable, or a slow port on the router, is the usual cause. Try another cable."
+msgstr ""
+
+msgid "Link speed"
+msgstr ""
+
+msgid "Full"
+msgstr ""
+
+msgid "Half"
+msgstr ""
+
+msgid "Half duplex means the two ends disagree about how to talk, which makes the connection slow and unreliable. A different cable or router port usually fixes it."
+msgstr ""
+
+msgid "Duplex"
+msgstr ""
+
+msgid "Wi-Fi"
+msgstr ""
+
+msgid "Not connected"
+msgstr ""
+
+msgid "The Wi-Fi signal is weak, which means slower and less reliable connections. Moving closer to the router, or removing obstacles in between, helps."
+msgstr ""
+
+msgid "Signal strength"
+msgstr ""
+
+msgid "{} dBm"
+msgstr ""
+
+msgid "NetworkManager"
+msgstr ""
+
+msgid "This adapter also supports the faster, less crowded 5 GHz band, if your router offers it."
+msgstr ""
+
+msgid "Wi-Fi band"
+msgstr ""
+
+msgid "{} GHz"
+msgstr ""
+
+msgid "Connection speed"
+msgstr ""
+
+msgid "The speed the Wi-Fi link is running at now. Real downloads are slower."
+msgstr ""
+
+msgid "Interface name"
+msgstr ""
+
+msgid "Largest packet size (MTU)"
+msgstr ""
+
+msgid "Network connection"
+msgstr ""
+
 msgid "Unknown {} {}"
 msgstr "Onbekende {} {}"
 
@@ -988,9 +1057,6 @@ msgid "Graphics cards slow this connection down when nothing is asking much of t
 msgstr ""
 
 msgid "This is slower than both the device and its slot can go. Power saving can cause this. If the device feels slow, check its PCIe speed setting in the BIOS."
-msgstr ""
-
-msgid "Link speed"
 msgstr ""
 
 msgid "Using {} lanes where {} are possible. For a card in a slot this usually means it isn't pushed in fully, or the slot shares lanes with another slot or drive. The motherboard manual says which."

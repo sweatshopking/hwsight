@@ -36,6 +36,10 @@ pub struct SystemPaths {
     pub drm_live: bool,
     /// Ask the fwupd service about firmware versions and updates (off in tests).
     pub fwupd: bool,
+    /// `/proc/net/wireless`: Wi-Fi signal levels.
+    pub proc_net_wireless: PathBuf,
+    /// Ask NetworkManager about Wi-Fi bands and speeds (off in tests).
+    pub network_manager: bool,
 }
 
 impl SystemPaths {
@@ -54,6 +58,8 @@ impl SystemPaths {
             pnp_ids: PathBuf::from("/usr/share/hwdata/pnp.ids"),
             drm_live: true,
             fwupd: true,
+            proc_net_wireless: PathBuf::from("/proc/net/wireless"),
+            network_manager: true,
         }
     }
 
@@ -74,6 +80,8 @@ impl SystemPaths {
             pnp_ids: nowhere.join("pnp.ids"),
             drm_live: false,
             fwupd: false,
+            proc_net_wireless: nowhere.join("wireless"),
+            network_manager: false,
         }
     }
 }

@@ -1787,6 +1787,16 @@ empty, so the `GetUpgrades` reply (release keys Version and Summary) is parsed f
 documented format only. After the owner runs `fwupdmgr refresh`, re-check a device with an
 update, and check the install flow later (Claude does the install flow, plan item 7).
 
+**Network connections are read** (`network.rs`): wired link state, speed, and duplex (sysfs);
+Wi-Fi signal (`/proc/net/wireless`, else NetworkManager's percent) plus band, speed, and 5 GHz
+support (NetworkManager over D-Bus, read-only). Amber findings: a cable at 100 Mb/s or less
+(judged without asking the adapter its maximum, which needs a low-level call: a modern
+adapter at 100 Mb/s means a bad cable or slow router port), half duplex, and a Wi-Fi signal
+of -70 dBm or worse (or under 35%). A 2.4 GHz connection on an adapter that supports 5 GHz is
+only a hint (Info), since we can't see whether the router offers 5 GHz. MAC addresses and the
+Wi-Fi network name are never read. Not yet: the Wi-Fi standard (4/5/6/7, needs nl80211),
+IP addresses, the adapter's maximum speed.
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the

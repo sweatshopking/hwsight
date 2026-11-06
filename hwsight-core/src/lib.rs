@@ -22,6 +22,7 @@ pub mod i18n;
 pub mod kernel_log;
 mod memory;
 pub mod modules;
+mod network;
 mod pci;
 mod pci_details;
 pub mod pci_ids;
@@ -287,6 +288,12 @@ impl Scanner {
         {
             firmware_updates::attach(&mut devices, &firmware);
         }
+        let wifi = if self.system.network_manager {
+            network::read_wifi_live()
+        } else {
+            Default::default()
+        };
+        network::attach(&mut devices, &self.system.proc_net_wireless, &wifi);
         devices.sort_by(|a, b| {
             a.category
                 .cmp(&b.category)
