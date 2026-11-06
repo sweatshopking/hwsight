@@ -50,6 +50,14 @@ export struct FixItem {
     command: string,
 }
 
+// One firmware update the user can tick on or off. `id` is fwupd's device id.
+export struct FirmwareItem {
+    id: string,
+    name: string,
+    version: string,
+    checked: bool,
+}
+
 export struct SoftwareItem {
     name: string,
     what: string,

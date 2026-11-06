@@ -1,0 +1,94 @@
+import { Theme, FirmwareItem } from "../theme.slint";
+import { AccentButton } from "accent-button.slint";
+import { CheckBox } from "std-widgets.slint";
+
+// Firmware updates hwsight may install (never the BIOS), one tick box per device, all
+// ticked to start with. Installing asks once more before it does anything.
+export component FirmwareBanner inherits Rectangle {
+    in property <string> text;
+    in property <[FirmwareItem]> items;
+    in property <string> status;
+    in property <bool> busy;
+    callback toggle(int, bool);
+    callback install();
+    callback check();
+
+    property <bool> confirming: false;
+    // How many are ticked (kept up to date by the Rust side).
+    in property <int> checked-count;
+
+    visible: root.text != "" || root.status != "";
+    height: self.visible ? banner-layout.preferred-height : 0px;
+    background: Theme.surface-raised;
+    border-width: 1px;
+    border-color: Theme.accent-start.with-alpha(0.6);
+    border-radius: Theme.radius-small;
+
+    banner-layout := VerticalLayout {
+        padding-left: Theme.padding;
+        padding-right: Theme.padding;
+        padding-top: Theme.gap;
+        padding-bottom: Theme.gap;
+        spacing: Theme.gap;
+        HorizontalLayout {
+            spacing: Theme.gap;
+            Text {
+                text: root.text;
+                color: Theme.text;
+                font-size: Theme.font-body;
+                font-weight: 600;
+                wrap: word-wrap;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+            if !root.busy && !root.confirming : AccentButton {
+                text: @tr("Check for new updates");
+                clicked => { root.check(); }
+            }
+            if !root.busy && !root.confirming && root.items.length > 0 : AccentButton {
+                text: @tr("Install selected");
+                enabled: root.checked-count > 0;
+                clicked => { root.confirming = true; }
+            }
+        }
+        for item[i] in root.items : CheckBox {
+            text: @tr("{}: version {}", item.name, item.version);
+            checked: item.checked;
+            enabled: !root.busy;
+            toggled => { root.toggle(i, self.checked); }
+        }
+        if root.confirming && !root.busy : HorizontalLayout {
+            spacing: Theme.gap;
+            Text {
+                text: @tr("Install the ticked updates now? Keep the computer plugged in and don't turn it off while they install. Some need a restart afterwards. You may be asked for your password.");
+                color: Theme.text;
+                font-size: Theme.font-body;
+                wrap: word-wrap;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+            AccentButton {
+                text: @tr("Yes, install");
+                clicked => {
+                    root.confirming = false;
+                    root.install();
+                }
+            }
+            AccentButton {
+                text: @tr("Cancel");
+                clicked => { root.confirming = false; }
+            }
+        }
+        if root.busy : Text {
+            text: @tr("Working... this can take a few minutes.");
+            color: Theme.text-muted;
+            font-size: Theme.font-body;
+        }
+        if root.status != "" : Text {
+            text: root.status;
+            color: Theme.text-muted;
+            font-size: Theme.font-body;
+            wrap: word-wrap;
+        }
+    }
+}

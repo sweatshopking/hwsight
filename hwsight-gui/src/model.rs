@@ -8,7 +8,7 @@ use std::rc::Rc;
 use hwsight_core::device::Attention;
 use slint::{ModelRc, VecModel};
 
-use crate::{DetailGroupItem, DetailItem, DeviceItem, FixItem, Row, SoftwareItem};
+use crate::{DetailGroupItem, DetailItem, DeviceItem, FirmwareItem, FixItem, Row, SoftwareItem};
 
 /// Everything the window needs from one scan.
 pub struct View {
@@ -19,9 +19,38 @@ pub struct View {
     /// Working devices that have something that could be better.
     pub improve_count: i32,
     pub notes: Vec<String>,
+    /// Headline for the firmware banner, or "" when there is nothing to say.
+    pub firmware_text: String,
+    pub firmware_items: Vec<FirmwareItem>,
+}
+
+/// The firmware banner: how many updates can be installed, or that the update list is old.
+pub fn firmware_banner(report: &ScanReport) -> (String, Vec<FirmwareItem>) {
+    let items: Vec<FirmwareItem> = report
+        .pending_firmware
+        .iter()
+        .map(|u| FirmwareItem {
+            id: u.device_id.clone().into(),
+            name: u.name.clone().into(),
+            version: u.version.clone().into(),
+            checked: true,
+        })
+        .collect();
+    let n = items.len();
+    let text = if n > 0 {
+        hwsight_core::tr!(
+            "1 firmware update is available" | "{n} firmware updates are available" % n
+        )
+    } else if report.firmware_catalog_old {
+        hwsight_core::tr!("The list of available firmware updates is out of date")
+    } else {
+        String::new()
+    };
+    (text, items)
 }
 
 pub fn view(report: &ScanReport) -> View {
+    let (firmware_text, firmware_items) = firmware_banner(report);
     let devices: Vec<DeviceItem> = report.devices.iter().map(device_item).collect();
     let rows = filter_rows(&report.devices, "", false);
 
@@ -70,6 +99,8 @@ pub fn view(report: &ScanReport) -> View {
         problem_count: problems as i32,
         improve_count: improve as i32,
         notes,
+        firmware_text,
+        firmware_items,
     }
 }
 

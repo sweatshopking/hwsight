@@ -1,35 +1,35 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 06:58+0000\n"
+"POT-Creation-Date: 2026-11-06 07:08+0000\n"
 "Language: tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: hwsight-gui/ui/app.slint:137
+#: hwsight-gui/ui/app.slint:146
 msgid "Scanning your hardware..."
 msgstr "Donanımınız taranıyor..."
 
-#: hwsight-gui/ui/app.slint:148
+#: hwsight-gui/ui/app.slint:157
 msgid "No problems found"
 msgstr "Sorun bulunamadı"
 
-#: hwsight-gui/ui/app.slint:159
+#: hwsight-gui/ui/app.slint:168
 msgid "Copy report for all devices"
 msgstr "Tüm cihazların raporunu kopyala"
 
-#: hwsight-gui/ui/app.slint:163
+#: hwsight-gui/ui/app.slint:172
 msgid "Scanning..."
 msgstr "Taranıyor..."
 
-#: hwsight-gui/ui/app.slint:163
+#: hwsight-gui/ui/app.slint:172
 msgid "Scan again"
 msgstr "Tekrar tara"
 
-#: hwsight-gui/ui/app.slint:192
+#: hwsight-gui/ui/app.slint:211
 msgid "Nothing matches."
 msgstr "Eşleşme yok."
 
-#: hwsight-gui/ui/app.slint:211
+#: hwsight-gui/ui/app.slint:230
 msgid "Only problems"
 msgstr "Yalnızca sorunlar"
 
@@ -116,6 +116,34 @@ msgstr "Adres"
 #: hwsight-gui/ui/components/details-panel.slint:436
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Bu aygıt henüz aygıt veritabanında yok. Yukarıdaki donanım kimliğini çevrimiçi arayabilirsiniz."
+
+#: hwsight-gui/ui/components/firmware-banner.slint:45
+msgid "Check for new updates"
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:49
+msgid "Install selected"
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:55
+msgid "{}: version {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:63
+msgid "Install the ticked updates now? Keep the computer plugged in and don't turn it off while they install. Some need a restart afterwards. You may be asked for your password."
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:71
+msgid "Yes, install"
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:78
+msgid "Cancel"
+msgstr ""
+
+#: hwsight-gui/ui/components/firmware-banner.slint:83
+msgid "Working... this can take a few minutes."
+msgstr ""
 
 #: hwsight-gui/ui/components/level-switch.slint:16
 msgid "Simple"
@@ -747,6 +775,15 @@ msgstr ""
 msgid "This drive reports a serious health problem. Back up anything important right away."
 msgstr ""
 
+msgid "The fwupdmgr program isn't installed."
+msgstr ""
+
+msgid "Couldn't start fwupdmgr: {}"
+msgstr ""
+
+msgid "That isn't a valid device id."
+msgstr ""
+
 msgid "Firmware update check"
 msgstr ""
 
@@ -793,6 +830,9 @@ msgid "Back up important files first, and keep the computer plugged in while it 
 msgstr ""
 
 msgid "Firmware update"
+msgstr ""
+
+msgid "This is an update to your computer's main firmware (the BIOS), and hwsight won't install it for you: if it fails, the computer may not start again. The safest way is the instructions on {}'s support page. If you use the command instead, keep the computer plugged in (and a laptop's battery charged), and don't turn it off or unplug it while it works. The restart that finishes the update takes longer than usual."
 msgstr ""
 
 msgid "Version {} is available"
@@ -1292,6 +1332,26 @@ msgstr "hwsight {} kullanılabilir."
 
 msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} kullanılabilir. Paket yöneticinizle güncelleyin veya web sitesinden indirin."
+
+msgid "The list of firmware updates is up to date."
+msgstr ""
+
+msgid "Couldn't download the update list: {}"
+msgstr ""
+
+msgid "{}: installed. If it asks for a restart, restart when it suits you."
+msgstr ""
+
+msgid "{}: not installed. {}"
+msgstr ""
+
+msgid "1 firmware update is available"
+msgid_plural "{n} firmware updates are available"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "The list of available firmware updates is out of date"
+msgstr ""
 
 msgid "No devices found"
 msgstr "Aygıt bulunamadı"

@@ -15,6 +15,7 @@ pub mod distro;
 mod drives;
 mod edid;
 pub mod firmware;
+mod firmware_actions;
 mod firmware_updates;
 pub mod fixes;
 mod fwupd;
@@ -46,6 +47,8 @@ pub use descriptions::Descriptions;
 pub use device::{Bus, Category, Device, Status, short_vendor};
 pub use distro::{Distro, Family};
 pub use firmware::FirmwarePackages;
+pub use firmware_actions::{install_update, refresh_catalog};
+pub use firmware_updates::PendingUpdate;
 pub use fixes::{Fix, Fixes};
 pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
@@ -68,6 +71,11 @@ pub struct ScanReport {
     pub distro: Distro,
     /// Distro-specific advice for installing firmware, e.g. enabling a repository.
     pub firmware_note: Option<String>,
+    /// Firmware updates hwsight may install after the user confirms (never the BIOS).
+    pub pending_firmware: Vec<PendingUpdate>,
+    /// fwupd's list of available updates was never downloaded or is old, so a refresh
+    /// would help.
+    pub firmware_catalog_old: bool,
 }
 
 /// A problem on a USB port rather than a device.
@@ -283,10 +291,16 @@ impl Scanner {
         }
         // Firmware versions and updates go on the device they belong to, so every device
         // has to be in the list first.
+        let mut pending_firmware = Vec::new();
+        let mut firmware_catalog_old = false;
         if self.system.fwupd
             && let Some(firmware) = fwupd::read()
         {
-            firmware_updates::attach(&mut devices, &firmware);
+            firmware_catalog_old = matches!(
+                firmware.catalog,
+                fwupd::Catalog::NeverDownloaded | fwupd::Catalog::Stale { .. }
+            );
+            pending_firmware = firmware_updates::attach(&mut devices, &firmware);
         }
         let wifi = if self.system.network_manager {
             network::read_wifi_live()
@@ -428,6 +442,8 @@ impl Scanner {
             kernel_log: log_source,
             distro: self.distro.clone(),
             firmware_note,
+            pending_firmware,
+            firmware_catalog_old,
         }
     }
 }

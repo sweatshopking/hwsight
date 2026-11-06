@@ -8,6 +8,8 @@
 
 use std::collections::BTreeMap;
 
+use serde::Serialize;
+
 use crate::details::{Detail, DetailGroup, Verdict};
 use crate::device::{Bus, Category, Device};
 use crate::fwupd::{Catalog, Fwupd, FwupdDevice};
@@ -26,6 +28,36 @@ const SKIPPED: [&str; 7] = [
 
 /// Firmware that belongs to the computer as a whole.
 const SYSTEM_PLUGINS: [&str; 4] = ["uefi_capsule", "uefi_dbx", "tpm", "bios"];
+
+/// Firmware that can leave the computer unable to start if an update goes wrong. hwsight
+/// reports these updates and shows the command, but never offers a button for them.
+const RISKY_PLUGINS: [&str; 8] = [
+    "uefi_capsule",
+    "bios",
+    "tpm",
+    "intel_me",
+    "intel_amt",
+    "intel_spi",
+    "amd_pmc",
+    "redfish",
+];
+
+/// An update hwsight may install for the user, after they confirm it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct PendingUpdate {
+    /// fwupd's id for the device (a 40-character hex string).
+    pub device_id: String,
+    pub name: String,
+    pub from_version: Option<String>,
+    pub version: String,
+}
+
+/// Whether an update to this firmware is too risky for hwsight to install. The Secure
+/// Boot key list (dbx) lives on the motherboard but is a small, routine update.
+fn is_system_firmware(fw: &FwupdDevice, category: Category) -> bool {
+    RISKY_PLUGINS.contains(&fw.plugin.as_str())
+        || (category == Category::Motherboard && fw.plugin != "uefi_dbx")
+}
 
 const STORAGE_PLUGINS: [&str; 3] = ["nvme", "ata", "scsi"];
 
@@ -128,7 +160,13 @@ fn catalog_finding(catalog: Catalog) -> Option<Detail> {
     }
 }
 
-fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Option<DetailGroup> {
+fn group_for(
+    owned: &[&FwupdDevice],
+    category: Category,
+    catalog: Catalog,
+    maker: &str,
+    pending: &mut Vec<PendingUpdate>,
+) -> Option<DetailGroup> {
     let source = crate::tr!("The fwupd firmware service");
     let mut items = Vec::new();
     let mut checked = false;
@@ -205,6 +243,21 @@ fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Op
             } else {
                 crate::tr!("{} update", fw.name)
             };
+            let command = format!("fwupdmgr update {}", fw.id);
+            if is_system_firmware(fw, category) {
+                why.push(' ');
+                why.push_str(&crate::tr!(
+                    "This is an update to your computer's main firmware (the BIOS), and hwsight won't install it for you: if it fails, the computer may not start again. The safest way is the instructions on {}'s support page. If you use the command instead, keep the computer plugged in (and a laptop's battery charged), and don't turn it off or unplug it while it works. The restart that finishes the update takes longer than usual.",
+                    maker
+                ));
+            } else {
+                pending.push(PendingUpdate {
+                    device_id: fw.id.clone(),
+                    name: fw.name.clone(),
+                    from_version: fw.version.clone(),
+                    version: update.version.clone(),
+                });
+            }
             items.push(
                 Detail::new(
                     label,
@@ -212,7 +265,7 @@ fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Op
                     source.clone(),
                 )
                 .verdict(Verdict::Reduced, Some(why))
-                .command("fwupdmgr update"),
+                .command(command),
             );
         }
     }
@@ -233,7 +286,8 @@ fn group_for(owned: &[&FwupdDevice], category: Category, catalog: Catalog) -> Op
 }
 
 /// Add a "Firmware" group to every device fwupd has something to say about.
-pub(crate) fn attach(devices: &mut [Device], fwupd: &Fwupd) {
+pub(crate) fn attach(devices: &mut [Device], fwupd: &Fwupd) -> Vec<PendingUpdate> {
+    let mut pending = Vec::new();
     let mut by_device: BTreeMap<usize, Vec<&FwupdDevice>> = BTreeMap::new();
     for fw in &fwupd.devices {
         if let Some(index) = target(fw, &fwupd.devices, devices, 0) {
@@ -242,7 +296,11 @@ pub(crate) fn attach(devices: &mut [Device], fwupd: &Fwupd) {
     }
     for (index, owned) in by_device {
         let category = devices[index].category;
-        if let Some(mut group) = group_for(&owned, category, fwupd.catalog) {
+        let maker = match &devices[index].vendor_name {
+            Some(vendor) => format!("{vendor} {}", devices[index].display_name),
+            None => devices[index].display_name.clone(),
+        };
+        if let Some(mut group) = group_for(&owned, category, fwupd.catalog, &maker, &mut pending) {
             // The catalog problem belongs with the computer, not with every drive.
             if devices[index].address == "motherboard"
                 && let Some(finding) = catalog_finding(fwupd.catalog)
@@ -265,6 +323,7 @@ pub(crate) fn attach(devices: &mut [Device], fwupd: &Fwupd) {
             items: vec![finding],
         });
     }
+    pending
 }
 
 #[cfg(test)]
@@ -338,7 +397,7 @@ mod tests {
             .unwrap_or_else(|| panic!("no {label:?} in {group:#?}"))
     }
 
-    fn run(devices: &mut [Device], catalog: Catalog, list: Vec<FwupdDevice>) {
+    fn run(devices: &mut [Device], catalog: Catalog, list: Vec<FwupdDevice>) -> Vec<PendingUpdate> {
         in_english(|| {
             attach(
                 devices,
@@ -346,8 +405,8 @@ mod tests {
                     catalog,
                     devices: list,
                 },
-            );
-        });
+            )
+        })
     }
 
     #[test]
@@ -404,18 +463,52 @@ mod tests {
             version: "VACR002".into(),
             summary: Some("Fixes a power bug.".into()),
         });
-        run(&mut devices, Catalog::Fresh, vec![drive]);
+        let pending = run(&mut devices, Catalog::Fresh, vec![drive]);
+        assert_eq!(pending.len(), 1);
+        assert_eq!(pending[0].device_id, "1");
+        assert_eq!(pending[0].version, "VACR002");
         let g = group(&devices, "nvme0n1").expect("group");
         let update = item(g, "Firmware update");
         assert_eq!(update.value, "Version VACR002 is available");
         assert_eq!(update.verdict, Verdict::Reduced);
-        assert_eq!(update.command.as_deref(), Some("fwupdmgr update"));
+        assert_eq!(update.command.as_deref(), Some("fwupdmgr update 1"));
         let why = update.explanation.as_deref().expect("why");
         assert!(why.starts_with("Fixes a power bug."));
         assert!(why.contains("Back up important files first"));
         assert!(
             g.items.iter().all(|i| i.label != "Firmware update check"),
             "no all-clear when there is an update"
+        );
+    }
+
+    #[test]
+    fn a_bios_update_gets_a_command_and_a_warning_but_is_never_offered_for_install() {
+        let mut devices = computer();
+        let mut bios = fw("b", "System Firmware", "uefi_capsule", Some("1.0"));
+        bios.update = Some(Update {
+            version: "2.0".into(),
+            summary: None,
+        });
+        let mut dbx = fw("d", "UEFI dbx", "uefi_dbx", Some("1"));
+        dbx.update = Some(Update {
+            version: "2".into(),
+            summary: None,
+        });
+        let pending = run(&mut devices, Catalog::Fresh, vec![bios, dbx]);
+        assert_eq!(pending.len(), 1, "only the dbx may be installed by hwsight");
+        assert_eq!(pending[0].device_id, "d");
+        let g = group(&devices, "motherboard").expect("group");
+        let update = item(g, "System Firmware update");
+        assert_eq!(update.command.as_deref(), Some("fwupdmgr update b"));
+        let why = update.explanation.as_deref().expect("why");
+        assert!(why.contains("won't install it for you"));
+        assert!(why.contains("plugged in"));
+        assert!(
+            !item(g, "UEFI dbx update")
+                .explanation
+                .as_deref()
+                .expect("why")
+                .contains("BIOS")
         );
     }
 

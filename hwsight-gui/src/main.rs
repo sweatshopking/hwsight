@@ -19,7 +19,9 @@ use slint::{ComponentHandle, Model, ModelRc, SharedString, VecModel};
 mod ui {
     slint::include_modules!();
 }
-use ui::{AppWindow, DetailGroupItem, DetailItem, DeviceItem, FixItem, Row, SoftwareItem};
+use ui::{
+    AppWindow, DetailGroupItem, DetailItem, DeviceItem, FirmwareItem, FixItem, Row, SoftwareItem,
+};
 
 struct UpdateState {
     release: Option<hwsight_core::app_update::Release>,
@@ -48,6 +50,39 @@ fn main() -> Result<(), slint::PlatformError> {
     let scan_devices = devices.clone();
     let scan_report = last_report.clone();
     window.on_refresh(move || start_scan(weak.clone(), scan_devices.clone(), scan_report.clone()));
+    window.on_firmware_toggle({
+        let weak = window.as_weak();
+        move |index, on| {
+            let Some(w) = weak.upgrade() else { return };
+            let items = w.get_firmware_items();
+            if let Some(mut item) = items.row_data(index as usize) {
+                item.checked = on;
+                items.set_row_data(index as usize, item);
+            }
+            w.set_firmware_checked(items.iter().filter(|i| i.checked).count() as i32);
+        }
+    });
+    window.on_firmware_check({
+        let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
+        move || {
+            run_firmware_job(weak.clone(), devices.clone(), report.clone(), Vec::new());
+        }
+    });
+    window.on_firmware_install({
+        let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
+        move || {
+            let Some(w) = weak.upgrade() else { return };
+            let ticked: Vec<(String, String)> = w
+                .get_firmware_items()
+                .iter()
+                .filter(|i| i.checked)
+                .map(|i| (i.id.to_string(), i.name.to_string()))
+                .collect();
+            if !ticked.is_empty() {
+                run_firmware_job(weak.clone(), devices.clone(), report.clone(), ticked);
+            }
+        }
+    });
     let filter_window = window.as_weak();
     let filter_devices = devices.clone();
     window.on_filter_changed(move || apply_filter(&filter_window, &filter_devices));
@@ -407,6 +442,49 @@ fn apply_filter(window: &slint::Weak<AppWindow>, devices: &Arc<Mutex<Vec<hwsight
     w.set_rows(ModelRc::from(Rc::new(VecModel::from(rows))));
 }
 
+/// Refresh fwupd's list (when `install` is empty) or install the given (id, name) updates,
+/// one device at a time, then scan again. fwupdmgr asks for the password itself.
+fn run_firmware_job(
+    window: slint::Weak<AppWindow>,
+    devices: Arc<Mutex<Vec<hwsight_core::Device>>>,
+    last_report: Arc<Mutex<Option<hwsight_core::ScanReport>>>,
+    install: Vec<(String, String)>,
+) {
+    if let Some(w) = window.upgrade() {
+        if w.get_firmware_busy() {
+            return;
+        }
+        w.set_firmware_busy(true);
+        w.set_firmware_status("".into());
+    }
+    std::thread::spawn(move || {
+        let status = if install.is_empty() {
+            match hwsight_core::refresh_catalog() {
+                Ok(_) => hwsight_core::tr!("The list of firmware updates is up to date."),
+                Err(e) => hwsight_core::tr!("Couldn't download the update list: {}", e),
+            }
+        } else {
+            let mut lines = Vec::new();
+            for (id, name) in &install {
+                lines.push(match hwsight_core::install_update(id) {
+                    Ok(_) => hwsight_core::tr!(
+                        "{}: installed. If it asks for a restart, restart when it suits you.",
+                        name
+                    ),
+                    Err(e) => hwsight_core::tr!("{}: not installed. {}", name, e),
+                });
+            }
+            lines.join("\n")
+        };
+        let _ = slint::invoke_from_event_loop(move || {
+            let Some(w) = window.upgrade() else { return };
+            w.set_firmware_status(status.into());
+            w.set_firmware_busy(false);
+            start_scan(window, devices, last_report);
+        });
+    });
+}
+
 /// Scan on a background thread so the window stays responsive, then show the result.
 fn start_scan(
     window: slint::Weak<AppWindow>,
@@ -437,6 +515,9 @@ fn start_scan(
             w.set_devices(ModelRc::from(Rc::new(VecModel::from(view.devices))));
             w.set_rows(ModelRc::from(Rc::new(VecModel::from(view.rows))));
             w.set_summary(view.summary.into());
+            w.set_firmware_text(view.firmware_text.into());
+            w.set_firmware_checked(view.firmware_items.len() as i32);
+            w.set_firmware_items(ModelRc::from(Rc::new(VecModel::from(view.firmware_items))));
             w.set_problem_count(view.problem_count);
             w.set_improve_count(view.improve_count);
             let notes: Vec<SharedString> = view.notes.into_iter().map(Into::into).collect();

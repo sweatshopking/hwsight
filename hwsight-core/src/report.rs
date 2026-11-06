@@ -327,6 +327,8 @@ mod tests {
                 base_release: None,
             },
             firmware_note: None,
+            pending_firmware: vec![],
+            firmware_catalog_old: false,
         }
     }
 
