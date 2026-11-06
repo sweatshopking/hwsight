@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
+use crate::data_text::DataText;
 use crate::device::{Bus, Category};
 use crate::rules::{Matcher, compile_matcher};
 
@@ -14,6 +15,8 @@ pub struct Descriptions {
     pub version: String,
     pub source: DataSource,
     table: Table,
+    /// Translations for the user's language (English by default).
+    text: DataText,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -92,7 +95,23 @@ impl Descriptions {
             version: loaded.version,
             source: loaded.source,
             table: loaded.data,
+            text: DataText::english(),
         }
+    }
+
+    /// Every English text in the built-in file, for the translation checks.
+    #[cfg(test)]
+    pub(crate) fn english_texts() -> Vec<String> {
+        let table = Self::embedded().table;
+        let mut texts: Vec<String> = table.entries.into_iter().map(|(_, t)| t).collect();
+        texts.extend(table.by_category.into_values());
+        texts
+    }
+
+    /// Describe devices in the language of `text`; English where it has no translation.
+    pub fn with_text(mut self, text: DataText) -> Self {
+        self.text = text;
+        self
     }
 
     /// The best description for a device that offers these class codes (one for a PCI
@@ -116,8 +135,14 @@ impl Descriptions {
                 }
             }
         }
-        best.map(|(_, text)| text.to_owned())
-            .or_else(|| self.table.by_category.get(category_key(category)).cloned())
+        best.map(|(_, text)| text)
+            .or_else(|| {
+                self.table
+                    .by_category
+                    .get(category_key(category))
+                    .map(String::as_str)
+            })
+            .map(|english| self.text.get(english).to_owned())
     }
 }
 
@@ -146,6 +171,29 @@ fn category_key(category: Category) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn descriptions_are_translated_including_category_fallbacks() {
+        let english = Descriptions::embedded();
+        let sound = english
+            .describe(Bus::Pci, &[], 0, 0, Category::Sound)
+            .expect("sound has a fallback");
+        let text = DataText::from_toml(&format!(
+            "schema = 1\nversion = \"2026.11.06\"\nlanguage = \"de\"\n[text]\n{sound:?} = \"Spielt Ton ab.\"\n"
+        ));
+        let german = english.clone().with_text(text);
+        assert_eq!(
+            german
+                .describe(Bus::Pci, &[], 0, 0, Category::Sound)
+                .as_deref(),
+            Some("Spielt Ton ab.")
+        );
+        // Text without a translation stays English.
+        assert_eq!(
+            german.describe(Bus::Pci, &[], 0, 0, Category::Network),
+            english.describe(Bus::Pci, &[], 0, 0, Category::Network)
+        );
+    }
 
     const ALL: [Category; 16] = [
         Category::Graphics,

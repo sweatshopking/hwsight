@@ -1357,14 +1357,19 @@ Order (each task starts only after the one before is reviewed):
    Read `po/README.md`.
 2. **Copilot 13:** mark every user-facing text for translation (below).
 3. **Copilot 14:** machine-draft all 11 catalogs (below).
-4. **Claude 14:** translated data files (descriptions, fixes) per language.
-5. **Copilot 15:** software recommendations (`software.toml`, core, CLI, GUI). Spec written
-   after Copilot 14.
+4. **Claude 14 (done 2026-11-06):** translated data text. `data_text.rs` loads
+   `text-<language>.toml` (English text -> translation, signed and updated like every
+   data file); descriptions and fix steps use it, English where a text has no
+   translation. `--json` and `--report` stay English.
+5. **Copilot 15:** machine-draft the 11 data text files (below).
+5b. **Copilot 16:** software recommendations (`software.toml`, core, CLI, GUI); its texts
+   use the same data text files. Spec written after Copilot 15.
 6. **Claude 15:** detail levels foundation (data model, Simple / More details /
-   Technical toggle, `hwsight --details`). Also fix the header for long translations
-   (French "Analyser à nouveau" runs off the right edge at the default 1100px width):
+   Technical toggle, `hwsight --details`). Also fix the layout for long translations
+   (French "Analyser à nouveau" runs off the right edge at the default 1100px width;
+   German "Für einen Forumsbeitrag kopieren" is wider than the details panel):
    it must fit, or wrap, at the minimum window width in every language; check
-   snapshots in de, fr, and ru. Then **Copilot 16 and on:** one detail reader
+   snapshots in de, fr, and ru. Then **Copilot 17 and on:** one detail reader
    per device type (PCI link and power, USB, drivers, CPU, GPU, memory, board and BIOS,
    drives, monitors, battery, network, audio, input, sensors), each against fake sysfs
    files. Admin-only data (polkit helper) and NVIDIA through NVML may follow the release.
@@ -1594,3 +1599,53 @@ this task's Done notes. Nothing else. Don't edit `po/hwsight.pot`.
 
   ALL CHECKS PASSED
   ```
+
+---
+
+## Copilot 15: machine-draft the data text translations
+
+**Only after Claude 14.** Read the top of `hwsight-core/src/data_text.rs` and one of the
+`hwsight-core/data/text-*.toml` files first.
+
+**Files you may change:** the 11 files `hwsight-core/data/text-<language>.toml` (de, es,
+fr, it, ja, ko, nl, pt_BR, ru, tr, zh_CN) and this task's Done notes. Nothing else. Never
+edit `descriptions.toml` or `fixes.toml`.
+
+**Steps (do all of them):**
+
+1. For each language, run `python3 -I tools/data-text-missing.py <language>`. It prints
+   every text that language still needs, as `"English" = ""` lines. Paste them under
+   `[text]` in that language's file. **Never type or change the English (left) side:**
+   it must match the data file exactly, character for character, or it's never used.
+   Only ever paste what the script printed.
+2. Fill in every right-hand side: the translation. All 11 languages, every line (83 per
+   language). Don't stop after one language and don't ask whether to continue.
+3. Keep every placeholder exactly: `{module}`, `{package}`, `{file}`, `{hardware_id}`.
+   Same names, same count. Never translate the word inside the braces.
+4. Same tone as the English: short, plain, friendly sentences for people who aren't
+   technical, informal "you" where apps normally use it (German "du", Spanish "tú").
+   Same meaning; nothing added or dropped. Don't translate brand names, driver names,
+   or commands.
+5. Use the same words as the app's own translations in `po/<language>/LC_MESSAGES/`
+   for the same things (for example "driver", "device", "firmware"), so the app and its
+   data read as one.
+6. When done, `python3 -I tools/data-text-missing.py <language>` prints nothing for every
+   language.
+
+**Tests:** none new. `cargo test` already rejects broken placeholders, empty
+translations, and English keys that don't exist. Also run
+`cargo test -p hwsight-core --lib -- --ignored every_data_text_is_translated`: it must
+pass.
+
+**Done when:**
+
+- [ ] `python3 -I tools/data-text-missing.py <language>` prints nothing for all 11
+      (paste the output of: `for l in de es fr it ja ko nl pt_BR ru tr zh_CN; do echo "$l $(python3 -I tools/data-text-missing.py $l | wc -l)"; done`, every count 0)
+- [ ] `every_data_text_is_translated` passes (output pasted)
+- [ ] `tools/check.sh` printed `ALL CHECKS PASSED` after the last edit (output pasted)
+- [ ] the app shows a German description: run
+      `LANGUAGE=de cargo run -q -p hwsight-gui`, select the graphics card, and paste its
+      "What it does" text
+- [ ] nothing committed, nothing pushed, no co-author line
+
+**Done notes:**

@@ -180,7 +180,13 @@ pub(crate) fn parse_data<T: DataFile>(text: &str) -> Result<(String, T), ParseEr
 }
 
 pub(crate) fn embedded<T: DataFile>() -> Loaded<T> {
-    match parse_data::<T>(T::EMBEDDED) {
+    embedded_from::<T>(T::EMBEDDED)
+}
+
+/// Like `embedded`, for file types whose built-in copy is chosen at run time (one per
+/// language).
+pub(crate) fn embedded_from<T: DataFile>(text: &str) -> Loaded<T> {
+    match parse_data::<T>(text) {
         Ok((version, data)) => Loaded {
             data,
             version,
@@ -197,9 +203,18 @@ pub(crate) fn embedded<T: DataFile>() -> Loaded<T> {
 
 /// The newest valid copy from the data folders or the built-in one, plus skipped files.
 pub(crate) fn load_newest<T: DataFile>(dirs: &DataDirs) -> (Loaded<T>, Vec<DataProblem>) {
-    let mut best = embedded::<T>();
+    load_newest_named::<T>(dirs, T::FILE_NAME, T::EMBEDDED)
+}
+
+/// Like `load_newest`, with the file name and built-in copy chosen at run time.
+pub(crate) fn load_newest_named<T: DataFile>(
+    dirs: &DataDirs,
+    file_name: &str,
+    embedded_text: &str,
+) -> (Loaded<T>, Vec<DataProblem>) {
+    let mut best = embedded_from::<T>(embedded_text);
     let mut problems = Vec::new();
-    for path in dirs.hwsight_files(T::FILE_NAME) {
+    for path in dirs.hwsight_files(file_name) {
         let text = match std::fs::read_to_string(&path) {
             Ok(text) => text,
             Err(e) => {

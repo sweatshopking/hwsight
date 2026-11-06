@@ -89,7 +89,12 @@ fn main() -> ExitCode {
             }
         }
     }
-    let report = scanner.scan();
+    // --json and --report are for tools and for helpers on forums: always English.
+    let report = if opts.json || opts.report.is_some() {
+        hwsight_core::i18n::in_english(|| scanner.scan())
+    } else {
+        scanner.scan()
+    };
     if let Some(address) = &opts.report {
         print!(
             "{}",

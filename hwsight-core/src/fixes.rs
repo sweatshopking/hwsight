@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
+use crate::data_text::DataText;
 use crate::device::{Bus, Device, Status};
 use crate::kernel_log::LogIssue;
 
@@ -22,6 +23,8 @@ pub struct Fixes {
     pub version: String,
     pub source: DataSource,
     table: Table,
+    /// Translations for the user's language (English by default).
+    text: DataText,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -92,7 +95,25 @@ impl Fixes {
             version: loaded.version,
             source: loaded.source,
             table: loaded.data,
+            text: DataText::english(),
         }
+    }
+
+    /// Every English step in the built-in file, for the translation checks.
+    #[cfg(test)]
+    pub(crate) fn english_texts() -> Vec<String> {
+        Self::embedded()
+            .table
+            .fixes
+            .into_values()
+            .map(|t| t.text)
+            .collect()
+    }
+
+    /// Write steps in the language of `text`; English where it has no translation.
+    pub fn with_text(mut self, text: DataText) -> Self {
+        self.text = text;
+        self
     }
 
     /// Steps to fix this device's problem: specific ones from the kernel log first, then
@@ -233,7 +254,8 @@ impl Fixes {
     /// missing or unsafe, so a step is never shown half-filled or with a risky command.
     fn render(&self, name: &str, v: &Values) -> Option<Fix> {
         let t = self.table.fixes.get(name)?;
-        let text = fill(&t.text, v, false)?;
+        // The translated step, or the English one if the translation can't be filled in.
+        let text = fill(self.text.get(&t.text), v, false).or_else(|| fill(&t.text, v, false))?;
         let command = match &t.command {
             Some(c) => Some(fill(c, v, true)?),
             None => None,
@@ -355,6 +377,22 @@ mod tests {
                 "fixes.toml has no fix.{name}"
             );
         }
+    }
+
+    #[test]
+    fn steps_are_translated_and_filled_in() {
+        let english = "A driver for this device ({module}) is installed but isn't running. Start it now with this command. It normally starts by itself after a restart.";
+        let f = Fixes::embedded();
+        assert_eq!(f.table.fixes["driver_not_loaded"].text, english);
+        let text = crate::data_text::DataText::from_toml(&format!(
+            "schema = 1\nversion = \"2026.11.06\"\nlanguage = \"de\"\n[text]\n{english:?} = \"Starte den Treiber {{module}}.\"\n"
+        ));
+        let f = f.with_text(text);
+        let mut d = device(Status::DriverAvailableNotLoaded);
+        d.driver_candidates = vec![candidate("iwlwifi", false, None)];
+        let fixes = f.suggest(&d);
+        assert_eq!(fixes[0].text, "Starte den Treiber iwlwifi.");
+        assert_eq!(fixes[0].command.as_deref(), Some("sudo modprobe iwlwifi"));
     }
 
     #[test]

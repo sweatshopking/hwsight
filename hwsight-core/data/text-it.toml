@@ -1,0 +1,11 @@
+# Translations of the text in descriptions.toml and fixes.toml, language: it.
+#
+# Built into hwsight and replaceable by a newer downloaded copy, like the other data
+# files. Each line maps the English text, exactly as written in those files, to its
+# translation. English text that isn't listed here shows in English. Keep every
+# placeholder such as {module} or {package} exactly as it is in the English.
+schema = 1
+version = "2026.11.06"
+language = "it"
+
+[text]

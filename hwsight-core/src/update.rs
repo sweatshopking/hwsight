@@ -59,6 +59,18 @@ const KNOWN_FILES: &[&str] = &[
     "fixes.toml",
     "pci.ids",
     "usb.ids",
+    // Translated data text, one per language (data_text::LANGUAGES).
+    "text-de.toml",
+    "text-es.toml",
+    "text-fr.toml",
+    "text-it.toml",
+    "text-ja.toml",
+    "text-ko.toml",
+    "text-nl.toml",
+    "text-pt_BR.toml",
+    "text-ru.toml",
+    "text-tr.toml",
+    "text-zh_CN.toml",
 ];
 
 /// Gets release files by name. The real one uses HTTPS; tests use a folder.
@@ -242,6 +254,9 @@ pub fn file_version(name: &str, bytes: &[u8]) -> Result<String, String> {
         "fixes.toml" => data::parse_data::<crate::fixes::Table>(text)
             .map(|(v, _)| v)
             .map_err(|e| format!("{name}: {e:?}"))?,
+        _ if name.starts_with("text-") => data::parse_data::<crate::data_text::Table>(text)
+            .map(|(v, _)| v)
+            .map_err(|e| format!("{name}: {e:?}"))?,
         "pci.ids" => {
             if !crate::pci_ids::looks_valid(text) {
                 return Err("pci.ids has no devices".into());
@@ -298,6 +313,13 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
     };
     let pci = ids("pci.ids");
     let usb = ids("usb.ids");
+    let text: Vec<(String, String)> = crate::data_text::LANGUAGES
+        .iter()
+        .map(|l| {
+            let version = crate::data_text::DataText::load(dirs, l).0.version;
+            (crate::data_text::file_name(l), version)
+        })
+        .collect();
     move |name: &str| match name {
         "rules.toml" => Some(rules.clone()),
         "firmware.toml" => Some(firmware.clone()),
@@ -305,7 +327,10 @@ pub fn current_versions(dirs: &DataDirs) -> impl Fn(&str) -> Option<String> {
         "fixes.toml" => Some(fixes.clone()),
         "pci.ids" => pci.clone(),
         "usb.ids" => usb.clone(),
-        _ => None,
+        _ => text
+            .iter()
+            .find(|(file, _)| file == name)
+            .map(|(_, version)| version.clone()),
     }
 }
 
@@ -369,6 +394,15 @@ impl Fetch for HttpFetch {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn every_data_text_language_can_be_updated() {
+        for language in crate::data_text::LANGUAGES {
+            let name = crate::data_text::file_name(language);
+            assert!(KNOWN_FILES.contains(&name.as_str()), "{name} missing");
+            assert!(current_versions(&DataDirs::only(Path::new("/nonexistent")))(&name).is_some());
+        }
+    }
+
     use super::*;
     use ed25519_dalek::{Signer, SigningKey};
     use std::cell::RefCell;

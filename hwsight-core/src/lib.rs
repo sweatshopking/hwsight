@@ -4,6 +4,7 @@
 
 pub mod app_update;
 pub mod data;
+pub mod data_text;
 pub mod descriptions;
 pub mod device;
 pub mod distro;
@@ -25,6 +26,7 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 pub use data::{DataDirs, DataProblem, DataSource};
+pub use data_text::DataText;
 pub use descriptions::Descriptions;
 pub use device::{Bus, Category, Device, Status, short_vendor};
 pub use distro::{Distro, Family};
@@ -202,9 +204,13 @@ impl Scanner {
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (firmware, problems) = FirmwarePackages::load(&self.data_dirs);
         notes.extend(problems.into_iter().map(ScanNote::from));
+        let (text, problems) = DataText::load(&self.data_dirs, i18n::language());
+        notes.extend(problems.into_iter().map(ScanNote::from));
         let (descriptions, problems) = Descriptions::load(&self.data_dirs);
+        let descriptions = descriptions.with_text(text.clone());
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (fixes, problems) = Fixes::load(&self.data_dirs);
+        let fixes = fixes.with_text(text);
         notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
