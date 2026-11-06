@@ -76,7 +76,9 @@ def main():
     for crate in ("hwsight-core", "hwsight-cli", "hwsight-gui"):
         sources += sorted(Path(crate, "src").rglob("*.rs"))
     for source in sources:
-        text = source.read_text().split("#[cfg(test)]", 1)[0]
+        # Stop at the test module only: `#[cfg(test)]` can also sit on a single item
+        # earlier in a file, and cutting there would drop every string after it.
+        text = re.split(r"^#\[cfg\(test\)\]\s*\nmod ", source.read_text(), maxsplit=1, flags=re.M)[0]
         # comments (doc comments too) are not code: blank them out, keeping line count
         text = re.sub(r"^\s*//.*$", "", text, flags=re.M)
         for match in call.finditer(text):

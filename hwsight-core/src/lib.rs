@@ -66,7 +66,11 @@ pub use optional_tools::install_tools;
 /// password, asked for by the system). Only a repo package of the user's own distro
 /// qualifies, and the package name comes from the data file, never from the caller.
 pub fn install_driver(id: &str, distro: &Distro) -> Result<String, String> {
-    Drivers::load(&DataDirs::standard()).0.install(id, distro)
+    Drivers::load(&DataDirs::standard()).0.install(
+        id,
+        distro,
+        modules::running_kernel_modules_dir().as_deref(),
+    )
 }
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::Rules;
@@ -408,7 +412,12 @@ impl Scanner {
                     let source = drivers.source(d, &self.distro);
                     let install = match source {
                         drivers::Source::Repo(p) => {
-                            self.distro.family.install_command(p, self.distro.immutable)
+                            let all = drivers
+                                .packages(d, &self.distro, self.kernel_modules.as_deref())
+                                .map_or_else(|| p.to_owned(), |v| v.join(" "));
+                            self.distro
+                                .family
+                                .install_command(&all, self.distro.immutable)
                         }
                         _ => None,
                     };
@@ -423,21 +432,32 @@ impl Scanner {
                     // A package in a section that's switched off (Debian's non-free)
                     // can't be installed yet: say so first, with the command that fixes
                     // it, and hold back the install button until it's on.
-                    let section_off = match (&source, drivers.section(d, &self.distro)) {
-                        (drivers::Source::Repo(_), Some(section)) => {
-                            apt_sources::section_status(&self.system.apt_dir, section)
-                                .filter(|status| !status.enabled)
-                                .and_then(|status| {
-                                    fixes.driver_section_fix(
-                                        section,
-                                        status.enable_command.as_deref(),
-                                    )
-                                })
-                        }
-                        _ => None,
-                    };
+                    // When the sources can't be read at all, nothing is known about the
+                    // section, so the button is held back too (the copyable command stays).
+                    let (section_off, section_unknown) =
+                        match (&source, drivers.section(d, &self.distro)) {
+                            (drivers::Source::Repo(_), Some(section)) => {
+                                match apt_sources::section_status(&self.system.apt_dir, section) {
+                                    None => (None, true),
+                                    Some(status) if status.enabled => (None, false),
+                                    Some(status) => (
+                                        fixes.driver_section_fix(
+                                            section,
+                                            status.enable_command.as_deref(),
+                                        ),
+                                        false,
+                                    ),
+                                }
+                            }
+                            _ => (None, false),
+                        };
                     // Offer the button only where installing would actually work.
-                    if section_off.is_none() && drivers.install_argv(&d.id, &self.distro).is_ok() {
+                    if section_off.is_none()
+                        && !section_unknown
+                        && drivers
+                            .install_argv(&d.id, &self.distro, self.kernel_modules.as_deref())
+                            .is_ok()
+                    {
                         fix.driver = Some(d.id.clone());
                     }
                     offers.extend(section_off);
@@ -599,61 +619,77 @@ mod tests {
         assert_eq!(list, vec!["1-2", "1-2.1", "1-9", "1-10"]);
     }
 
+    /// Scan a fake machine with one Broadcom Wi-Fi card (14e4:43a0) and no driver.
+    fn scan_fake_broadcom(os_release: &str, apt: Option<&str>) -> ScanReport {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let root = tmp.path();
+        let dev = root.join("pci/0000:03:00.0");
+        fs::create_dir_all(&dev).expect("mkdir");
+        for (file, value) in [
+            ("vendor", "0x14e4"),
+            ("device", "0x43a0"),
+            ("class", "0x028000"),
+            (
+                "modalias",
+                "pci:v000014E4d000043A0sv00001028sd00000010bc02sc80i00",
+            ),
+        ] {
+            fs::write(dev.join(file), value).expect("write");
+        }
+        let modules = root.join("modules");
+        fs::create_dir_all(&modules).expect("mkdir");
+        fs::write(modules.join("modules.alias"), "").expect("write");
+        fs::write(modules.join("pkgbase"), "linux\n").expect("write");
+        fs::write(root.join("cmdline"), "quiet").expect("write");
+        let mut system = SystemPaths::none();
+        if let Some(sources) = apt {
+            let dir = root.join("apt/sources.list.d");
+            fs::create_dir_all(&dir).expect("mkdir");
+            fs::write(dir.join("debian.sources"), sources).expect("write");
+            system.apt_dir = root.join("apt");
+        }
+        Scanner {
+            data_dirs: DataDirs::only(&root.join("data")),
+            pci_devices: root.join("pci"),
+            usb_devices: root.join("usb"),
+            kernel_modules: Some(modules.clone()),
+            loaded_modules: modules,
+            modprobe_dirs: Vec::new(),
+            kernel_cmdline: root.join("cmdline"),
+            kernel_log: KernelLogInput::Lines(Vec::new()),
+            firmware_dirs: vec![root.join("firmware")],
+            distro: Distro::from_os_release(os_release, false),
+            install_check: software::InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
+            system,
+        }
+        .scan()
+    }
+
     /// A Broadcom Wi-Fi card nothing in the kernel supports gets the driver for this distro
     /// first, then the generic "search online" step.
     #[test]
     fn full_scan_offers_a_known_third_party_driver() {
-        for (os_release, first_step, command) in [
+        for (os_release, first_step, command, button) in [
+            // Debian's sources can't be read here, so the button is held back.
             (
                 "ID=debian\n",
                 "the package broadcom-sta-dkms",
                 Some("sudo apt install broadcom-sta-dkms"),
+                false,
             ),
             (
                 "ID=arch\n",
                 "the package broadcom-wl-dkms",
-                Some("sudo pacman -S broadcom-wl-dkms"),
+                Some("sudo pacman -S broadcom-wl-dkms linux-headers"),
+                true,
             ),
             // No package on Fedora: the project page, and nothing to copy.
-            ("ID=fedora\n", "https://wiki.debian.org/wl", None),
+            ("ID=fedora\n", "https://wiki.debian.org/wl", None, false),
         ] {
-            let tmp = tempfile::tempdir().expect("tempdir");
-            let root = tmp.path();
-            let dev = root.join("pci/0000:03:00.0");
-            fs::create_dir_all(&dev).expect("mkdir");
-            for (file, value) in [
-                ("vendor", "0x14e4"),
-                ("device", "0x43a0"),
-                ("class", "0x028000"),
-                (
-                    "modalias",
-                    "pci:v000014E4d000043A0sv00001028sd00000010bc02sc80i00",
-                ),
-            ] {
-                fs::write(dev.join(file), value).expect("write");
-            }
-            let modules = root.join("modules");
-            fs::create_dir_all(&modules).expect("mkdir");
-            fs::write(modules.join("modules.alias"), "").expect("write");
-            fs::write(root.join("cmdline"), "quiet").expect("write");
-            let scanner = Scanner {
-                data_dirs: DataDirs::only(&root.join("data")),
-                pci_devices: root.join("pci"),
-                usb_devices: root.join("usb"),
-                kernel_modules: Some(modules.clone()),
-                loaded_modules: modules,
-                modprobe_dirs: Vec::new(),
-                kernel_cmdline: root.join("cmdline"),
-                kernel_log: KernelLogInput::Lines(Vec::new()),
-                firmware_dirs: vec![root.join("firmware")],
-                distro: Distro::from_os_release(os_release, false),
-                install_check: software::InstallCheck {
-                    path_dirs: vec![],
-                    flatpak_dirs: vec![],
-                },
-                system: SystemPaths::none(),
-            };
-            let report = scanner.scan();
+            let report = scan_fake_broadcom(os_release, None);
             let [card] = report.devices.as_slice() else {
                 panic!("expected one device, got {:?}", report.devices);
             };
@@ -663,8 +699,7 @@ mod tests {
             };
             assert!(driver.text.contains(first_step), "{os_release}: {driver:?}");
             assert_eq!(driver.command.as_deref(), command, "{os_release}");
-            // The install button is offered exactly where there is a command to run.
-            assert_eq!(driver.driver.is_some(), command.is_some(), "{os_release}");
+            assert_eq!(driver.driver.is_some(), button, "{os_release}");
             assert!(
                 search.text.contains("14e4:43a0"),
                 "{os_release}: {search:?}"
@@ -679,52 +714,8 @@ mod tests {
         const MAIN_ONLY: &str =
             "Types: deb\nURIs: http://deb.debian.org/debian\nSuites: trixie\nComponents: main\n";
         for (components, section_step) in [("main", true), ("main contrib non-free", false)] {
-            let tmp = tempfile::tempdir().expect("tempdir");
-            let root = tmp.path();
-            let dev = root.join("pci/0000:03:00.0");
-            fs::create_dir_all(&dev).expect("mkdir");
-            for (file, value) in [
-                ("vendor", "0x14e4"),
-                ("device", "0x43a0"),
-                ("class", "0x028000"),
-                (
-                    "modalias",
-                    "pci:v000014E4d000043A0sv00001028sd00000010bc02sc80i00",
-                ),
-            ] {
-                fs::write(dev.join(file), value).expect("write");
-            }
-            let modules = root.join("modules");
-            fs::create_dir_all(&modules).expect("mkdir");
-            fs::write(modules.join("modules.alias"), "").expect("write");
-            fs::write(root.join("cmdline"), "quiet").expect("write");
-            let apt = root.join("apt/sources.list.d");
-            fs::create_dir_all(&apt).expect("mkdir");
-            fs::write(
-                apt.join("debian.sources"),
-                MAIN_ONLY.replace("main", components),
-            )
-            .expect("write");
-            let mut system = SystemPaths::none();
-            system.apt_dir = root.join("apt");
-            let scanner = Scanner {
-                data_dirs: DataDirs::only(&root.join("data")),
-                pci_devices: root.join("pci"),
-                usb_devices: root.join("usb"),
-                kernel_modules: Some(modules.clone()),
-                loaded_modules: modules,
-                modprobe_dirs: Vec::new(),
-                kernel_cmdline: root.join("cmdline"),
-                kernel_log: KernelLogInput::Lines(Vec::new()),
-                firmware_dirs: vec![root.join("firmware")],
-                distro: Distro::from_os_release("ID=debian\n", false),
-                install_check: software::InstallCheck {
-                    path_dirs: vec![],
-                    flatpak_dirs: vec![],
-                },
-                system,
-            };
-            let report = scanner.scan();
+            let report =
+                scan_fake_broadcom("ID=debian\n", Some(&MAIN_ONLY.replace("main", components)));
             let [card] = report.devices.as_slice() else {
                 panic!("expected one device, got {:?}", report.devices);
             };

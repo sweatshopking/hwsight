@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Lists Slint string literals a user can read that don't go through @tr(...).
-Ignored: comments, imports, font names, and single lowercase words (internal values such
+Ignored: comments, imports, font names, image paths, and single lowercase words (internal values such
 as "ok" or "neutral", and the app name "hwsight")."""
 import re
 import sys
@@ -17,7 +17,7 @@ for path in sorted(Path(sys.argv[1]).rglob("*.slint")):
             text = match.group(0)[1:-1]
             if not re.search(r'[A-Za-z]', text) or re.fullmatch(r'[a-z][a-z0-9-]*', text):
                 continue
-            if code[: match.start()].rstrip().endswith("@tr("):
+            if code[: match.start()].rstrip().endswith(("@tr(", "@image-url(")):
                 continue
             hits.append(f"{path}:{number}: {line.strip()}")
             break

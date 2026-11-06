@@ -41,6 +41,8 @@ what = "This is a Broadcom Wi-Fi card. Broadcom's own driver (called wl) makes i
 homepage = "https://wiki.debian.org/wl"
 packages = { arch = "broadcom-wl-dkms", debian = "broadcom-sta-dkms", ubuntu = "bcmwl-kernel-source" }
 sections = { debian = "non-free" }
+# DKMS builds the module on this computer, which needs the kernel headers (Arch only).
+needs_kernel_headers = true
 # BCM4360 (two variants) and BCM4352 802.11ac cards.
 [[driver.match]]
 vendor = "14e4"

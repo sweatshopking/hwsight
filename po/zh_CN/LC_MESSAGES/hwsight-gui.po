@@ -1,35 +1,35 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 09:46+0000\n"
+"POT-Creation-Date: 2026-11-06 11:29+0000\n"
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "Scanning your hardware..."
 msgstr "正在扫描硬件…"
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "No problems found"
 msgstr "未发现问题"
 
-#: hwsight-gui/ui/app.slint:186
+#: hwsight-gui/ui/app.slint:187
 msgid "Copy report for all devices"
 msgstr "复制所有设备的报告"
 
-#: hwsight-gui/ui/app.slint:190
+#: hwsight-gui/ui/app.slint:191
 msgid "Scanning..."
 msgstr "正在扫描…"
 
-#: hwsight-gui/ui/app.slint:190
+#: hwsight-gui/ui/app.slint:191
 msgid "Scan again"
 msgstr "重新扫描"
 
-#: hwsight-gui/ui/app.slint:237
+#: hwsight-gui/ui/app.slint:238
 msgid "Nothing matches."
 msgstr "没有匹配项。"
 
-#: hwsight-gui/ui/app.slint:256
+#: hwsight-gui/ui/app.slint:257
 msgid "Only problems"
 msgstr "仅显示问题"
 
@@ -697,6 +697,18 @@ msgstr ""
 msgid "Screen"
 msgstr ""
 
+msgid "{} isn't a driver hwsight knows how to install."
+msgstr "{} 不是 hwsight 知道如何安装的驱动程序。"
+
+msgid "hwsight can only install drivers that your distro packages itself."
+msgstr "hwsight 只能安装你的发行版自己打包提供的驱动程序。"
+
+msgid "hwsight can't tell which kernel headers this driver needs. Use your system's package manager instead."
+msgstr "hwsight 无法确定此驱动程序需要哪个内核头文件包。请改用你系统的包管理器。"
+
+msgid "hwsight can't install software on this system. Use your system's package manager instead."
+msgstr "hwsight 无法在此系统上安装软件。请改用你系统的包管理器。"
+
 msgid "{} years ({} hours)"
 msgstr ""
 
@@ -1262,9 +1274,6 @@ msgid "{} isn't a tool hwsight knows how to install."
 msgstr ""
 
 msgid "Nothing to install."
-msgstr ""
-
-msgid "hwsight can't install software on this system. Use your system's package manager instead."
 msgstr ""
 
 msgid "Unknown {} {}"

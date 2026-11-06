@@ -65,9 +65,15 @@ pub fn section_status(apt_dir: &Path, section: &str) -> Option<SectionStatus> {
         let quoted = shell_quote(path.to_str()?)?;
         let is_sources = path.extension().is_some_and(|e| e == "sources");
         let edit = if is_sources {
-            format!("sudo sed -i '/^Components:/ s/$/ {section}/' {quoted}")
+            // Only the stanzas whose URIs line names a Debian archive host.
+            format!(
+                "sudo sed -i '/^URIs:.*debian\\.\\(org\\|net\\)/,/^$/ {{ /^Components:/ s/$/ {section}/ }}' {quoted}"
+            )
         } else {
-            format!("sudo sed -i '/^deb .*debian/ s/$/ {section}/' {quoted}")
+            // Only Debian archive lines; the section goes before any trailing comment.
+            format!(
+                "sudo sed -i -E '/^deb .*debian\\.(org|net)/ s/^([^#]*[^# ])( *#.*)?$/\\1 {section}\\2/' {quoted}"
+            )
         };
         Some(format!("{edit} && sudo apt update"))
     });
@@ -84,15 +90,35 @@ fn shell_quote(path: &str) -> Option<String> {
         .then(|| path.to_owned())
 }
 
+/// Debian's own archive hosts (`deb.debian.org`, `security.debian.org`, `ftp.de.debian.org`,
+/// `deb.debian.net`), not third-party repos that merely have "debian" in their path.
+fn is_debian_uri(uris: &str) -> bool {
+    uris.split_whitespace().any(|uri| {
+        let host = uri
+            .split_once("://")
+            .map_or(uri, |(_, rest)| rest)
+            .split('/')
+            .next()
+            .unwrap_or("");
+        host == "debian.org"
+            || host == "debian.net"
+            || host.ends_with(".debian.org")
+            || host.ends_with(".debian.net")
+    })
+}
+
 /// `Types/URIs/Suites/Components` stanzas. Returns (mentions a Debian archive, section on).
 fn scan_deb822(text: &str, section: &str) -> (bool, bool) {
     let (mut debian, mut has) = (false, false);
     for stanza in text.split("\n\n") {
         let mut uris = "";
         let mut components = "";
+        let mut types = "deb";
         let mut disabled = false;
         for line in stanza.lines() {
-            if let Some(v) = line.strip_prefix("URIs:") {
+            if let Some(v) = line.strip_prefix("Types:") {
+                types = v;
+            } else if let Some(v) = line.strip_prefix("URIs:") {
                 uris = v;
             } else if let Some(v) = line.strip_prefix("Components:") {
                 components = v;
@@ -100,7 +126,7 @@ fn scan_deb822(text: &str, section: &str) -> (bool, bool) {
                 disabled = v.trim().eq_ignore_ascii_case("no");
             }
         }
-        if disabled || !uris.contains("debian") {
+        if disabled || !is_debian_uri(uris) || !types.split_whitespace().any(|t| t == "deb") {
             continue;
         }
         debian = true;
@@ -126,7 +152,7 @@ fn scan_one_line(text: &str, section: &str) -> (bool, bool) {
             }
         }
         let Some(uri) = words.next() else { continue };
-        if !uri.contains("debian") {
+        if !is_debian_uri(uri) {
             continue;
         }
         debian = true;
@@ -161,7 +187,8 @@ mod tests {
         let s = section_status(tmp.path(), "non-free").expect("debian");
         assert!(!s.enabled);
         let command = s.enable_command.expect("command");
-        assert!(command.starts_with("sudo sed -i '/^Components:/ s/$/ non-free/' "));
+        assert!(command.starts_with("sudo sed -i '/^URIs:.*debian"));
+        assert!(command.contains("s/$/ non-free/"));
         assert!(command.ends_with("debian.sources && sudo apt update"));
     }
 
@@ -197,7 +224,7 @@ mod tests {
         assert!(
             s.enable_command
                 .expect("command")
-                .starts_with("sudo sed -i '/^deb .*debian/ s/$/ non-free/' ")
+                .starts_with("sudo sed -i -E '/^deb .*debian\\.(org|net)/ ")
         );
         let on = "deb [arch=amd64 signed-by=/x.gpg] http://deb.debian.org/debian bookworm main non-free # comment\n";
         let tmp = apt(&[("sources.list", on)]);
@@ -206,6 +233,18 @@ mod tests {
                 .expect("debian")
                 .enabled
         );
+    }
+
+    #[test]
+    fn third_party_debian_paths_and_source_only_stanzas_do_not_count() {
+        let docker =
+            "deb [arch=amd64] https://download.docker.com/linux/debian bookworm stable non-free\n";
+        let tmp = apt(&[("sources.list.d/docker.list", docker)]);
+        assert_eq!(section_status(tmp.path(), "non-free"), None);
+        let src_only = MAIN_ONLY.replace("Components: main", "Components: main non-free");
+        let src_only = src_only.replace("Types: deb", "Types: deb-src");
+        let tmp = apt(&[("sources.list.d/debian.sources", &src_only)]);
+        assert_eq!(section_status(tmp.path(), "non-free"), None);
     }
 
     #[test]

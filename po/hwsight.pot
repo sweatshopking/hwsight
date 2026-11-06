@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-06 09:46+0000\n"
+"POT-Creation-Date: 2026-11-06 11:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -12,31 +12,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: hwsight-gui/ui/app.slint:164
+#: hwsight-gui/ui/app.slint:165
 msgid "Scanning your hardware..."
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:175
+#: hwsight-gui/ui/app.slint:176
 msgid "No problems found"
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:186
+#: hwsight-gui/ui/app.slint:187
 msgid "Copy report for all devices"
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:190
+#: hwsight-gui/ui/app.slint:191
 msgid "Scanning..."
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:190
+#: hwsight-gui/ui/app.slint:191
 msgid "Scan again"
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:237
+#: hwsight-gui/ui/app.slint:238
 msgid "Nothing matches."
 msgstr ""
 
-#: hwsight-gui/ui/app.slint:256
+#: hwsight-gui/ui/app.slint:257
 msgid "Only problems"
 msgstr ""
 
@@ -724,6 +724,18 @@ msgstr ""
 msgid "Screen"
 msgstr ""
 
+msgid "{} isn't a driver hwsight knows how to install."
+msgstr ""
+
+msgid "hwsight can only install drivers that your distro packages itself."
+msgstr ""
+
+msgid "hwsight can't tell which kernel headers this driver needs. Use your system's package manager instead."
+msgstr ""
+
+msgid "hwsight can't install software on this system. Use your system's package manager instead."
+msgstr ""
+
 msgid "{} years ({} hours)"
 msgstr ""
 
@@ -1289,9 +1301,6 @@ msgid "{} isn't a tool hwsight knows how to install."
 msgstr ""
 
 msgid "Nothing to install."
-msgstr ""
-
-msgid "hwsight can't install software on this system. Use your system's package manager instead."
 msgstr ""
 
 msgid "Unknown {} {}"

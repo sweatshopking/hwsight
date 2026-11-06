@@ -31,6 +31,10 @@ struct UpdateState {
 }
 
 fn main() -> Result<(), slint::PlatformError> {
+    // Matches StartupWMClass in the .desktop file, so the desktop shows our icon and name.
+    if let Err(e) = slint::set_xdg_app_id("hwsight") {
+        eprintln!("hwsight: couldn't set the app id: {e}");
+    }
     let window = AppWindow::new()?;
     // Slint only accepts this once a component exists.
     let language = hwsight_core::i18n::language();
@@ -79,7 +83,7 @@ fn main() -> Result<(), slint::PlatformError> {
         let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
         move || {
             let Some(w) = weak.upgrade() else { return };
-            if w.get_tools_busy() {
+            if w.get_tools_busy() || w.get_driver_busy() {
                 return;
             }
             let names: Vec<String> = w
@@ -117,7 +121,7 @@ fn main() -> Result<(), slint::PlatformError> {
         let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
         move |id| {
             let Some(w) = weak.upgrade() else { return };
-            if w.get_driver_busy() {
+            if w.get_driver_busy() || w.get_tools_busy() {
                 return;
             }
             let distro = report
@@ -127,6 +131,7 @@ fn main() -> Result<(), slint::PlatformError> {
             let Some(distro) = distro else { return };
             w.set_driver_busy(true);
             w.set_driver_status("".into());
+            w.set_driver_status_device(w.get_selected());
             let (weak, devices, report) = (weak.clone(), devices.clone(), report.clone());
             let id = id.to_string();
             std::thread::spawn(move || {

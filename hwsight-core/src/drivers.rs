@@ -6,13 +6,14 @@
 //! already supports it" check.
 
 use std::collections::{HashMap, HashSet};
+use std::path::Path;
 
 use serde::Deserialize;
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
 use crate::data_text::DataText;
 use crate::device::Bus;
-use crate::distro::Distro;
+use crate::distro::{Distro, Family};
 use crate::rules::{Matcher, compile_matcher};
 
 #[derive(Debug, Clone)]
@@ -44,6 +45,7 @@ pub struct DriverEntry {
     pub homepage: String,
     packages: HashMap<String, String>,
     sections: HashMap<String, String>,
+    needs_kernel_headers: bool,
     matchers: Vec<Matcher>,
 }
 
@@ -72,6 +74,10 @@ struct RawDriver {
     /// default (Debian's `non-free`).
     #[serde(default)]
     sections: HashMap<String, String>,
+    /// Built on this computer against the running kernel (DKMS), which on Arch needs the
+    /// kernel's headers package too.
+    #[serde(default)]
+    needs_kernel_headers: bool,
     #[serde(rename = "match", default)]
     matches: Vec<RawMatch>,
 }
@@ -84,18 +90,9 @@ struct RawMatch {
     device: String,
 }
 
-/// Package names end up in commands, so only the characters real names use.
-fn is_name(s: &str) -> bool {
-    !s.is_empty()
-        && s.len() <= 100
-        && s.chars()
-            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.' | '+'))
-        && s.chars().next().is_some_and(|c| c.is_ascii_alphanumeric())
-}
-
 /// A package value is a name, `aur:<name>`, or `none`.
 fn check_package(value: &str) -> bool {
-    value == "none" || is_name(value.strip_prefix("aur:").unwrap_or(value))
+    value == "none" || crate::fixes::is_name(value.strip_prefix("aur:").unwrap_or(value))
 }
 
 fn check(d: &RawDriver) -> Result<(), String> {
@@ -159,6 +156,7 @@ impl DataFile for Table {
                 homepage: d.homepage,
                 packages: d.packages,
                 sections: d.sections,
+                needs_kernel_headers: d.needs_kernel_headers,
                 matchers,
             });
         }
@@ -236,24 +234,58 @@ impl Drivers {
         }
     }
 
+    /// Every package to install for `driver`: its own, plus on Arch the running kernel's
+    /// headers when the driver is built locally. The headers package is named after the
+    /// kernel's own `pkgbase` file (`linux`, `linux-lts`, `linux-cachyos`, ...); `None`
+    /// when that can't be read, since installing without headers would only look done.
+    pub fn packages(
+        &self,
+        driver: &DriverEntry,
+        distro: &Distro,
+        kernel_dir: Option<&Path>,
+    ) -> Option<Vec<String>> {
+        let Source::Repo(package) = self.source(driver, distro) else {
+            return None;
+        };
+        let mut all = vec![package.to_owned()];
+        if driver.needs_kernel_headers && distro.family == Family::Arch {
+            let base = std::fs::read_to_string(kernel_dir?.join("pkgbase")).ok()?;
+            let base = base.trim();
+            if !crate::fixes::is_name(base) {
+                return None;
+            }
+            all.push(format!("{base}-headers"));
+        }
+        Some(all)
+    }
+
     /// The command that installs driver `id` on this distro. Only a repo package from
     /// this file qualifies: AUR packages are built from community recipes and are never
     /// installed by hwsight, and a distro without a package has nothing to install.
-    pub(crate) fn install_argv(&self, id: &str, distro: &Distro) -> Result<Vec<String>, String> {
+    pub(crate) fn install_argv(
+        &self,
+        id: &str,
+        distro: &Distro,
+        kernel_dir: Option<&Path>,
+    ) -> Result<Vec<String>, String> {
         let driver = self
             .table
             .drivers
             .iter()
             .find(|d| d.id == id)
             .ok_or_else(|| crate::tr!("{} isn't a driver hwsight knows how to install.", id))?;
-        let Source::Repo(package) = self.source(driver, distro) else {
+        if !matches!(self.source(driver, distro), Source::Repo(_)) {
             return Err(crate::tr!(
                 "hwsight can only install drivers that your distro packages itself."
             ));
-        };
+        }
+        let packages = self.packages(driver, distro, kernel_dir).ok_or_else(|| {
+            crate::tr!("hwsight can't tell which kernel headers this driver needs. Use your system's package manager instead.")
+        })?;
+        let refs: Vec<&str> = packages.iter().map(String::as_str).collect();
         distro
             .family
-            .install_argv(&[package], distro.immutable)
+            .install_argv(&refs, distro.immutable)
             .ok_or_else(|| {
                 crate::tr!("hwsight can't install software on this system. Use your system's package manager instead.")
             })
@@ -261,8 +293,13 @@ impl Drivers {
 
     /// Install driver `id` through pkexec, which asks for the password in the desktop's
     /// own window. The package comes from this file, never from the caller.
-    pub fn install(&self, id: &str, distro: &Distro) -> Result<String, String> {
-        crate::optional_tools::run_installer(&self.install_argv(id, distro)?)
+    pub fn install(
+        &self,
+        id: &str,
+        distro: &Distro,
+        kernel_dir: Option<&Path>,
+    ) -> Result<String, String> {
+        crate::optional_tools::run_installer(&self.install_argv(id, distro, kernel_dir)?)
     }
 
     /// The archive section `driver`'s package lives in on this distro, when it needs
@@ -369,7 +406,7 @@ device = "43a0"
             text: DataText::english(),
         };
         assert_eq!(
-            d.install_argv("broadcom-wl", &distro("ID=debian\n")),
+            d.install_argv("broadcom-wl", &distro("ID=debian\n"), None),
             Ok(vec![
                 "apt-get".to_owned(),
                 "install".to_owned(),
@@ -379,19 +416,66 @@ device = "43a0"
         );
         // No package, an AUR package, an unknown id, and a read-only system all refuse.
         assert!(
-            d.install_argv("broadcom-wl", &distro("ID=fedora\n"))
+            d.install_argv("broadcom-wl", &distro("ID=fedora\n"), None)
                 .is_err()
         );
         assert!(
             d.install_argv(
                 "broadcom-wl",
-                &distro("ID=opensuse-tumbleweed\nID_LIKE=\"opensuse suse\"\n")
+                &distro("ID=opensuse-tumbleweed\nID_LIKE=\"opensuse suse\"\n"),
+                None
             )
             .is_err()
         );
-        assert!(d.install_argv("nope", &distro("ID=debian\n")).is_err());
         assert!(
-            d.install_argv("broadcom-wl", &Distro::from_os_release("ID=debian\n", true))
+            d.install_argv("nope", &distro("ID=debian\n"), None)
+                .is_err()
+        );
+        assert!(
+            d.install_argv(
+                "broadcom-wl",
+                &Distro::from_os_release("ID=debian\n", true),
+                None
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn arch_dkms_drivers_also_get_the_running_kernels_headers() {
+        let entry = ENTRY
+            .replace("arch = \"broadcom-wl\"", "arch = \"broadcom-wl-dkms\"")
+            .replace(
+                "[[driver.match]]",
+                "needs_kernel_headers = true\n[[driver.match]]",
+            );
+        let (_, t) = table(&entry).unwrap_or_default();
+        let d = Drivers {
+            version: String::new(),
+            source: DataSource::Embedded,
+            table: t,
+            text: DataText::english(),
+        };
+        let arch = distro("ID=arch\n");
+        let tmp = tempfile::tempdir().expect("tempdir");
+        // Headers can't be named without the kernel's pkgbase file: no install.
+        assert!(
+            d.install_argv("broadcom-wl", &arch, Some(tmp.path()))
+                .is_err()
+        );
+        assert!(d.install_argv("broadcom-wl", &arch, None).is_err());
+        std::fs::write(tmp.path().join("pkgbase"), "linux-cachyos\n").expect("write");
+        let argv = d
+            .install_argv("broadcom-wl", &arch, Some(tmp.path()))
+            .expect("argv");
+        assert_eq!(
+            &argv[argv.len() - 2..],
+            ["broadcom-wl-dkms", "linux-cachyos-headers"]
+        );
+        // A hostile pkgbase is refused.
+        std::fs::write(tmp.path().join("pkgbase"), "x; rm -rf ~").expect("write");
+        assert!(
+            d.install_argv("broadcom-wl", &arch, Some(tmp.path()))
                 .is_err()
         );
     }

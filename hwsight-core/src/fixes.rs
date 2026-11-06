@@ -347,7 +347,7 @@ fn fill(template: &str, v: &Values, for_command: bool) -> Option<String> {
 }
 
 /// Driver and package names: letters, digits, and - _ . + only.
-fn is_name(s: &str) -> bool {
+pub(crate) fn is_name(s: &str) -> bool {
     !s.is_empty()
         && s.len() <= 100
         && s.chars()

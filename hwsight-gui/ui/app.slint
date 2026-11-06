@@ -34,6 +34,7 @@ export struct Row {
 
 export component AppWindow inherits Window {
     title: "hwsight";
+    icon: @image-url("../../assets/hwsight.png");
     preferred-width: 1100px;
     preferred-height: 720px;
     // Narrower than this the details panel gets too small for the three-level switch and
@@ -73,6 +74,8 @@ export component AppWindow inherits Window {
     in property <bool> tools-busy;
     in-out property <bool> driver-busy;
     in-out property <string> driver-status;
+    // The device the install was started on; its result shows only there.
+    in-out property <int> driver-status-device: -1;
     in-out property <length> list-viewport-y;
     out property <length> list-height: device-list.height;
     in-out property <string> query;
@@ -99,8 +102,6 @@ export component AppWindow inherits Window {
     callback install-driver(string);
 
     changed query => { root.filter-changed(); }
-    // A driver install's result belongs to the device it was started on.
-    changed selected => { root.driver-status = ""; }
     changed only-problems => { root.filter-changed(); }
 
     // Keyboard shortcuts get focus when the window opens, so they work straight away.
@@ -303,7 +304,7 @@ export component AppWindow inherits Window {
                     has-device: root.selected >= 0;
                     level: root.detail-level;
                     driver-busy: root.driver-busy;
-                    driver-status: root.driver-status;
+                    driver-status: root.selected == root.driver-status-device ? root.driver-status : "";
                     install-driver(id) => { root.install-driver(id); }
                     set-level(level) => {
                         root.detail-level = level;

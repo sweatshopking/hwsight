@@ -22,6 +22,8 @@ english += [fix["text"] for fix in fixes.get("fix", {}).values()]
 software = tomllib.loads((data / "software.toml").read_text())
 for program in software.get("software", []):
     english += [program["what"]] + ([program["get"]] if "get" in program else [])
+drivers = tomllib.loads((data / "drivers.toml").read_text())
+english += [driver["what"] for driver in drivers.get("driver", [])]
 done = tomllib.loads((data / f"text-{language}.toml").read_text()).get("text", {})
 seen = set()
 for text in english:

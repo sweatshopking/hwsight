@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#232846"/><stop offset="1" stop-color="#12142a"/></linearGradient>
+    <linearGradient id="ac" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a5cff"/><stop offset="0.55" stop-color="#d23bd8"/><stop offset="1" stop-color="#ff4d9d"/></linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#c04bff" stop-opacity="0.55"/><stop offset="1" stop-color="#c04bff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="eye" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#fff"/><stop offset="0.45" stop-color="#ff7ab8"/><stop offset="1" stop-color="#d23bd8"/></radialGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="104" fill="url(#glow)"/>
+  <g stroke="url(#ac)" stroke-width="9" stroke-linecap="round" fill="none">
+    <path d="M100 56V76M128 56V76M156 56V76M100 180V200M128 180V200M156 180V200"/>
+    <path d="M56 100H76M56 128H76M56 156H76M180 100H200M180 128H200M180 156H200"/>
+  </g>
+  <rect x="74" y="74" width="108" height="108" rx="22" fill="#171a33" stroke="url(#ac)" stroke-width="9"/>
+  <circle cx="128" cy="128" r="32" fill="none" stroke="url(#ac)" stroke-width="8"/>
+  <circle cx="128" cy="128" r="15" fill="url(#eye)"/>
+</svg>
