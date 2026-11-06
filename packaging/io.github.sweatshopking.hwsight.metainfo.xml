@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.sweatshopking.hwsight</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>hwsight</name>
+  <summary>A Device Manager for Linux, in plain English</summary>
+  <description>
+    <p>
+      hwsight looks at everything inside and plugged into your computer, tells you in plain
+      English what is working and what isn't, explains why, and shows the fix for your
+      distro.
+    </p>
+    <ul>
+      <li>Every device, grouped by type, each with a clear status</li>
+      <li>Problems explained using the kernel log, such as the exact firmware that is missing</li>
+      <li>Quiet performance problems: slow RAM, a graphics card in a slow slot, a USB drive on a USB 2 port</li>
+      <li>Three levels of detail, from plain English to every raw value</li>
+      <li>Firmware updates, one device at a time, only after you confirm</li>
+      <li>Reads by default; anything that needs admin rights asks through your desktop's own password window</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">hwsight.desktop</launchable>
+  <url type="homepage">https://github.com/sweatshopking/hwsight</url>
+  <url type="bugtracker">https://github.com/sweatshopking/hwsight/issues</url>
+  <developer id="io.github.sweatshopking">
+    <name>sweatshopking</name>
+  </developer>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/sweatshopking/hwsight/main/docs/screenshots/memory-simple.png</image>
+      <caption>Plain-English explanation of slow memory</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/sweatshopking/hwsight/main/docs/screenshots/graphics-more.png</image>
+      <caption>Key numbers for a graphics card, each with a verdict</caption>
+    </screenshot>
+  </screenshots>
+  <categories>
+    <category>System</category>
+    <category>Settings</category>
+  </categories>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-11-08"/>
+  </releases>
+</component>

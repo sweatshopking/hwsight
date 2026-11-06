@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Name=hwsight
+GenericName=Device Manager
+Comment=See which parts of your computer work, and fix the ones that don't
+Comment[de]=Sieh, welche Teile deines Computers funktionieren, und repariere die, die es nicht tun
+Comment[es]=Mira qué partes de tu equipo funcionan y arregla las que no
+Comment[fr]=Voyez quelles parties de votre ordinateur fonctionnent et réparez les autres
+Comment[it]=Guarda quali parti del tuo computer funzionano e sistema quelle che non funzionano
+Comment[ja]=コンピューターのどの部品が動作しているかを確認し、動作しないものを直します
+Comment[ko]=컴퓨터의 어떤 부품이 작동하는지 확인하고 작동하지 않는 부품을 해결하세요
+Comment[nl]=Zie welke onderdelen van je computer werken en repareer de onderdelen die dat niet doen
+Comment[pt_BR]=Veja quais partes do seu computador funcionam e conserte as que não funcionam
+Comment[ru]=Узнайте, какие части компьютера работают, и исправьте те, что не работают
+Comment[tr]=Bilgisayarınızın hangi parçalarının çalıştığını görün, çalışmayanları düzeltin
+Comment[zh_CN]=查看计算机的哪些部件正常工作，并修复不能工作的部件
+Exec=hwsight-gui
+Icon=hwsight
+Terminal=false
+Categories=System;HardwareSettings;Settings;
+Keywords=device manager;hardware;drivers;firmware;devices;lspci;lsusb;
+StartupNotify=true
+StartupWMClass=hwsight

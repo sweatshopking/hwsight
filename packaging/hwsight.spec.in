@@ -1,0 +1,39 @@
+# Binary-only spec: packaging/build.sh stages the files and passes their location as %{stage}.
+Name:           hwsight
+Version:        @VERSION@
+Release:        1
+Summary:        A Device Manager for Linux, in plain English
+License:        GPL-3.0-or-later
+URL:            https://github.com/sweatshopking/hwsight
+# libraries the window opens at runtime (dlopen), which automatic dependency detection can't see
+Requires:       libxkbcommon.so.0()(64bit)
+Requires:       libxkbcommon-x11.so.0()(64bit)
+Requires:       libEGL.so.1()(64bit)
+Requires:       libwayland-client.so.0()(64bit)
+Requires:       libwayland-egl.so.1()(64bit)
+Requires:       libX11.so.6()(64bit)
+Requires:       libX11-xcb.so.1()(64bit)
+Requires:       libXcursor.so.1()(64bit)
+Requires:       libXrandr.so.2()(64bit)
+Requires:       libXi.so.6()(64bit)
+Recommends:     polkit
+Recommends:     fwupd
+
+%global debug_package %{nil}
+%global __strip /bin/true
+
+%description
+hwsight looks at everything inside and plugged into your computer, tells you in plain
+English what is working and what isn't, explains why, and shows the fix for your distro.
+
+%install
+cp -a %{stage}/. %{buildroot}/
+
+%files
+%license /usr/share/licenses/hwsight/LICENSE
+/usr/bin/hwsight
+/usr/bin/hwsight-gui
+/usr/share/applications/hwsight.desktop
+/usr/share/metainfo/io.github.sweatshopking.hwsight.metainfo.xml
+/usr/share/icons/hicolor/scalable/apps/hwsight.svg
+/usr/share/icons/hicolor/256x256/apps/hwsight.png

@@ -32,7 +32,11 @@ struct UpdateState {
 
 fn main() -> Result<(), slint::PlatformError> {
     // Matches StartupWMClass in the .desktop file, so the desktop shows our icon and name.
-    if let Err(e) = slint::set_xdg_app_id("hwsight") {
+    // The platform has to exist before the id can be set; default choice (winit).
+    if let Err(e) = slint::BackendSelector::new()
+        .select()
+        .and_then(|()| slint::set_xdg_app_id("hwsight"))
+    {
         eprintln!("hwsight: couldn't set the app id: {e}");
     }
     let window = AppWindow::new()?;

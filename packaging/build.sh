@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+# Builds release packages. Run inside the matching build environment:
+#
+#   packaging/build.sh deb-appimage   on Ubuntu 22.04  -> dist/*.deb, dist/*.AppImage
+#   packaging/build.sh rpm            on Fedora 41     -> dist/*.rpm
+#
+# Packages are built for the machine it runs on: x86_64 (amd64) or aarch64 (arm64).
+# The file names are what the in-app updater looks for (hwsight-core/src/app_update.rs
+# `asset_for`): don't change them without changing it too.
+# packaging/build-in-containers.sh runs these with podman or docker; the GitHub workflow
+# uses the same targets. Adapted from DriveDeck's packaging.
+set -euo pipefail
+
+# A custom tag also requires its trusted LINUXDEPLOY_SHA256 in the build environment.
+LINUXDEPLOY_TAG="${LINUXDEPLOY_TAG:-1-alpha-20251107-1}"
+APP=hwsight
+GUI=hwsight-gui
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WORK="${CARGO_TARGET_DIR:-$ROOT/target}/package-work"
+DIST="$ROOT/dist"
+VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' "$ROOT/Cargo.toml" | head -1)"
+TARGET="${CARGO_TARGET_DIR:-$ROOT/target}"
+ARCH="$(uname -m)" # x86_64 or aarch64: the names linuxdeploy, AppImage and rpm use
+case "$ARCH" in
+    x86_64) DEB_ARCH=amd64 ;;
+    aarch64) DEB_ARCH=arm64 ;;
+    *) echo "error: unsupported architecture $ARCH" >&2; exit 1 ;;
+esac
+mkdir -p "$WORK" "$DIST"
+
+log() { printf '\n==> %s\n' "$*"; }
+
+install_deps_ubuntu() {
+    log "Installing build dependencies (apt)"
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq
+    apt-get install -y -qq --no-install-recommends \
+        ca-certificates curl git make gcc g++ pkg-config file dpkg-dev xz-utils \
+        libfontconfig1-dev libfreetype-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev \
+        libx11-dev libxcursor-dev libxrandr-dev libxi-dev libgl1-mesa-dev libegl1-mesa-dev \
+        desktop-file-utils appstream >/dev/null
+}
+
+install_deps_fedora() {
+    log "Installing build dependencies (dnf)"
+    dnf install -y -q \
+        ca-certificates curl git make gcc gcc-c++ pkgconf-pkg-config file rpm-build xz \
+        fontconfig-devel freetype-devel libxkbcommon-devel libxkbcommon-x11-devel wayland-devel \
+        libX11-devel libXcursor-devel libXrandr-devel libXi-devel mesa-libGL-devel mesa-libEGL-devel \
+        desktop-file-utils >/dev/null
+}
+
+install_rust() {
+    if ! command -v cargo >/dev/null; then
+        log "Installing Rust"
+        curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal >/dev/null
+    fi
+    # shellcheck disable=SC1091
+    source "${CARGO_HOME:-$HOME/.cargo}/env"
+}
+
+build_app() {
+    log "Building $APP $VERSION"
+    cargo build --release --locked -p hwsight-cli -p hwsight-gui
+}
+
+# Lays out the installed file tree shared by the .deb and .rpm.
+stage_tree() {
+    local dest="$1"
+    rm -rf "$dest"
+    install -Dm755 "$TARGET/release/$APP" "$dest/usr/bin/$APP"
+    install -Dm755 "$TARGET/release/$GUI" "$dest/usr/bin/$GUI"
+    install -Dm644 "$ROOT/packaging/$APP.desktop" "$dest/usr/share/applications/$APP.desktop"
+    install -Dm644 "$ROOT/packaging/io.github.sweatshopking.hwsight.metainfo.xml" \
+        "$dest/usr/share/metainfo/io.github.sweatshopking.hwsight.metainfo.xml"
+    install -Dm644 "$ROOT/assets/$APP.svg" "$dest/usr/share/icons/hicolor/scalable/apps/$APP.svg"
+    install -Dm644 "$ROOT/assets/$APP.png" "$dest/usr/share/icons/hicolor/256x256/apps/$APP.png"
+    install -Dm644 "$ROOT/LICENSE" "$dest/usr/share/licenses/$APP/LICENSE"
+}
+
+build_deb() {
+    log "Packaging .deb"
+    local stage="$WORK/deb"
+    stage_tree "$stage"
+    mkdir -p "$stage/DEBIAN" "$WORK/debian"
+    # dpkg-shlibdeps needs a debian/control to exist; it only reads the package name from it
+    printf 'Source: %s\n\nPackage: %s\nArchitecture: %s\n' "$APP" "$APP" "$DEB_ARCH" >"$WORK/debian/control"
+    local linked
+    linked="$(cd "$WORK" && dpkg-shlibdeps -O "$stage/usr/bin/$GUI" "$stage/usr/bin/$APP" 2>/dev/null | sed 's/^shlibs:Depends=//')"
+    # libraries the window opens at runtime (dlopen), which shlibdeps can't see
+    local runtime="libxkbcommon0, libxkbcommon-x11-0, libegl1, libwayland-client0, libwayland-egl1, libx11-6, libxcursor1, libxrandr2, libxi6"
+    cat >"$stage/DEBIAN/control" <<CONTROL
+Package: $APP
+Version: $VERSION
+Section: utils
+Priority: optional
+Architecture: $DEB_ARCH
+Maintainer: sweatshopking <336541686+sweatshopking@users.noreply.github.com>
+Depends: $linked, $runtime
+Recommends: policykit-1 | pkexec, fwupd
+Homepage: https://github.com/sweatshopking/hwsight
+Description: A Device Manager for Linux, in plain English
+ hwsight looks at everything inside and plugged into your computer, tells you
+ in plain English what is working and what isn't, explains why, and shows the
+ fix for your distro.
+CONTROL
+    dpkg-deb --root-owner-group --build "$stage" "$DIST/${APP}_${VERSION}_${DEB_ARCH}.deb" >/dev/null
+    dpkg-deb --info "$DIST/${APP}_${VERSION}_${DEB_ARCH}.deb" | sed -n '/Depends/p'
+}
+
+build_appimage() {
+    log "Packaging AppImage"
+    local appdir="$WORK/AppDir"
+    rm -rf "$appdir"
+    install -Dm644 "$ROOT/packaging/io.github.sweatshopking.hwsight.metainfo.xml" \
+        "$appdir/usr/share/metainfo/io.github.sweatshopking.hwsight.metainfo.xml"
+    install -Dm644 "$ROOT/LICENSE" "$appdir/usr/share/licenses/$APP/LICENSE"
+    local expected_sha256
+    if [ "$LINUXDEPLOY_TAG" = "1-alpha-20251107-1" ]; then
+        case "$ARCH" in
+            x86_64) expected_sha256="c20cd71e3a4e3b80c3483cef793cda3f4e990aca14014d23c544ca3ce1270b4d" ;;
+            aarch64) expected_sha256="620095110d693282b8ebeb244a95b5e911cf8f65f76c88b4b47d16ae6346fcff" ;;
+            *) echo "error: no pinned linuxdeploy checksum for $ARCH" >&2; return 1 ;;
+        esac
+    else
+        expected_sha256="${LINUXDEPLOY_SHA256:-}"
+    fi
+    if [[ ! "$expected_sha256" =~ ^[[:xdigit:]]{64}$ ]]; then
+        echo "error: set LINUXDEPLOY_SHA256 to the trusted SHA-256 for linuxdeploy $LINUXDEPLOY_TAG" >&2
+        return 1
+    fi
+    expected_sha256="${expected_sha256,,}"
+    local ld="$WORK/linuxdeploy-$ARCH-$expected_sha256.AppImage"
+    if [ ! -f "$ld" ]; then
+        local download
+        download="$(mktemp "$WORK/linuxdeploy-$ARCH.XXXXXX")"
+        if ! curl -fsSL -o "$download" "https://github.com/linuxdeploy/linuxdeploy/releases/download/$LINUXDEPLOY_TAG/linuxdeploy-$ARCH.AppImage"; then
+            rm -f "$download"
+            echo "error: failed to download linuxdeploy for $ARCH" >&2
+            return 1
+        fi
+        local downloaded_sha256
+        downloaded_sha256="$(sha256sum "$download" | cut -d ' ' -f1)"
+        if [ "$downloaded_sha256" != "$expected_sha256" ]; then
+            rm -f "$download"
+            echo "error: linuxdeploy checksum mismatch for $ARCH (expected $expected_sha256, got $downloaded_sha256)" >&2
+            return 1
+        fi
+        chmod +x "$download"
+        mv "$download" "$ld"
+    fi
+    chmod +x "$ld"
+    # containers have no FUSE, so let the tool unpack itself
+    export APPIMAGE_EXTRACT_AND_RUN=1
+    # The window opens these with dlopen, so linuxdeploy can't find them by itself; bundle them.
+    local multiarch
+    multiarch="$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
+    local dlopened=(--library "/usr/lib/$multiarch/libxkbcommon.so.0" --library "/usr/lib/$multiarch/libxkbcommon-x11.so.0")
+    (
+        cd "$WORK"
+        LDAI_OUTPUT="$DIST/${APP}-${VERSION}-${ARCH}.AppImage" \
+            "$ld" --appdir "$appdir" \
+            --executable "$TARGET/release/$GUI" "${dlopened[@]}" \
+            --desktop-file "$ROOT/packaging/$APP.desktop" \
+            --icon-file "$ROOT/assets/$APP.svg" \
+            --output appimage >"$WORK/linuxdeploy.log" 2>&1 || { tail -40 "$WORK/linuxdeploy.log"; exit 1; }
+    )
+    ls -la "$DIST"/*-"$ARCH".AppImage
+}
+
+build_rpm() {
+    log "Packaging .rpm"
+    local stage="$WORK/rpm-root"
+    stage_tree "$stage"
+    local top="$WORK/rpmbuild"
+    rm -rf "$top"
+    mkdir -p "$top"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    sed -e "s/@VERSION@/$VERSION/" "$ROOT/packaging/$APP.spec.in" >"$top/SPECS/$APP.spec"
+    rpmbuild -bb --quiet --define "_topdir $top" --define "stage $stage" "$top/SPECS/$APP.spec"
+    # The updater looks for hwsight-<version>-<release>.<arch>.rpm
+    cp "$top"/RPMS/"$ARCH"/*.rpm "$DIST/"
+    rpm -qp --requires "$DIST"/*."$ARCH".rpm | grep -v '^rpmlib' | tr '\n' ' '
+    echo
+}
+
+case "${1:-}" in
+    deb-appimage)
+        [ "${SKIP_DEPS:-}" = 1 ] || install_deps_ubuntu
+        install_rust
+        build_app
+        build_deb
+        build_appimage
+        ;;
+    rpm)
+        [ "${SKIP_DEPS:-}" = 1 ] || install_deps_fedora
+        install_rust
+        build_app
+        build_rpm
+        ;;
+    *)
+        echo "usage: $0 deb-appimage|rpm" >&2
+        exit 2
+        ;;
+esac
+log "Done: $(ls "$DIST")"

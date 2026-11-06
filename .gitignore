@@ -3,3 +3,4 @@ tools/.firmware-cache/
 tools/.software-cache/
 tools/.drivers-cache/
 tools/.release/
+/dist
