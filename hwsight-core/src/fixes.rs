@@ -16,6 +16,11 @@ pub struct Fix {
     pub text: String,
     /// A command the user can copy (and a later version may run after asking).
     pub command: Option<String>,
+    /// The id (in `drivers.toml`) of a driver hwsight can install for this step, after the
+    /// user confirms. Only an id: the package is looked up again when installing, so
+    /// nothing a caller passes in can reach the package manager.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub driver: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -290,7 +295,11 @@ impl Fixes {
             Some(c) => Some(fill(c, v, true)?),
             None => None,
         };
-        Some(Fix { text, command })
+        Some(Fix {
+            text,
+            command,
+            driver: None,
+        })
     }
 }
 

@@ -1,131 +1,151 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:29+0000\n"
+"POT-Creation-Date: 2026-11-06 09:46+0000\n"
 "Language: ko\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: hwsight-gui/ui/app.slint:154
+#: hwsight-gui/ui/app.slint:164
 msgid "Scanning your hardware..."
 msgstr "하드웨어를 검사하는 중…"
 
-#: hwsight-gui/ui/app.slint:165
+#: hwsight-gui/ui/app.slint:175
 msgid "No problems found"
 msgstr "문제가 없습니다"
 
-#: hwsight-gui/ui/app.slint:176
+#: hwsight-gui/ui/app.slint:186
 msgid "Copy report for all devices"
 msgstr "모든 장치 보고서 복사"
 
-#: hwsight-gui/ui/app.slint:180
+#: hwsight-gui/ui/app.slint:190
 msgid "Scanning..."
 msgstr "검사 중…"
 
-#: hwsight-gui/ui/app.slint:180
+#: hwsight-gui/ui/app.slint:190
 msgid "Scan again"
 msgstr "다시 검사"
 
-#: hwsight-gui/ui/app.slint:227
+#: hwsight-gui/ui/app.slint:237
 msgid "Nothing matches."
 msgstr "일치하는 항목이 없습니다."
 
-#: hwsight-gui/ui/app.slint:246
+#: hwsight-gui/ui/app.slint:256
 msgid "Only problems"
 msgstr "문제만"
 
-#: hwsight-gui/ui/components/details-panel.slint:28
+#: hwsight-gui/ui/components/details-panel.slint:36
 msgid "Select a device to see its details"
 msgstr "장치를 선택하면 세부 정보가 표시됩니다"
 
-#: hwsight-gui/ui/components/details-panel.slint:68
+#: hwsight-gui/ui/components/details-panel.slint:79
 msgid "WHAT IT DOES"
 msgstr "기능"
 
-#: hwsight-gui/ui/components/details-panel.slint:92
+#: hwsight-gui/ui/components/details-panel.slint:103
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:92
+#: hwsight-gui/ui/components/details-panel.slint:103
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:146
+#: hwsight-gui/ui/components/details-panel.slint:157
 msgid "What's wrong"
 msgstr "문제"
 
-#: hwsight-gui/ui/components/details-panel.slint:165
+#: hwsight-gui/ui/components/details-panel.slint:176
 msgid "How to fix"
 msgstr "해결 방법"
 
-#: hwsight-gui/ui/components/details-panel.slint:213
+#: hwsight-gui/ui/components/details-panel.slint:217
+msgid "Install this driver"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:224
+msgid "Installing a driver needs your password. Your system will ask for it in its own window; hwsight never sees it. Install it now?"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:232
+msgid "Yes, install"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:239
+msgid "Cancel"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:246
+msgid "Installing... a password window may be waiting for you."
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:264
 msgid "USEFUL SOFTWARE"
 msgstr "유용한 소프트웨어"
 
-#: hwsight-gui/ui/components/details-panel.slint:232
+#: hwsight-gui/ui/components/details-panel.slint:283
 msgid "Installed"
 msgstr "설치됨"
 
-#: hwsight-gui/ui/components/details-panel.slint:276
+#: hwsight-gui/ui/components/details-panel.slint:327
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:295
+#: hwsight-gui/ui/components/details-panel.slint:346
 msgid "Copied"
 msgstr "복사됨"
 
-#: hwsight-gui/ui/components/details-panel.slint:295
+#: hwsight-gui/ui/components/details-panel.slint:346
 msgid "Copy"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:354
+#: hwsight-gui/ui/components/details-panel.slint:405
 msgid "As read: {}"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:374
+#: hwsight-gui/ui/components/details-panel.slint:425
 msgid "Copy for a forum post"
 msgstr "포럼 게시물용으로 복사"
 
-#: hwsight-gui/ui/components/details-panel.slint:381
+#: hwsight-gui/ui/components/details-panel.slint:432
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "이 장치의 간단한 보고서를 복사합니다. 사용자 이름과 컴퓨터 이름은 삭제됩니다."
 
-#: hwsight-gui/ui/components/details-panel.slint:398
+#: hwsight-gui/ui/components/details-panel.slint:449
 msgid "DETAILS"
 msgstr "세부 정보"
 
-#: hwsight-gui/ui/components/details-panel.slint:407
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "Type"
 msgstr "종류"
 
-#: hwsight-gui/ui/components/details-panel.slint:417
+#: hwsight-gui/ui/components/details-panel.slint:468
 msgid "Driver"
 msgstr "드라이버"
 
-#: hwsight-gui/ui/components/details-panel.slint:419
+#: hwsight-gui/ui/components/details-panel.slint:470
 msgid "None"
 msgstr "없음"
 
-#: hwsight-gui/ui/components/details-panel.slint:427
+#: hwsight-gui/ui/components/details-panel.slint:478
 msgid "Model"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:427
+#: hwsight-gui/ui/components/details-panel.slint:478
 msgid "Hardware ID"
 msgstr "하드웨어 ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:437
+#: hwsight-gui/ui/components/details-panel.slint:488
 msgid "Connection"
 msgstr "연결"
 
-#: hwsight-gui/ui/components/details-panel.slint:447
+#: hwsight-gui/ui/components/details-panel.slint:498
 msgid "Name"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:447
+#: hwsight-gui/ui/components/details-panel.slint:498
 msgid "Address"
 msgstr "주소"
 
-#: hwsight-gui/ui/components/details-panel.slint:458
+#: hwsight-gui/ui/components/details-panel.slint:509
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "이 장치는 아직 장치 데이터베이스에 없습니다. 위의 하드웨어 ID를 온라인에서 검색할 수 있습니다."
 
@@ -143,14 +163,6 @@ msgstr ""
 
 #: hwsight-gui/ui/components/firmware-banner.slint:63
 msgid "Install the ticked updates now? Keep the computer plugged in and don't turn it off while they install. Some need a restart afterwards. You may be asked for your password."
-msgstr ""
-
-#: hwsight-gui/ui/components/firmware-banner.slint:71
-msgid "Yes, install"
-msgstr ""
-
-#: hwsight-gui/ui/components/firmware-banner.slint:78
-msgid "Cancel"
 msgstr ""
 
 #: hwsight-gui/ui/components/firmware-banner.slint:83
@@ -183,10 +195,6 @@ msgstr ""
 
 #: hwsight-gui/ui/components/tools-banner.slint:66
 msgid "Installing software needs your password. Your system will ask for it in its own window; hwsight never sees it. Install the ticked programs now?"
-msgstr ""
-
-#: hwsight-gui/ui/components/tools-banner.slint:86
-msgid "Installing... a password window may be waiting for you."
 msgstr ""
 
 #: hwsight-gui/ui/components/update-banner.slint:34
@@ -1235,15 +1243,6 @@ msgstr ""
 msgid "{} To turn this on, install {} with your system's package manager."
 msgstr ""
 
-msgid "{} isn't a tool hwsight knows how to install."
-msgstr ""
-
-msgid "Nothing to install."
-msgstr ""
-
-msgid "hwsight can't install software on this system. Use your system's package manager instead."
-msgstr ""
-
 msgid "The pkexec program (polkit) isn't installed, so hwsight can't ask for your password."
 msgstr ""
 
@@ -1257,6 +1256,15 @@ msgid "Not allowed: the password was refused."
 msgstr ""
 
 msgid "The installer failed: {}"
+msgstr ""
+
+msgid "{} isn't a tool hwsight knows how to install."
+msgstr ""
+
+msgid "Nothing to install."
+msgstr ""
+
+msgid "hwsight can't install software on this system. Use your system's package manager instead."
 msgstr ""
 
 msgid "Unknown {} {}"
@@ -1563,6 +1571,9 @@ msgid "hwsight {} is available. Update it with your package manager, or download
 msgstr "hwsight {}을(를) 사용할 수 있습니다. 패키지 관리자로 업데이트하거나 웹사이트에서 다운로드하세요."
 
 msgid "Installed. Scanning again to use it."
+msgstr ""
+
+msgid "Installed. Restart the computer to start using it."
 msgstr ""
 
 msgid "The list of firmware updates is up to date."

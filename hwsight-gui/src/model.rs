@@ -253,6 +253,7 @@ fn device_item(d: &Device) -> DeviceItem {
         .map(|f| FixItem {
             text: f.text.clone().into(),
             command: f.command.clone().unwrap_or_default().into(),
+            driver: f.driver.clone().unwrap_or_default().into(),
         })
         .collect();
     let software: Vec<SoftwareItem> = d

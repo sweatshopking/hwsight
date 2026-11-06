@@ -113,6 +113,38 @@ fn main() -> Result<(), slint::PlatformError> {
             });
         }
     });
+    window.on_install_driver({
+        let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
+        move |id| {
+            let Some(w) = weak.upgrade() else { return };
+            if w.get_driver_busy() {
+                return;
+            }
+            let distro = report
+                .lock()
+                .ok()
+                .and_then(|r| r.as_ref().map(|r| r.distro.clone()));
+            let Some(distro) = distro else { return };
+            w.set_driver_busy(true);
+            w.set_driver_status("".into());
+            let (weak, devices, report) = (weak.clone(), devices.clone(), report.clone());
+            let id = id.to_string();
+            std::thread::spawn(move || {
+                let status = match hwsight_core::install_driver(&id, &distro) {
+                    Ok(_) => {
+                        hwsight_core::tr!("Installed. Restart the computer to start using it.")
+                    }
+                    Err(e) => e,
+                };
+                let _ = slint::invoke_from_event_loop(move || {
+                    let Some(w) = weak.upgrade() else { return };
+                    w.set_driver_status(status.into());
+                    w.set_driver_busy(false);
+                    start_scan(weak, devices, report);
+                });
+            });
+        }
+    });
     window.on_firmware_check({
         let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
         move || {

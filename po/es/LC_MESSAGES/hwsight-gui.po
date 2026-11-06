@@ -1,131 +1,151 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:29+0000\n"
+"POT-Creation-Date: 2026-11-06 09:46+0000\n"
 "Language: es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: hwsight-gui/ui/app.slint:154
+#: hwsight-gui/ui/app.slint:164
 msgid "Scanning your hardware..."
 msgstr "Analizando tu hardware..."
 
-#: hwsight-gui/ui/app.slint:165
+#: hwsight-gui/ui/app.slint:175
 msgid "No problems found"
 msgstr "No se encontraron problemas"
 
-#: hwsight-gui/ui/app.slint:176
+#: hwsight-gui/ui/app.slint:186
 msgid "Copy report for all devices"
 msgstr "Copiar informe de todos los dispositivos"
 
-#: hwsight-gui/ui/app.slint:180
+#: hwsight-gui/ui/app.slint:190
 msgid "Scanning..."
 msgstr "Analizando..."
 
-#: hwsight-gui/ui/app.slint:180
+#: hwsight-gui/ui/app.slint:190
 msgid "Scan again"
 msgstr "Analizar de nuevo"
 
-#: hwsight-gui/ui/app.slint:227
+#: hwsight-gui/ui/app.slint:237
 msgid "Nothing matches."
 msgstr "No hay coincidencias."
 
-#: hwsight-gui/ui/app.slint:246
+#: hwsight-gui/ui/app.slint:256
 msgid "Only problems"
 msgstr "Solo problemas"
 
-#: hwsight-gui/ui/components/details-panel.slint:28
+#: hwsight-gui/ui/components/details-panel.slint:36
 msgid "Select a device to see its details"
 msgstr "Selecciona un dispositivo para ver sus detalles"
 
-#: hwsight-gui/ui/components/details-panel.slint:68
+#: hwsight-gui/ui/components/details-panel.slint:79
 msgid "WHAT IT DOES"
 msgstr "QUÉ HACE"
 
-#: hwsight-gui/ui/components/details-panel.slint:92
+#: hwsight-gui/ui/components/details-panel.slint:103
 msgid "Needs attention"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:92
+#: hwsight-gui/ui/components/details-panel.slint:103
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:146
+#: hwsight-gui/ui/components/details-panel.slint:157
 msgid "What's wrong"
 msgstr "Qué ocurre"
 
-#: hwsight-gui/ui/components/details-panel.slint:165
+#: hwsight-gui/ui/components/details-panel.slint:176
 msgid "How to fix"
 msgstr "Cómo solucionarlo"
 
-#: hwsight-gui/ui/components/details-panel.slint:213
+#: hwsight-gui/ui/components/details-panel.slint:217
+msgid "Install this driver"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:224
+msgid "Installing a driver needs your password. Your system will ask for it in its own window; hwsight never sees it. Install it now?"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:232
+msgid "Yes, install"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:239
+msgid "Cancel"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:246
+msgid "Installing... a password window may be waiting for you."
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:264
 msgid "USEFUL SOFTWARE"
 msgstr "SOFTWARE ÚTIL"
 
-#: hwsight-gui/ui/components/details-panel.slint:232
+#: hwsight-gui/ui/components/details-panel.slint:283
 msgid "Installed"
 msgstr "Instalado"
 
-#: hwsight-gui/ui/components/details-panel.slint:276
+#: hwsight-gui/ui/components/details-panel.slint:327
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:295
+#: hwsight-gui/ui/components/details-panel.slint:346
 msgid "Copied"
 msgstr "Copiado"
 
-#: hwsight-gui/ui/components/details-panel.slint:295
+#: hwsight-gui/ui/components/details-panel.slint:346
 msgid "Copy"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:354
+#: hwsight-gui/ui/components/details-panel.slint:405
 msgid "As read: {}"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:374
+#: hwsight-gui/ui/components/details-panel.slint:425
 msgid "Copy for a forum post"
 msgstr "Copiar para un foro"
 
-#: hwsight-gui/ui/components/details-panel.slint:381
+#: hwsight-gui/ui/components/details-panel.slint:432
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Copia un informe breve sobre este dispositivo. Se eliminan tu nombre de usuario y el del equipo."
 
-#: hwsight-gui/ui/components/details-panel.slint:398
+#: hwsight-gui/ui/components/details-panel.slint:449
 msgid "DETAILS"
 msgstr "DETALLES"
 
-#: hwsight-gui/ui/components/details-panel.slint:407
+#: hwsight-gui/ui/components/details-panel.slint:458
 msgid "Type"
 msgstr "Tipo"
 
-#: hwsight-gui/ui/components/details-panel.slint:417
+#: hwsight-gui/ui/components/details-panel.slint:468
 msgid "Driver"
 msgstr "Controlador"
 
-#: hwsight-gui/ui/components/details-panel.slint:419
+#: hwsight-gui/ui/components/details-panel.slint:470
 msgid "None"
 msgstr "Ninguno"
 
-#: hwsight-gui/ui/components/details-panel.slint:427
+#: hwsight-gui/ui/components/details-panel.slint:478
 msgid "Model"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:427
+#: hwsight-gui/ui/components/details-panel.slint:478
 msgid "Hardware ID"
 msgstr "ID de hardware"
 
-#: hwsight-gui/ui/components/details-panel.slint:437
+#: hwsight-gui/ui/components/details-panel.slint:488
 msgid "Connection"
 msgstr "Conexión"
 
-#: hwsight-gui/ui/components/details-panel.slint:447
+#: hwsight-gui/ui/components/details-panel.slint:498
 msgid "Name"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:447
+#: hwsight-gui/ui/components/details-panel.slint:498
 msgid "Address"
 msgstr "Dirección"
 
-#: hwsight-gui/ui/components/details-panel.slint:458
+#: hwsight-gui/ui/components/details-panel.slint:509
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Este dispositivo aún no está en la base de datos. Puedes buscar su ID de hardware en Internet."
 
@@ -143,14 +163,6 @@ msgstr ""
 
 #: hwsight-gui/ui/components/firmware-banner.slint:63
 msgid "Install the ticked updates now? Keep the computer plugged in and don't turn it off while they install. Some need a restart afterwards. You may be asked for your password."
-msgstr ""
-
-#: hwsight-gui/ui/components/firmware-banner.slint:71
-msgid "Yes, install"
-msgstr ""
-
-#: hwsight-gui/ui/components/firmware-banner.slint:78
-msgid "Cancel"
 msgstr ""
 
 #: hwsight-gui/ui/components/firmware-banner.slint:83
@@ -183,10 +195,6 @@ msgstr ""
 
 #: hwsight-gui/ui/components/tools-banner.slint:66
 msgid "Installing software needs your password. Your system will ask for it in its own window; hwsight never sees it. Install the ticked programs now?"
-msgstr ""
-
-#: hwsight-gui/ui/components/tools-banner.slint:86
-msgid "Installing... a password window may be waiting for you."
 msgstr ""
 
 #: hwsight-gui/ui/components/update-banner.slint:34
@@ -1237,15 +1245,6 @@ msgstr ""
 msgid "{} To turn this on, install {} with your system's package manager."
 msgstr ""
 
-msgid "{} isn't a tool hwsight knows how to install."
-msgstr ""
-
-msgid "Nothing to install."
-msgstr ""
-
-msgid "hwsight can't install software on this system. Use your system's package manager instead."
-msgstr ""
-
 msgid "The pkexec program (polkit) isn't installed, so hwsight can't ask for your password."
 msgstr ""
 
@@ -1259,6 +1258,15 @@ msgid "Not allowed: the password was refused."
 msgstr ""
 
 msgid "The installer failed: {}"
+msgstr ""
+
+msgid "{} isn't a tool hwsight knows how to install."
+msgstr ""
+
+msgid "Nothing to install."
+msgstr ""
+
+msgid "hwsight can't install software on this system. Use your system's package manager instead."
 msgstr ""
 
 msgid "Unknown {} {}"
@@ -1568,6 +1576,9 @@ msgid "hwsight {} is available. Update it with your package manager, or download
 msgstr "hwsight {} está disponible. Actualízala con tu gestor de paquetes o descárgala del sitio web."
 
 msgid "Installed. Scanning again to use it."
+msgstr ""
+
+msgid "Installed. Restart the computer to start using it."
 msgstr ""
 
 msgid "The list of firmware updates is up to date."

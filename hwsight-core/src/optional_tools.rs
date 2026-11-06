@@ -101,29 +101,12 @@ impl MissingTool {
 
 const ALL_TOOLS: [Tool; 4] = [Tool::Iw, Tool::NetworkManager, Tool::Fwupd, Tool::Udisks];
 
-/// Install the named tools (the `name` of a `MissingTool`) with the distro's package
-/// manager through pkexec, which asks the user for their password in the desktop's own
-/// window: hwsight never sees it. Only tools in hwsight's own table are accepted.
-pub fn install_tools(names: &[String], distro: &Distro) -> Result<String, String> {
-    let mut packages = Vec::new();
-    for name in names {
-        let tool = ALL_TOOLS
-            .iter()
-            .find(|t| t.name() == name)
-            .ok_or_else(|| crate::tr!("{} isn't a tool hwsight knows how to install.", name))?;
-        packages.push(tool.package(distro.family));
-    }
-    if packages.is_empty() {
-        return Err(crate::tr!("Nothing to install."));
-    }
-    let argv = distro
-        .family
-        .install_argv(&packages, distro.immutable)
-        .ok_or_else(|| {
-            crate::tr!("hwsight can't install software on this system. Use your system's package manager instead.")
-        })?;
+/// Run an install command through pkexec, which asks the user for their password in the
+/// desktop's own window: hwsight never sees it. Callers build `argv` from their own
+/// checked data, never from text a user or a downloaded file can steer.
+pub(crate) fn run_installer(argv: &[String]) -> Result<String, String> {
     let output = std::process::Command::new("pkexec")
-        .args(&argv)
+        .args(argv)
         .stdin(std::process::Stdio::null())
         .output()
         .map_err(|e| {
@@ -148,6 +131,30 @@ pub fn install_tools(names: &[String], distro: &Distro) -> Result<String, String
             Err(crate::tr!("The installer failed: {}", last.trim()))
         }
     }
+}
+
+/// Install the named tools (the `name` of a `MissingTool`) with the distro's package
+/// manager through pkexec, which asks the user for their password in the desktop's own
+/// window: hwsight never sees it. Only tools in hwsight's own table are accepted.
+pub fn install_tools(names: &[String], distro: &Distro) -> Result<String, String> {
+    let mut packages = Vec::new();
+    for name in names {
+        let tool = ALL_TOOLS
+            .iter()
+            .find(|t| t.name() == name)
+            .ok_or_else(|| crate::tr!("{} isn't a tool hwsight knows how to install.", name))?;
+        packages.push(tool.package(distro.family));
+    }
+    if packages.is_empty() {
+        return Err(crate::tr!("Nothing to install."));
+    }
+    let argv = distro
+        .family
+        .install_argv(&packages, distro.immutable)
+        .ok_or_else(|| {
+            crate::tr!("hwsight can't install software on this system. Use your system's package manager instead.")
+        })?;
+    run_installer(&argv)
 }
 
 fn on_path(program: &str, dirs: &[PathBuf]) -> bool {

@@ -223,6 +223,35 @@ impl Drivers {
         }
     }
 
+    /// The command that installs driver `id` on this distro. Only a repo package from
+    /// this file qualifies: AUR packages are built from community recipes and are never
+    /// installed by hwsight, and a distro without a package has nothing to install.
+    pub(crate) fn install_argv(&self, id: &str, distro: &Distro) -> Result<Vec<String>, String> {
+        let driver = self
+            .table
+            .drivers
+            .iter()
+            .find(|d| d.id == id)
+            .ok_or_else(|| crate::tr!("{} isn't a driver hwsight knows how to install.", id))?;
+        let Source::Repo(package) = self.source(driver, distro) else {
+            return Err(crate::tr!(
+                "hwsight can only install drivers that your distro packages itself."
+            ));
+        };
+        distro
+            .family
+            .install_argv(&[package], distro.immutable)
+            .ok_or_else(|| {
+                crate::tr!("hwsight can't install software on this system. Use your system's package manager instead.")
+            })
+    }
+
+    /// Install driver `id` through pkexec, which asks for the password in the desktop's
+    /// own window. The package comes from this file, never from the caller.
+    pub fn install(&self, id: &str, distro: &Distro) -> Result<String, String> {
+        crate::optional_tools::run_installer(&self.install_argv(id, distro)?)
+    }
+
     /// What the driver is for, in the user's language.
     pub fn what(&self, driver: &DriverEntry) -> String {
         self.text.get(&driver.what).to_owned()
@@ -305,6 +334,43 @@ device = "43a0"
             Source::Aur("nope")
         );
         assert_eq!(d.source(entry, &distro("ID=plan9\n")), Source::ByHand);
+    }
+
+    #[test]
+    fn only_repo_packages_can_be_installed() {
+        let (_, t) = table(ENTRY).unwrap_or_default();
+        let d = Drivers {
+            version: String::new(),
+            source: DataSource::Embedded,
+            table: t,
+            text: DataText::english(),
+        };
+        assert_eq!(
+            d.install_argv("broadcom-wl", &distro("ID=debian\n")),
+            Ok(vec![
+                "apt-get".to_owned(),
+                "install".to_owned(),
+                "-y".to_owned(),
+                "broadcom-sta-dkms".to_owned()
+            ])
+        );
+        // No package, an AUR package, an unknown id, and a read-only system all refuse.
+        assert!(
+            d.install_argv("broadcom-wl", &distro("ID=fedora\n"))
+                .is_err()
+        );
+        assert!(
+            d.install_argv(
+                "broadcom-wl",
+                &distro("ID=opensuse-tumbleweed\nID_LIKE=\"opensuse suse\"\n")
+            )
+            .is_err()
+        );
+        assert!(d.install_argv("nope", &distro("ID=debian\n")).is_err());
+        assert!(
+            d.install_argv("broadcom-wl", &Distro::from_os_release("ID=debian\n", true))
+                .is_err()
+        );
     }
 
     #[test]

@@ -13,6 +13,14 @@ export component DetailsPanel inherits Rectangle {
     callback set-level(int);
     callback copy-report();
     callback copy-group(int);
+    // Installing a third-party driver (needs the user's password; the system asks for it).
+    in property <bool> driver-busy;
+    in property <string> driver-status;
+    callback install-driver(string);
+    // The driver whose install is waiting for the user's confirmation, if any.
+    property <string> confirming-driver;
+    changed device => { root.confirming-driver = ""; }
+
     in-out property <int> copied-group: -1;
     property <bool> copied;
     property <color> status-colour: root.device.status-kind == "ok" ? Theme.ok
@@ -203,6 +211,46 @@ export component DetailsPanel inherits Rectangle {
                                 }
                             }
                         }
+                        if fix.driver != "" && !root.driver-busy && root.confirming-driver != fix.driver : HorizontalLayout {
+                            alignment: start;
+                            AccentButton {
+                                text: @tr("Install this driver");
+                                clicked => { root.confirming-driver = fix.driver; }
+                            }
+                        }
+                        if fix.driver != "" && !root.driver-busy && root.confirming-driver == fix.driver : VerticalLayout {
+                            spacing: 8px;
+                            Text {
+                                text: @tr("Installing a driver needs your password. Your system will ask for it in its own window; hwsight never sees it. Install it now?");
+                                color: Theme.text;
+                                wrap: word-wrap;
+                            }
+                            HorizontalLayout {
+                                alignment: start;
+                                spacing: Theme.gap;
+                                AccentButton {
+                                    text: @tr("Yes, install");
+                                    clicked => {
+                                        root.confirming-driver = "";
+                                        root.install-driver(fix.driver);
+                                    }
+                                }
+                                AccentButton {
+                                    text: @tr("Cancel");
+                                    clicked => { root.confirming-driver = ""; }
+                                }
+                            }
+                        }
+                    }
+                    if root.driver-busy : Text {
+                        text: @tr("Installing... a password window may be waiting for you.");
+                        color: Theme.text-muted;
+                        wrap: word-wrap;
+                    }
+                    if root.driver-status != "" && !root.driver-busy : Text {
+                        text: root.driver-status;
+                        color: Theme.text-muted;
+                        wrap: word-wrap;
                     }
                 }
             }

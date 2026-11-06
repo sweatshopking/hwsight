@@ -60,6 +60,13 @@ pub use fixes::{Fix, Fixes};
 pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use optional_tools::install_tools;
+
+/// Install the third-party driver `id` from `drivers.toml` (with the user's say-so and
+/// password, asked for by the system). Only a repo package of the user's own distro
+/// qualifies, and the package name comes from the data file, never from the caller.
+pub fn install_driver(id: &str, distro: &Distro) -> Result<String, String> {
+    Drivers::load(&DataDirs::standard()).0.install(id, distro)
+}
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::Rules;
 pub use system::SystemPaths;
@@ -406,7 +413,17 @@ impl Scanner {
                             }
                             _ => None,
                         };
-                        fixes.driver_fix(&drivers.what(d), &source, &d.homepage, install.as_deref())
+                        let mut fix = fixes.driver_fix(
+                            &drivers.what(d),
+                            &source,
+                            &d.homepage,
+                            install.as_deref(),
+                        )?;
+                        // Offer the button only where installing would actually work.
+                        if drivers.install_argv(&d.id, &self.distro).is_ok() {
+                            fix.driver = Some(d.id.clone());
+                        }
+                        Some(fix)
                     });
                 device.fixes.splice(0..0, offers.collect::<Vec<_>>());
             }
@@ -628,6 +645,8 @@ mod tests {
             };
             assert!(driver.text.contains(first_step), "{os_release}: {driver:?}");
             assert_eq!(driver.command.as_deref(), command, "{os_release}");
+            // The install button is offered exactly where there is a command to run.
+            assert_eq!(driver.driver.is_some(), command.is_some(), "{os_release}");
             assert!(
                 search.text.contains("14e4:43a0"),
                 "{os_release}: {search:?}"

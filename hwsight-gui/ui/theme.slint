@@ -48,6 +48,8 @@ export global Theme {
 export struct FixItem {
     text: string,
     command: string,
+    // Id of a driver hwsight can install for this step (empty: no install button).
+    driver: string,
 }
 
 // One firmware update the user can tick on or off. `id` is fwupd's device id.
