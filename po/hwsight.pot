@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-06 05:39+0000\n"
+"POT-Creation-Date: 2026-11-06 06:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -788,6 +788,15 @@ msgstr ""
 msgid "The battery is low. Recharge or replace it soon."
 msgstr ""
 
+msgid "{} update"
+msgstr ""
+
+msgid "Installed, waiting for a restart"
+msgstr ""
+
+msgid "The update was installed but only takes effect after the computer restarts. Restart when it suits you."
+msgstr ""
+
 msgid "Newer firmware can fix bugs and security problems."
 msgstr ""
 
@@ -795,9 +804,6 @@ msgid "Back up important files first, and keep the computer plugged in while it 
 msgstr ""
 
 msgid "Firmware update"
-msgstr ""
-
-msgid "{} update"
 msgstr ""
 
 msgid "Version {} is available"
