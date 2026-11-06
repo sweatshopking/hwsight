@@ -7,8 +7,25 @@ doing its job. hwsight looks at everything inside and plugged into your PC, tell
 English what's healthy and what isn't, and then goes further: it finds the problems you didn't
 know you had, explains why they happen, and shows you the fix for *your* distro.
 
-> **Status: early development.** There are no releases or packages yet. You can build it
-> from source (see below). Watch or star the repo to follow along.
+> **Status: first release coming shortly.** There are no packages yet, but you can build it
+> from source today (see below). Watch or star the repo to be there when it lands.
+
+## See it
+
+**Plain English, with the fix.** hwsight spotted that this PC's RAM is running well below
+the speed it was sold for, and says what to do about it:
+
+![hwsight explaining that memory is running at 4800 MT/s instead of its rated 6000 MT/s](docs/screenshots/memory-simple.png)
+
+**Key numbers with a verdict.** The graphics card's link speed, width, and Resizable BAR
+state, each judged for you:
+
+![hwsight showing a graphics card's PCIe connection details](docs/screenshots/graphics-more.png)
+
+**Every detail, with its source.** The Technical level shows what was read and exactly where
+it came from:
+
+![hwsight's Technical view of the memory, with the source of each value](docs/screenshots/memory-technical.png)
 
 ## Why hwsight
 
