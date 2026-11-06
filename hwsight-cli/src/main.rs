@@ -25,6 +25,9 @@ Options:
   --check-update
                See whether a newer version of hwsight is out
   --update     Download and install the newest version of hwsight
+  --details ADDRESS
+               Show everything hwsight can read about one device, with where each value
+               came from. Find addresses with --ids.
   --report [ADDRESS]
                Print a report to paste into a forum post or bug report. Private details are removed.
   -h, --help   Show this help
@@ -39,6 +42,7 @@ struct Options {
     problems_only: bool,
     show_ids: bool,
     report: Option<Option<String>>,
+    details: Option<String>,
 }
 
 enum Command {
@@ -95,6 +99,27 @@ fn main() -> ExitCode {
     } else {
         scanner.scan()
     };
+    if let Some(address) = &opts.details {
+        return match report.devices.iter().find(|d| &d.address == address) {
+            Some(device) => {
+                print!(
+                    "{}",
+                    details_text(&device.display_name, &device.address, &device.details)
+                );
+                ExitCode::SUCCESS
+            }
+            None => {
+                eprintln!(
+                    "{}",
+                    hwsight_core::tr!(
+                        "hwsight: no device with address {} was found (see `hwsight --ids`)",
+                        address
+                    )
+                );
+                ExitCode::FAILURE
+            }
+        };
+    }
     if let Some(address) = &opts.report {
         print!(
             "{}",
@@ -136,6 +161,7 @@ fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Options, String>
         problems_only: false,
         show_ids: false,
         report: None,
+        details: None,
     };
     let mut args = args.into_iter().peekable();
     while let Some(arg) = args.next() {
@@ -155,6 +181,15 @@ fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Options, String>
                 }
                 opts.report = Some(address);
             }
+            "--details" => match args.next().filter(|a| !a.starts_with('-')) {
+                Some(address) => opts.details = Some(address),
+                None => {
+                    return Err(
+                        "hwsight: --details needs a device address (see `hwsight --ids`)"
+                            .to_owned(),
+                    );
+                }
+            },
             "-h" | "--help" => opts.command = Command::Help,
             "--update-data" => opts.command = Command::UpdateData,
             "--check-update" => opts.command = Command::CheckUpdate,
@@ -165,6 +200,12 @@ fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Options, String>
     }
     if opts.json && opts.report.is_some() {
         return Err("hwsight: --report and --json can't be used together".to_owned());
+    }
+    if opts.details.is_some() && (opts.json || opts.report.is_some()) {
+        return Err(
+            "hwsight: --details can't be used with --json or --report (--json already includes every detail)"
+                .to_owned(),
+        );
     }
     Ok(opts)
 }
@@ -236,6 +277,49 @@ fn print_json(report: &ScanReport) -> io::Result<()> {
     let mut out = io::stdout().lock();
     serde_json::to_writer_pretty(&mut out, report)?;
     writeln!(out)
+}
+
+/// Everything hwsight can read about one device, grouped, with where each value came from.
+fn details_text(
+    name: &str,
+    address: &str,
+    groups: &[hwsight_core::details::DetailGroup],
+) -> String {
+    use hwsight_core::details::Verdict;
+    let mut out = format!("{name}  ({address})\n");
+    if groups.is_empty() {
+        out.push_str(&hwsight_core::tr!(
+            "No more details could be read for this device."
+        ));
+        out.push('\n');
+        return out;
+    }
+    for group in groups {
+        out.push_str(&format!("\n{}\n", group.title));
+        for detail in &group.items {
+            let mark = match detail.verdict {
+                Verdict::Good => "✓",
+                Verdict::Reduced => "!",
+                Verdict::Problem => "✗",
+                Verdict::Info => " ",
+            };
+            out.push_str(&format!("  {mark} {}: {}\n", detail.label, detail.value));
+            if let Some(why) = &detail.explanation {
+                out.push_str(&format!("      {why}\n"));
+            }
+            if let Some(raw) = detail.raw.as_ref().filter(|r| **r != detail.value) {
+                out.push_str(&format!(
+                    "      {}\n",
+                    hwsight_core::tr!("As read: {}", raw)
+                ));
+            }
+            out.push_str(&format!(
+                "      {}\n",
+                hwsight_core::tr!("Source: {}", detail.source)
+            ));
+        }
+    }
+    out
 }
 
 fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()> {
@@ -524,6 +608,41 @@ mod tests {
             result,
             Err(e) if e == "hwsight: --report and --json can't be used together"
         ));
+    }
+
+    #[test]
+    fn details_needs_an_address_and_conflicts_with_json() {
+        let parse = |args: &[&str]| parse_args(args.iter().map(|a| (*a).to_owned()));
+        assert_eq!(
+            parse(&["--details", "0000:01:00.0"])
+                .expect("valid")
+                .details
+                .as_deref(),
+            Some("0000:01:00.0")
+        );
+        assert!(parse(&["--details"]).is_err());
+        assert!(parse(&["--details", "--json"]).is_err());
+        assert!(parse(&["--details", "0000:01:00.0", "--json"]).is_err());
+        assert!(parse(&["--details", "0000:01:00.0", "--report"]).is_err());
+    }
+
+    #[test]
+    fn details_text_lists_groups_values_and_sources() {
+        use hwsight_core::details::{Detail, DetailGroup, Verdict};
+        assert!(details_text("GPU", "0000:01:00.0", &[]).contains("No more details"));
+        let groups = vec![DetailGroup {
+            title: "PCIe connection".into(),
+            items: vec![
+                Detail::new("Link width".into(), "x4".into(), "/sys/w".into())
+                    .raw("4 (device maximum 16)")
+                    .verdict(Verdict::Reduced, Some("Using 4 lanes.".into())),
+            ],
+        }];
+        let text = hwsight_core::i18n::in_english(|| details_text("GPU", "0000:01:00.0", &groups));
+        assert!(text.contains("\nPCIe connection\n  ! Link width: x4\n"));
+        assert!(text.contains("      Using 4 lanes.\n"));
+        assert!(text.contains("      As read: 4 (device maximum 16)\n"));
+        assert!(text.contains("      Source: /sys/w\n"));
     }
 
     #[test]

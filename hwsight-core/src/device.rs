@@ -167,6 +167,9 @@ pub struct Device {
     pub note: Option<String>,
     /// What this kind of device does, in plain English (from descriptions.toml).
     pub description: Option<String>,
+    /// Facts for the "More details" and "Technical" levels, in groups. Empty when
+    /// nothing could be read.
+    pub details: Vec<crate::details::DetailGroup>,
     /// Software recommendations for this device.
     pub software: Vec<crate::software::Tip>,
     /// Class codes used to match descriptions and software recommendations.

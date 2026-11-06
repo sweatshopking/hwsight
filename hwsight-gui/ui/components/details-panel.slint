@@ -1,11 +1,16 @@
 import { ScrollView } from "std-widgets.slint";
-import { Theme, DeviceItem, FixItem, SoftwareItem } from "../theme.slint";
+import { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem } from "../theme.slint";
 import { StatusPill } from "status-pill.slint";
+import { StatusDot } from "status-dot.slint";
+import { LevelSwitch } from "level-switch.slint";
 import { AccentButton } from "accent-button.slint";
 
 export component DetailsPanel inherits Rectangle {
     in property <DeviceItem> device;
     in property <bool> has-device;
+    // 0 = Simple, 1 = More details, 2 = Technical.
+    in property <int> level;
+    callback set-level(int);
     callback copy-report();
     property <bool> copied;
     property <color> status-colour: root.device.status-kind == "ok" ? Theme.ok
@@ -50,6 +55,10 @@ export component DetailsPanel inherits Rectangle {
                     kind: root.device.status-kind;
                     text: root.device.status-text;
                 }
+            }
+            LevelSwitch {
+                level: root.level;
+                selected(level) => { root.set-level(level); }
             }
             if root.device.description != "" : VerticalLayout {
                 spacing: 4px;
@@ -202,6 +211,72 @@ export component DetailsPanel inherits Rectangle {
                 text: root.device.note;
                 color: Theme.text-muted;
                 wrap: word-wrap;
+            }
+            if root.level > 0 : VerticalLayout {
+                spacing: 0px;
+                if root.device.details.length == 0 : Text {
+                    text: @tr("No more details could be read for this device.");
+                    color: Theme.text-muted;
+                    wrap: word-wrap;
+                }
+                for group in root.device.details : VerticalLayout {
+                    if root.level >= 2 || group.more-count > 0 : VerticalLayout {
+                        padding-top: Theme.gap;
+                        spacing: 10px;
+                        Text {
+                            text: group.title;
+                            color: Theme.text-muted;
+                            font-size: Theme.font-small;
+                            font-weight: 700;
+                            letter-spacing: 1px;
+                        }
+                        for item in group.items : VerticalLayout {
+                            if root.level >= 2 || !item.technical : VerticalLayout {
+                                spacing: 2px;
+                                Text {
+                                    text: item.label;
+                                    color: Theme.text-muted;
+                                    font-size: Theme.font-small;
+                                    wrap: word-wrap;
+                                }
+                                HorizontalLayout {
+                                    spacing: 8px;
+                                    if item.kind != "neutral" : VerticalLayout {
+                                        alignment: start;
+                                        padding-top: 4px;
+                                        StatusDot { kind: item.kind; }
+                                    }
+                                    Text {
+                                        text: item.value;
+                                        color: Theme.text;
+                                        font-size: Theme.font-body;
+                                        wrap: word-wrap;
+                                        horizontal-stretch: 1;
+                                    }
+                                }
+                                if item.explanation != "" : Text {
+                                    text: item.explanation;
+                                    color: Theme.text-muted;
+                                    font-size: Theme.font-small;
+                                    wrap: word-wrap;
+                                }
+                                if root.level >= 2 && item.raw != "" : Text {
+                                    text: @tr("As read: {}", item.raw);
+                                    color: Theme.text-faint;
+                                    font-size: Theme.font-small;
+                                    wrap: word-wrap;
+                                }
+                                if root.level >= 2 && item.source != "" : Text {
+                                    text: item.source;
+                                    color: Theme.text-faint;
+                                    font-size: Theme.font-small;
+                                    font-family: "monospace";
+                                    wrap: word-wrap;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             VerticalLayout {
                 spacing: Theme.gap;

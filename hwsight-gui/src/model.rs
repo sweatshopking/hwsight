@@ -7,7 +7,7 @@ use std::rc::Rc;
 
 use slint::{ModelRc, VecModel};
 
-use crate::{DeviceItem, FixItem, Row, SoftwareItem};
+use crate::{DetailGroupItem, DetailItem, DeviceItem, FixItem, Row, SoftwareItem};
 
 /// Everything the window needs from one scan.
 pub struct View {
@@ -184,6 +184,34 @@ fn device_item(d: &Device) -> DeviceItem {
         })
         .collect();
 
+    let details: Vec<DetailGroupItem> = d
+        .details
+        .iter()
+        .map(|g| DetailGroupItem {
+            title: g.title.clone().into(),
+            more_count: g.items.iter().filter(|i| !i.technical).count() as i32,
+            items: ModelRc::from(Rc::new(VecModel::from(
+                g.items
+                    .iter()
+                    .map(|i| DetailItem {
+                        label: i.label.clone().into(),
+                        value: i.value.clone().into(),
+                        raw: i
+                            .raw
+                            .clone()
+                            .filter(|r| *r != i.value)
+                            .unwrap_or_default()
+                            .into(),
+                        explanation: i.explanation.clone().unwrap_or_default().into(),
+                        source: i.source.clone().into(),
+                        kind: i.verdict.kind().into(),
+                        technical: i.technical,
+                    })
+                    .collect::<Vec<_>>(),
+            ))),
+        })
+        .collect();
+
     DeviceItem {
         name: d.display_name.clone().into(),
         vendor: d
@@ -207,6 +235,7 @@ fn device_item(d: &Device) -> DeviceItem {
         why: why.join("\n").into(),
         fixes: ModelRc::from(Rc::new(VecModel::from(fixes))),
         software: ModelRc::from(Rc::new(VecModel::from(software))),
+        details: ModelRc::from(Rc::new(VecModel::from(details))),
         note: d.note.clone().unwrap_or_default().into(),
         description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
@@ -361,6 +390,41 @@ mod tests {
         assert_eq!(item.what.as_str(), "Pairs Logitech mice.");
         assert_eq!(item.command.as_str(), "sudo pacman -S solaar");
         assert_eq!(v.devices[1].software.row_count(), 0);
+    }
+
+    #[test]
+    fn details_keep_verdicts_levels_and_sources() {
+        use hwsight_core::details::{Detail, DetailGroup, Verdict};
+        let mut r = report();
+        r.devices[0].details = vec![DetailGroup {
+            title: "PCIe connection".into(),
+            items: vec![
+                Detail::new("Link width".into(), "x4".into(), "/sys/w".into())
+                    .raw("4 (device maximum 16)")
+                    .verdict(Verdict::Reduced, Some("Using 4 lanes.".into())),
+                Detail::new("Interrupt".into(), "75".into(), "/sys/irq".into())
+                    .raw("75")
+                    .technical(),
+            ],
+        }];
+        let v = view(&r);
+        let group = v.devices[0].details.row_data(0).expect("group");
+        assert_eq!(group.title.as_str(), "PCIe connection");
+        assert_eq!(group.more_count, 1, "only the first shows in More details");
+        let width = group.items.row_data(0).expect("item");
+        assert_eq!(width.kind.as_str(), "warn");
+        assert_eq!(width.raw.as_str(), "4 (device maximum 16)");
+        assert_eq!(width.explanation.as_str(), "Using 4 lanes.");
+        assert_eq!(width.source.as_str(), "/sys/w");
+        assert!(!width.technical);
+        let irq = group.items.row_data(1).expect("item");
+        assert!(irq.technical);
+        assert_eq!(
+            irq.raw.as_str(),
+            "",
+            "a raw value equal to the value is dropped"
+        );
+        assert_eq!(v.devices[1].details.row_count(), 0);
     }
 
     #[test]

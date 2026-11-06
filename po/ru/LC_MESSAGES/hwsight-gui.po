@@ -1,105 +1,125 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 04:02+0000\n"
+"POT-Creation-Date: 2026-11-06 04:28+0000\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: hwsight-gui/ui/app.slint:131
+#: hwsight-gui/ui/app.slint:136
 msgid "Scanning your hardware..."
 msgstr "Сканирование оборудования…"
 
-#: hwsight-gui/ui/app.slint:142
+#: hwsight-gui/ui/app.slint:147
 msgid "No problems found"
 msgstr "Проблем не найдено"
 
-#: hwsight-gui/ui/app.slint:153
+#: hwsight-gui/ui/app.slint:158
 msgid "Copy report for all devices"
 msgstr "Копировать отчёт обо всех устройствах"
 
-#: hwsight-gui/ui/app.slint:157
+#: hwsight-gui/ui/app.slint:162
 msgid "Scanning..."
 msgstr "Сканирование…"
 
-#: hwsight-gui/ui/app.slint:157
+#: hwsight-gui/ui/app.slint:162
 msgid "Scan again"
 msgstr "Сканировать снова"
 
-#: hwsight-gui/ui/app.slint:186
+#: hwsight-gui/ui/app.slint:191
 msgid "Nothing matches."
 msgstr "Совпадений нет."
 
-#: hwsight-gui/ui/app.slint:205
+#: hwsight-gui/ui/app.slint:210
 msgid "Only problems"
 msgstr "Только проблемы"
 
-#: hwsight-gui/ui/components/details-panel.slint:21
+#: hwsight-gui/ui/components/details-panel.slint:26
 msgid "Select a device to see its details"
 msgstr "Выберите устройство, чтобы увидеть подробности"
 
-#: hwsight-gui/ui/components/details-panel.slint:57
+#: hwsight-gui/ui/components/details-panel.slint:66
 msgid "WHAT IT DOES"
 msgstr "НАЗНАЧЕНИЕ"
 
-#: hwsight-gui/ui/components/details-panel.slint:79
+#: hwsight-gui/ui/components/details-panel.slint:88
 msgid "What's wrong"
 msgstr "Что не так"
 
-#: hwsight-gui/ui/components/details-panel.slint:98
+#: hwsight-gui/ui/components/details-panel.slint:107
 msgid "How to fix"
 msgstr "Как исправить"
 
-#: hwsight-gui/ui/components/details-panel.slint:146
+#: hwsight-gui/ui/components/details-panel.slint:155
 msgid "USEFUL SOFTWARE"
 msgstr "ПОЛЕЗНЫЕ ПРОГРАММЫ"
 
-#: hwsight-gui/ui/components/details-panel.slint:165
+#: hwsight-gui/ui/components/details-panel.slint:174
 msgid "Installed"
 msgstr "Установлено"
 
-#: hwsight-gui/ui/components/details-panel.slint:209
+#: hwsight-gui/ui/components/details-panel.slint:218
+msgid "No more details could be read for this device."
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:264
+msgid "As read: {}"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:284
 msgid "Copied"
 msgstr "Скопировано"
 
-#: hwsight-gui/ui/components/details-panel.slint:209
+#: hwsight-gui/ui/components/details-panel.slint:284
 msgid "Copy for a forum post"
 msgstr "Копировать для сообщения на форуме"
 
-#: hwsight-gui/ui/components/details-panel.slint:216
+#: hwsight-gui/ui/components/details-panel.slint:291
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Копируется краткий отчёт об устройстве. Имя пользователя и компьютера удаляются."
 
-#: hwsight-gui/ui/components/details-panel.slint:230
+#: hwsight-gui/ui/components/details-panel.slint:305
 msgid "DETAILS"
 msgstr "ПОДРОБНОСТИ"
 
-#: hwsight-gui/ui/components/details-panel.slint:239
+#: hwsight-gui/ui/components/details-panel.slint:314
 msgid "Type"
 msgstr "Тип"
 
-#: hwsight-gui/ui/components/details-panel.slint:249
+#: hwsight-gui/ui/components/details-panel.slint:324
 msgid "Driver"
 msgstr "Драйвер"
 
-#: hwsight-gui/ui/components/details-panel.slint:251
+#: hwsight-gui/ui/components/details-panel.slint:326
 msgid "None"
 msgstr "Нет"
 
-#: hwsight-gui/ui/components/details-panel.slint:259
+#: hwsight-gui/ui/components/details-panel.slint:334
 msgid "Hardware ID"
 msgstr "ID оборудования"
 
-#: hwsight-gui/ui/components/details-panel.slint:269
+#: hwsight-gui/ui/components/details-panel.slint:344
 msgid "Connection"
 msgstr "Подключение"
 
-#: hwsight-gui/ui/components/details-panel.slint:279
+#: hwsight-gui/ui/components/details-panel.slint:354
 msgid "Address"
 msgstr "Адрес"
 
-#: hwsight-gui/ui/components/details-panel.slint:290
+#: hwsight-gui/ui/components/details-panel.slint:365
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Этого устройства пока нет в базе данных. Найдите его идентификатор оборудования в интернете."
+
+#: hwsight-gui/ui/components/level-switch.slint:16
+msgid "Simple"
+msgstr ""
+
+#: hwsight-gui/ui/components/level-switch.slint:16
+msgid "More details"
+msgstr ""
+
+#: hwsight-gui/ui/components/level-switch.slint:16
+msgid "Technical"
+msgstr ""
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
 msgid "Good to know"
@@ -349,6 +369,105 @@ msgstr "Неизвестный {} {}"
 msgid "Unknown {}"
 msgstr "Неизвестный {}"
 
+msgid "PCIe {} ({} GT/s)"
+msgstr ""
+
+msgid "{} GT/s"
+msgstr ""
+
+msgid "The slot this is plugged into only supports {}, so this is as fast as it can go here."
+msgstr ""
+
+msgid "Graphics cards slow this connection down when nothing is asking much of them, to save power, and speed it up when needed. This is normal. Its full speed can only be seen while it's busy."
+msgstr ""
+
+msgid "This is slower than both the device and its slot can go. Power saving can cause this. If the device feels slow, check its PCIe speed setting in the BIOS."
+msgstr ""
+
+msgid "Link speed"
+msgstr ""
+
+msgid "Using {} lanes where {} are possible. For a card in a slot this usually means it isn't pushed in fully, or the slot shares lanes with another slot or drive. The motherboard manual says which."
+msgstr ""
+
+msgid "Link width"
+msgstr ""
+
+msgid "Active (D0)"
+msgstr ""
+
+msgid "Powered down (D3hot)"
+msgstr ""
+
+msgid "Powered off (D3cold)"
+msgstr ""
+
+msgid "Power state"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Suspended to save power"
+msgstr ""
+
+msgid "Runtime power saving"
+msgstr ""
+
+msgid "The connection had to repeat some messages. A few are normal; many can mean a card that isn't pushed in fully or a failing slot."
+msgstr ""
+
+msgid "Corrected connection errors"
+msgstr ""
+
+msgid "The connection reported errors it couldn't recover from. Try pushing the card in again, or another slot."
+msgstr ""
+
+msgid "Serious connection errors"
+msgstr ""
+
+msgid "A window the device uses to exchange data with the computer."
+msgstr ""
+
+msgid "Expansion ROM"
+msgstr ""
+
+msgid "I/O ports window {}"
+msgstr ""
+
+msgid "Memory window {}"
+msgstr ""
+
+msgid "Interrupt (IRQ)"
+msgstr ""
+
+msgid "The line the device uses to get the processor's attention."
+msgstr ""
+
+msgid "IOMMU group"
+msgstr ""
+
+msgid "Devices in the same group can only be passed through to a virtual machine together."
+msgstr ""
+
+msgid "NUMA node"
+msgstr ""
+
+msgid "Which group of processor cores and memory this device sits closest to."
+msgstr ""
+
+msgid "PCIe connection"
+msgstr ""
+
+msgid "Connection errors"
+msgstr ""
+
+msgid "Power"
+msgstr ""
+
+msgid "Resources"
+msgstr ""
+
 msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
 msgstr "{} нет в источниках программ вашего дистрибутива, но его можно установить из Flathub этой командой."
 
@@ -385,6 +504,9 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
+msgid "hwsight: no device with address {} was found (see `hwsight --ids`)"
+msgstr ""
+
 msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "Доступна hwsight {} (у вас {}). Выполните hwsight --update для установки."
 
@@ -396,6 +518,9 @@ msgstr "Не удалось проверить обновления: {}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "Не удалось найти установленный hwsight."
+
+msgid "Source: {}"
+msgstr ""
 
 msgid "{}, driver: {}"
 msgstr "{}, драйвер: {}"

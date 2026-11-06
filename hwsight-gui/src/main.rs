@@ -2,6 +2,7 @@
 
 mod app_updates;
 mod model;
+mod settings;
 
 use std::{
     path::PathBuf,
@@ -18,7 +19,7 @@ use slint::{ComponentHandle, Model, ModelRc, SharedString, VecModel};
 mod ui {
     slint::include_modules!();
 }
-use ui::{AppWindow, DeviceItem, FixItem, Row, SoftwareItem};
+use ui::{AppWindow, DetailGroupItem, DetailItem, DeviceItem, FixItem, Row, SoftwareItem};
 
 struct UpdateState {
     release: Option<hwsight_core::app_update::Release>,
@@ -63,6 +64,26 @@ fn main() -> Result<(), slint::PlatformError> {
         w.set_selected(selected);
         scroll_to_selected(&w, &rows, selected);
     });
+    let config_dir = settings::config_dir();
+    if let Some(dir) = &config_dir {
+        window.set_detail_level(settings::load_from(dir).level().index());
+    }
+    window.on_level_changed(move |level| {
+        if let Some(dir) = &config_dir {
+            settings::save_to(
+                dir,
+                &settings::Settings {
+                    detail_level: level,
+                },
+            );
+        }
+    });
+    if let Ok(level) = std::env::var("HWSIGHT_LEVEL")
+        && let Ok(level) = level.parse::<i32>()
+    {
+        // Developer aid with HWSIGHT_SNAPSHOT: show a level without touching the saved one.
+        window.set_detail_level(level);
+    }
     let report_state = last_report.clone();
     window.on_device_report(move |address| {
         let Ok(report) = report_state.lock() else {

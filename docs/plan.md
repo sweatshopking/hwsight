@@ -1364,7 +1364,7 @@ Order (each task starts only after the one before is reviewed):
 5. **Copilot 15 (done 2026-11-06):** machine-draft the 11 data text files (below).
 5b. **Copilot 16 (done 2026-11-06, finished by Claude):** software recommendations (`software.toml`, core, CLI, GUI); its texts
    use the same data text files. Spec: `docs/copilot-16.md`.
-6. **Claude 15:** detail levels foundation (data model, Simple / More details /
+6. **Claude 15 (foundation DONE 2026-11-06, see "Claude 15 notes" below):** detail levels foundation (data model, Simple / More details /
    Technical toggle, `hwsight --details`). Also fix the layout for long translations
    (French "Analyser à nouveau" runs off the right edge at the default 1100px width;
    German "Für einen Forumsbeitrag kopieren" is wider than the details panel):
@@ -1708,3 +1708,41 @@ pass.
 
   ALL CHECKS PASSED
   ```
+
+## Claude 15 notes (2026-11-06)
+
+Done: `details.rs` (Detail, DetailGroup, Verdict, Level), `pci_details.rs` (the first
+reader: PCIe link speed and width judged against the slot above, graphics idle slowdown
+treated as normal, AER error counters, power state, IRQ, IOMMU group, NUMA node, BAR
+windows), `Device.details` (in `--json`), CLI `hwsight --details ADDRESS`, GUI level switch
+(Simple / More details / Technical, remembered in `~/.config/hwsight/settings.toml`), and
+the long-translation layout fix (window minimum width 960px; the switch no longer depends
+on its label widths). Checked in en, de, fr, ru at 960px.
+
+Still to do for the detail levels:
+- **Translate the 40 new strings** in all 11 catalogs (left English on purpose, so the
+  readers can settle first; `every_language_is_complete` fails until then). Do it in one
+  batch after the next readers land, and read the machine output properly (see
+  CLAUDE.md "Lessons").
+- Readers, one per area, using `docs/learn-from-qldm.md` (RAM SPD first).
+- Privacy: add a `sensitive` flag to `Detail` with the first reader that has a serial
+  number or MAC address (USB), hidden behind a "show" eye icon and left out of reports.
+- Tooltips per label (plan rule), "Copy" per group, "Copy all"/"Save report".
+- `AccentButton` has a fixed width (label + 36px): fine at 960px, but shorten or wrap if
+  a translation ever overflows.
+
+## Design: hardware that isn't a PCI or USB device (RAM, CPU, board, battery, monitors, drives)
+
+The device list only has PCI and USB entries. RAM sticks, the processor, the motherboard,
+the battery, monitors, and drives need their own entries, using the same model so the GUI
+and CLI need no changes:
+- Add `Bus::System` (shown as "Built in"), with one `Device` per thing: Processor,
+  Memory (one entry for the whole memory, each stick as a group of details), Motherboard
+  and BIOS, Battery, each Monitor, each Drive. Categories `Processors` and `Storage`
+  already exist; add `Memory`, `Board`, `Displays`, and `Power`.
+- Their `status` is Working unless a reader finds a real fault; what a beginner sees at
+  Simple is the plain "What it does" text plus any verdict summed up in one line.
+- OPEN QUESTION for the owner: should a `Reduced` verdict (e.g. RAM at 4800 but rated
+  6000) show at the Simple level, as a gentle "Could be better" note on the device and a
+  count in the header? Recommended: yes, as a separate pill colour (not a problem).
+

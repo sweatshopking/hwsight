@@ -6,7 +6,7 @@
 // components.
 
 import { ScrollView, Button, ListView, Switch, Palette } from "std-widgets.slint";
-import { Theme, DeviceItem, FixItem, SoftwareItem } from "theme.slint";
+import { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
 import { DetailsPanel } from "components/details-panel.slint";
@@ -18,7 +18,7 @@ import { SearchBox } from "components/search-box.slint";
 import { CopyText } from "components/copy-text.slint";
 
 // Re-exported so the Rust side can set theme tokens and build device items.
-export { Theme, DeviceItem, FixItem, SoftwareItem }
+export { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem }
 
 // One row of the device list: either a category heading or a device.
 export struct Row {
@@ -34,8 +34,10 @@ export component AppWindow inherits Window {
     title: "hwsight";
     preferred-width: 1100px;
     preferred-height: 720px;
-    min-width: 720px;
-    min-height: 480px;
+    // Narrower than this the details panel gets too small for the three-level switch and
+    // long translations (the list column can't shrink below about 430px).
+    min-width: 960px;
+    min-height: 520px;
     background: Theme.background;
     // Slint's built-in widgets (the switch, scrollbars) default to a light scheme with
     // dark text, which is hard to read on our dark background.
@@ -59,6 +61,9 @@ export component AppWindow inherits Window {
 
     // Index into `devices` of the selected device, or -1.
     in-out property <int> selected: -1;
+    // How much detail the panel shows: 0 = Simple, 1 = More details, 2 = Technical.
+    in-out property <int> detail-level: 0;
+    callback level-changed(int);
 
     callback refresh();
     callback filter-changed();
@@ -249,6 +254,11 @@ export component AppWindow inherits Window {
                         unrecognized: false
                     };
                     has-device: root.selected >= 0;
+                    level: root.detail-level;
+                    set-level(level) => {
+                        root.detail-level = level;
+                        root.level-changed(level);
+                    }
                     horizontal-stretch: 3;
                     copy-report => {
                         copy-text.copy(root.device-report(details.device.address));

@@ -193,6 +193,7 @@ fn read_device(
         log_issues: Vec::new(),
         note,
         description,
+        details: Vec::new(),
         software: Vec::new(),
         class_codes: interface_classes,
         fixes: Vec::new(),

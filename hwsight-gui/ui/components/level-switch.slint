@@ -1,0 +1,41 @@
+import { Theme } from "../theme.slint";
+
+// Chooses how much detail to show: 0 = Simple, 1 = More details, 2 = Technical.
+export component LevelSwitch inherits Rectangle {
+    in property <int> level;
+    callback selected(int);
+    height: 34px;
+    border-radius: 17px;
+    background: Theme.background;
+    border-width: 1px;
+    border-color: Theme.border;
+
+    // Three equal segments placed by fraction of the width (not by their labels' widths),
+    // so the switch always fits and a long translation is elided instead of overflowing.
+
+    for label[i] in [@tr("Simple"), @tr("More details"), @tr("Technical")] : Rectangle {
+        height: 30px;
+        y: 2px;
+        x: 2px + i * (root.width - 4px) / 3;
+        width: (root.width - 4px) / 3;
+        border-radius: 15px;
+        background: root.level == i
+            ? @linear-gradient(90deg, Theme.accent-start 0%, Theme.accent-end 100%)
+            : touch.has-hover ? Theme.surface-hover : transparent;
+        touch := TouchArea {
+            clicked => { root.selected(i); }
+        }
+        Text {
+            x: 6px;
+            width: parent.width - 12px;
+            height: parent.height;
+            text: label;
+            color: root.level == i ? white : Theme.text-muted;
+            font-size: Theme.font-small;
+            font-weight: root.level == i ? 700 : 500;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            overflow: elide;
+        }
+    }
+}

@@ -59,6 +59,26 @@ export struct SoftwareItem {
     homepage: string,
 }
 
+// One fact for the "More details" and "Technical" levels. `kind` is the verdict as a
+// status kind ("ok", "warn", "error", or "neutral").
+export struct DetailItem {
+    label: string,
+    value: string,
+    raw: string,
+    explanation: string,
+    source: string,
+    kind: string,
+    technical: bool,
+}
+
+// Details that belong together. `more-count` is how many of them the "More details"
+// level shows (the rest are technical only), so a group with none can be hidden.
+export struct DetailGroupItem {
+    title: string,
+    more-count: int,
+    items: [DetailItem],
+}
+
 export struct DeviceItem {
     name: string,
     vendor: string,
@@ -75,6 +95,7 @@ export struct DeviceItem {
     // Steps to fix it, most specific first; empty when it works.
     fixes: [FixItem],
     software: [SoftwareItem],
+    details: [DetailGroupItem],
     // Extra explanation, e.g. why no driver is needed.
     note: string,
     // What this kind of device does, in plain English.
