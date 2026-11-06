@@ -1,5 +1,5 @@
 //! The parts of the computer that aren't plugged in: the processor, memory, disk
-//! drives, and the motherboard.
+//! drives, monitors, and the motherboard.
 
 use std::fs;
 use std::path::PathBuf;
@@ -28,6 +28,12 @@ pub struct SystemPaths {
     pub block_dir: PathBuf,
     /// Ask the UDisks2 service for drive health (off in tests).
     pub udisks: bool,
+    /// `/sys/class/drm`: the connected screens.
+    pub drm_dir: PathBuf,
+    /// The system's list of monitor maker codes (hwdata).
+    pub pnp_ids: PathBuf,
+    /// Ask the graphics driver for each screen's modes and current mode (off in tests).
+    pub drm_live: bool,
 }
 
 impl SystemPaths {
@@ -42,6 +48,9 @@ impl SystemPaths {
             hwmon_dir: PathBuf::from("/sys/class/hwmon"),
             block_dir: PathBuf::from("/sys/block"),
             udisks: true,
+            drm_dir: PathBuf::from("/sys/class/drm"),
+            pnp_ids: PathBuf::from("/usr/share/hwdata/pnp.ids"),
+            drm_live: true,
         }
     }
 
@@ -58,6 +67,9 @@ impl SystemPaths {
             hwmon_dir: nowhere.join("hwmon"),
             block_dir: nowhere.join("block"),
             udisks: false,
+            drm_dir: nowhere.join("drm"),
+            pnp_ids: nowhere.join("pnp.ids"),
+            drm_live: false,
         }
     }
 }
@@ -108,6 +120,17 @@ pub(crate) fn scan(paths: &SystemPaths, descriptions: &Descriptions) -> Vec<Devi
     devices.extend(crate::drives::devices(
         &paths.block_dir,
         &health,
+        descriptions,
+    ));
+    let live = if paths.drm_live {
+        crate::displays::read_live()
+    } else {
+        Default::default()
+    };
+    devices.extend(crate::displays::devices(
+        &paths.drm_dir,
+        &paths.pnp_ids,
+        &live,
         descriptions,
     ));
     devices.extend(crate::board::device(

@@ -1747,6 +1747,15 @@ gets the new `Status::DriveFailing`: a real problem in the header, a note, and t
 Without UDisks (a container, no service) a drive says "Health: Not available".
 Not yet: partitions and filesystems, self-tests, spin state, drive link speed.
 
+Monitors are done (`displays.rs`, `edid.rs`; new dependency `drm`): each connected screen
+from `/sys/class/drm`, identity from its EDID (name, maker, size, colour depth, HDR from the
+CTA extension, made week/year; the serial number is never read and the test fixture has it
+zeroed), and every mode plus the mode in use right now from the graphics driver (read-only
+queries on `/dev/dri/cardN`, no probing, works on Wayland and X11). Verdicts: resolution
+below the screen's best, and refresh rate below the fastest offered at that size (flagged
+when 5 Hz or more short). Without driver data it still shows the screen's own best picture.
+Not yet: variable refresh rate (VRR) and whether HDR is switched on, multi-monitor layout.
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the

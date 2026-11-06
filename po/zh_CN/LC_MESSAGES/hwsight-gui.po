@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 05:11+0000\n"
+"POT-Creation-Date: 2026-11-06 05:16+0000\n"
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -389,6 +389,9 @@ msgstr ""
 msgid "Disk drives"
 msgstr ""
 
+msgid "Monitors"
+msgstr ""
+
 msgid "Motherboard and BIOS"
 msgstr ""
 
@@ -446,6 +449,9 @@ msgstr ""
 msgid "drive"
 msgstr ""
 
+msgid "monitor"
+msgstr ""
+
 msgid "motherboard"
 msgstr ""
 
@@ -480,6 +486,84 @@ msgid "Reserved for a virtual machine"
 msgstr "已为虚拟机保留"
 
 msgid "Drive reports a health problem"
+msgstr ""
+
+msgid "This screen can show {} but is set to a lower size, so the picture may look soft. You can change it in your display settings."
+msgstr ""
+
+msgid "Resolution"
+msgstr ""
+
+msgid "This screen can run at {} at this size but is set to {}. A higher refresh rate makes motion look smoother. You can change it in your display settings."
+msgstr ""
+
+msgid "Refresh rate"
+msgstr ""
+
+msgid "Best picture the screen can show"
+msgstr ""
+
+msgid "{} at {}"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "{} inches"
+msgstr ""
+
+msgid "Colour depth"
+msgstr ""
+
+msgid "{} bits per colour"
+msgstr ""
+
+msgid "More bits give smoother colour gradients, without visible banding."
+msgstr ""
+
+msgid "HDR"
+msgstr ""
+
+msgid "Supported"
+msgstr ""
+
+msgid "Not reported"
+msgstr ""
+
+msgid "HDR makes very bright and very dark areas look more lifelike. It usually has to be turned on in your display settings too."
+msgstr ""
+
+msgid "Made"
+msgstr ""
+
+msgid "Week {} of {}"
+msgstr ""
+
+msgid "Connector"
+msgstr ""
+
+msgid "Graphics card"
+msgstr ""
+
+msgid "Screen information standard"
+msgstr ""
+
+msgid "Maker code"
+msgstr ""
+
+msgid "Product code"
+msgstr ""
+
+msgid "Every size and refresh rate on offer"
+msgstr ""
+
+msgid "The graphics driver"
+msgstr ""
+
+msgid "Monitor on {}"
+msgstr ""
+
+msgid "Screen"
 msgstr ""
 
 msgid "{} years ({} hours)"
@@ -762,9 +846,6 @@ msgid "Memory stick in {}"
 msgstr ""
 
 msgid "Memory stick in {}, channel {}"
-msgstr ""
-
-msgid "Size"
 msgstr ""
 
 msgid "Part number"
