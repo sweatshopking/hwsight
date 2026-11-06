@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 05:25+0000\n"
+"POT-Creation-Date: 2026-11-06 05:36+0000\n"
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -49,71 +49,71 @@ msgstr ""
 msgid "Could be better"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:129
+#: hwsight-gui/ui/components/details-panel.slint:144
 msgid "What's wrong"
 msgstr "问题"
 
-#: hwsight-gui/ui/components/details-panel.slint:148
+#: hwsight-gui/ui/components/details-panel.slint:163
 msgid "How to fix"
 msgstr "如何修复"
 
-#: hwsight-gui/ui/components/details-panel.slint:196
+#: hwsight-gui/ui/components/details-panel.slint:211
 msgid "USEFUL SOFTWARE"
 msgstr "实用软件"
 
-#: hwsight-gui/ui/components/details-panel.slint:215
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "Installed"
 msgstr "已安装"
 
-#: hwsight-gui/ui/components/details-panel.slint:259
+#: hwsight-gui/ui/components/details-panel.slint:274
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:305
+#: hwsight-gui/ui/components/details-panel.slint:335
 msgid "As read: {}"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:325
+#: hwsight-gui/ui/components/details-panel.slint:355
 msgid "Copied"
 msgstr "已复制"
 
-#: hwsight-gui/ui/components/details-panel.slint:325
+#: hwsight-gui/ui/components/details-panel.slint:355
 msgid "Copy for a forum post"
 msgstr "复制用于论坛发帖"
 
-#: hwsight-gui/ui/components/details-panel.slint:332
+#: hwsight-gui/ui/components/details-panel.slint:362
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "复制此设备的简短报告。报告中会删除用户名和计算机名。"
 
-#: hwsight-gui/ui/components/details-panel.slint:346
+#: hwsight-gui/ui/components/details-panel.slint:376
 msgid "DETAILS"
 msgstr "详细信息"
 
-#: hwsight-gui/ui/components/details-panel.slint:355
+#: hwsight-gui/ui/components/details-panel.slint:385
 msgid "Type"
 msgstr "类型"
 
-#: hwsight-gui/ui/components/details-panel.slint:365
+#: hwsight-gui/ui/components/details-panel.slint:395
 msgid "Driver"
 msgstr "驱动程序"
 
-#: hwsight-gui/ui/components/details-panel.slint:367
+#: hwsight-gui/ui/components/details-panel.slint:397
 msgid "None"
 msgstr "无"
 
-#: hwsight-gui/ui/components/details-panel.slint:375
+#: hwsight-gui/ui/components/details-panel.slint:405
 msgid "Hardware ID"
 msgstr "硬件 ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:385
+#: hwsight-gui/ui/components/details-panel.slint:415
 msgid "Connection"
 msgstr "连接"
 
-#: hwsight-gui/ui/components/details-panel.slint:395
+#: hwsight-gui/ui/components/details-panel.slint:425
 msgid "Address"
 msgstr "地址"
 
-#: hwsight-gui/ui/components/details-panel.slint:406
+#: hwsight-gui/ui/components/details-panel.slint:436
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "此设备尚未收录在设备数据库中。你可以在线搜索上面的硬件 ID。"
 
@@ -745,6 +745,57 @@ msgstr ""
 msgid "This drive reports a serious health problem. Back up anything important right away."
 msgstr ""
 
+msgid "Firmware update check"
+msgstr ""
+
+msgid "The fwupd firmware service"
+msgstr ""
+
+msgid "Not set up"
+msgstr ""
+
+msgid "hwsight can't tell whether your devices have firmware updates, because fwupd has never downloaded its list of available updates. This command downloads it from the Linux Vendor Firmware Service. To keep it up to date automatically, turn on the timer: sudo systemctl enable --now fwupd-refresh.timer"
+msgstr ""
+
+msgid "{} days out of date"
+msgstr ""
+
+msgid "fwupd's list of available firmware updates is old, so newer updates may be missing. This command refreshes it."
+msgstr ""
+
+msgid "No source of firmware updates is switched on in fwupd, so updates can't be found. This command switches on the Linux Vendor Firmware Service."
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "{} battery"
+msgstr ""
+
+msgid "The battery is low. Recharge or replace it soon."
+msgstr ""
+
+msgid "Newer firmware can fix bugs and security problems."
+msgstr ""
+
+msgid "Back up important files first, and keep the computer plugged in while it updates."
+msgstr ""
+
+msgid "Firmware update"
+msgstr ""
+
+msgid "{} update"
+msgstr ""
+
+msgid "Version {} is available"
+msgstr ""
+
+msgid "No updates available"
+msgstr ""
+
+msgid "Firmware"
+msgstr ""
+
 msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "计算机启动时缺少固件文件 {}，但现在已安装。重新启动应该可以解决问题。"
 
@@ -1077,6 +1128,9 @@ msgstr "无法检查更新：{}"
 
 msgid "Couldn't find where hwsight is installed."
 msgstr "找不到 hwsight 的安装位置。"
+
+msgid "Run: {}"
+msgstr ""
 
 msgid "Source: {}"
 msgstr ""

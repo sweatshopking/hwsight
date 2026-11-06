@@ -229,6 +229,7 @@ fn device_item(d: &Device) -> DeviceItem {
         source: Default::default(),
         kind: detail.verdict.kind().into(),
         technical: false,
+        command: detail.command.clone().unwrap_or_default().into(),
     };
     let findings: Vec<DetailItem> = d.findings().into_iter().map(finding_items).collect();
 
@@ -254,6 +255,7 @@ fn device_item(d: &Device) -> DeviceItem {
                         source: i.source.clone().into(),
                         kind: i.verdict.kind().into(),
                         technical: i.technical,
+                        command: i.command.clone().unwrap_or_default().into(),
                     })
                     .collect::<Vec<_>>(),
             ))),

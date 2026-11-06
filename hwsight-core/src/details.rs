@@ -46,6 +46,8 @@ pub struct Detail {
     pub source: String,
     /// Only shown in the Technical level (the "More details" level skips it).
     pub technical: bool,
+    /// A command that fixes or acts on this, for the user to copy. Never run for them.
+    pub command: Option<String>,
 }
 
 impl Detail {
@@ -58,6 +60,7 @@ impl Detail {
             explanation: None,
             source,
             technical: false,
+            command: None,
         }
     }
 
@@ -74,6 +77,11 @@ impl Detail {
 
     pub fn technical(mut self) -> Self {
         self.technical = true;
+        self
+    }
+
+    pub fn command(mut self, command: impl Into<String>) -> Self {
+        self.command = Some(command.into());
         self
     }
 }

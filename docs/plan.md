@@ -1771,6 +1771,22 @@ verdicts honest: an amber finding must be something a person can act on. Interna
 bridges and chipset ports slowing down when idle are Info, never amber (they were false
 alarms); a graphics card's idle link slowdown is Info too.
 
+**Firmware updates (fwupd) are read** (`fwupd.rs`, `firmware_updates.rs`; D-Bus via zbus, 4 s
+limit): each device gets a "Firmware" group with its version: drives (matched by model),
+the Logitech receiver and the keyboards/mice paired to it (matched through fwupd's parent
+device, with their battery levels, amber under the device's own low-battery threshold),
+and the motherboard (System Firmware, UEFI dbx, TPM; key databases and GPIO are hidden).
+An available update is an amber finding with the version, the vendor's summary, a backup
+warning for drives and the BIOS, and the command `fwupdmgr update`. The catalog's state is
+checked first: **on the owner's PC the LVFS catalog was never downloaded** (refresh timer
+off), so "no updates" meant nothing; that is an amber finding on the motherboard with the
+command `fwupdmgr refresh` (and a stale-catalog and a no-source variant). hwsight never
+installs or downloads anything itself; `Detail.command` is shown in a copyable box
+(GUI) and as "Run:" (CLI). NOT verified against a real catalog: the owner's catalog is
+empty, so the `GetUpgrades` reply (release keys Version and Summary) is parsed from fwupd's
+documented format only. After the owner runs `fwupdmgr refresh`, re-check a device with an
+update, and check the install flow later (Claude does the install flow, plan item 7).
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the

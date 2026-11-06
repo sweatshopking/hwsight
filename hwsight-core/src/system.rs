@@ -34,6 +34,8 @@ pub struct SystemPaths {
     pub pnp_ids: PathBuf,
     /// Ask the graphics driver for each screen's modes and current mode (off in tests).
     pub drm_live: bool,
+    /// Ask the fwupd service about firmware versions and updates (off in tests).
+    pub fwupd: bool,
 }
 
 impl SystemPaths {
@@ -51,6 +53,7 @@ impl SystemPaths {
             drm_dir: PathBuf::from("/sys/class/drm"),
             pnp_ids: PathBuf::from("/usr/share/hwdata/pnp.ids"),
             drm_live: true,
+            fwupd: true,
         }
     }
 
@@ -70,6 +73,7 @@ impl SystemPaths {
             drm_dir: nowhere.join("drm"),
             pnp_ids: nowhere.join("pnp.ids"),
             drm_live: false,
+            fwupd: false,
         }
     }
 }

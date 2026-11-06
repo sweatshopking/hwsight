@@ -307,6 +307,12 @@ fn details_text(
             if let Some(why) = &detail.explanation {
                 out.push_str(&format!("      {why}\n"));
             }
+            if let Some(command) = &detail.command {
+                out.push_str(&format!(
+                    "      {}\n",
+                    hwsight_core::tr!("Run: {}", command)
+                ));
+            }
             if let Some(raw) = detail.raw.as_ref().filter(|r| **r != detail.value) {
                 out.push_str(&format!(
                     "      {}\n",
@@ -415,6 +421,9 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             )?;
             if let Some(why) = &finding.explanation {
                 writeln!(out, "        {why}")?;
+            }
+            if let Some(command) = &finding.command {
+                writeln!(out, "        {}", hwsight_core::tr!("Run: {}", command))?;
             }
         }
         for tip in &device.software {

@@ -15,7 +15,9 @@ pub mod distro;
 mod drives;
 mod edid;
 pub mod firmware;
+mod firmware_updates;
 pub mod fixes;
+mod fwupd;
 pub mod i18n;
 pub mod kernel_log;
 mod memory;
@@ -277,6 +279,13 @@ impl Scanner {
             Err(e) => notes.push(ScanNote::UsbUnreadable {
                 error: e.to_string(),
             }),
+        }
+        // Firmware versions and updates go on the device they belong to, so every device
+        // has to be in the list first.
+        if self.system.fwupd
+            && let Some(firmware) = fwupd::read()
+        {
+            firmware_updates::attach(&mut devices, &firmware);
         }
         devices.sort_by(|a, b| {
             a.category

@@ -114,6 +114,21 @@ export component DetailsPanel inherits Rectangle {
                             color: Theme.text;
                             wrap: word-wrap;
                         }
+                        if finding.command != "" : Rectangle {
+                            background: Theme.background;
+                            border-radius: 6px;
+                            HorizontalLayout {
+                                padding: 10px;
+                                TextInput {
+                                    text: finding.command;
+                                    read-only: true;
+                                    single-line: true;
+                                    color: Theme.highlight;
+                                    font-family: "monospace";
+                                    horizontal-stretch: 1;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -300,6 +315,21 @@ export component DetailsPanel inherits Rectangle {
                                     color: Theme.text-muted;
                                     font-size: Theme.font-small;
                                     wrap: word-wrap;
+                                }
+                                if item.command != "" : Rectangle {
+                                    background: Theme.background;
+                                    border-radius: 6px;
+                                    HorizontalLayout {
+                                        padding: 10px;
+                                        TextInput {
+                                            text: item.command;
+                                            read-only: true;
+                                            single-line: true;
+                                            color: Theme.highlight;
+                                            font-family: "monospace";
+                                            horizontal-stretch: 1;
+                                        }
+                                    }
                                 }
                                 if root.level >= 2 && item.raw != "" : Text {
                                     text: @tr("As read: {}", item.raw);
