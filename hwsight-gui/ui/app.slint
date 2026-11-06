@@ -6,7 +6,7 @@
 // components.
 
 import { ScrollView, Button, ListView, Switch, Palette } from "std-widgets.slint";
-import { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem, FirmwareItem } from "theme.slint";
+import { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem, FirmwareItem, ToolItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
 import { DetailsPanel } from "components/details-panel.slint";
@@ -14,12 +14,13 @@ import { AccentButton } from "components/accent-button.slint";
 import { NotesBanner } from "components/notes-banner.slint";
 import { UpdateBanner } from "components/update-banner.slint";
 import { FirmwareBanner } from "components/firmware-banner.slint";
+import { ToolsBanner } from "components/tools-banner.slint";
 import { StatusPill } from "components/status-pill.slint";
 import { SearchBox } from "components/search-box.slint";
 import { CopyText } from "components/copy-text.slint";
 
 // Re-exported so the Rust side can set theme tokens and build device items.
-export { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem, FirmwareItem }
+export { Theme, DeviceItem, FixItem, SoftwareItem, DetailItem, DetailGroupItem, FirmwareItem, ToolItem }
 
 // One row of the device list: either a category heading or a device.
 export struct Row {
@@ -61,6 +62,10 @@ export component AppWindow inherits Window {
     in property <bool> firmware-busy;
     in-out property <[FirmwareItem]> firmware-items;
     in-out property <int> firmware-checked;
+    in-out property <[ToolItem]> tools;
+    in-out property <int> tools-checked;
+    in property <string> tools-status;
+    in property <bool> tools-busy;
     in-out property <length> list-viewport-y;
     out property <length> list-height: device-list.height;
     in-out property <string> query;
@@ -81,6 +86,8 @@ export component AppWindow inherits Window {
     callback firmware-toggle(int, bool);
     callback firmware-install();
     callback firmware-check();
+    callback tools-toggle(int, bool);
+    callback tools-install();
 
     changed query => { root.filter-changed(); }
     changed only-problems => { root.filter-changed(); }
@@ -193,6 +200,14 @@ export component AppWindow inherits Window {
                 toggle(i, on) => { root.firmware-toggle(i, on); }
                 install => { root.firmware-install(); }
                 check => { root.firmware-check(); }
+            }
+            ToolsBanner {
+                items: root.tools;
+                checked-count: root.tools-checked;
+                status: root.tools-status;
+                busy: root.tools-busy;
+                toggle(i, on) => { root.tools-toggle(i, on); }
+                install => { root.tools-install(); }
             }
 
             HorizontalLayout {

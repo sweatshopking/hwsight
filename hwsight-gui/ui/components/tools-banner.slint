@@ -1,0 +1,97 @@
+import { Theme, ToolItem } from "../theme.slint";
+import { AccentButton } from "accent-button.slint";
+import { CheckBox } from "std-widgets.slint";
+
+// Programs that would let hwsight show more. Installing needs the user's password, which
+// the system asks for in its own window; the confirm step says so before anything runs.
+export component ToolsBanner inherits Rectangle {
+    in property <[ToolItem]> items;
+    in property <int> checked-count;
+    in property <string> status;
+    in property <bool> busy;
+    callback toggle(int, bool);
+    callback install();
+
+    property <bool> confirming: false;
+
+    visible: root.items.length > 0 || root.status != "";
+    height: self.visible ? banner-layout.preferred-height : 0px;
+    background: Theme.surface-raised;
+    border-width: 1px;
+    border-color: Theme.accent-start.with-alpha(0.6);
+    border-radius: Theme.radius-small;
+
+    banner-layout := VerticalLayout {
+        padding-left: Theme.padding;
+        padding-right: Theme.padding;
+        padding-top: Theme.gap;
+        padding-bottom: Theme.gap;
+        spacing: Theme.gap;
+        if root.items.length > 0 : HorizontalLayout {
+            spacing: Theme.gap;
+            Text {
+                text: @tr("hwsight can show more if you install:");
+                color: Theme.text;
+                font-size: Theme.font-body;
+                font-weight: 600;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+            if !root.busy && !root.confirming : AccentButton {
+                text: @tr("Install selected");
+                enabled: root.checked-count > 0;
+                clicked => { root.confirming = true; }
+            }
+        }
+        for item[i] in root.items : HorizontalLayout {
+            spacing: Theme.gap;
+            CheckBox {
+                text: item.name;
+                checked: item.checked;
+                enabled: !root.busy;
+                toggled => { root.toggle(i, self.checked); }
+            }
+            Text {
+                text: item.benefit;
+                color: Theme.text-muted;
+                font-size: Theme.font-body;
+                wrap: word-wrap;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+        }
+        if root.confirming && !root.busy : HorizontalLayout {
+            spacing: Theme.gap;
+            Text {
+                text: @tr("Installing software needs your password. Your system will ask for it in its own window; hwsight never sees it. Install the ticked programs now?");
+                color: Theme.text;
+                font-size: Theme.font-body;
+                wrap: word-wrap;
+                vertical-alignment: center;
+                horizontal-stretch: 1;
+            }
+            AccentButton {
+                text: @tr("Yes, install");
+                clicked => {
+                    root.confirming = false;
+                    root.install();
+                }
+            }
+            AccentButton {
+                text: @tr("Cancel");
+                clicked => { root.confirming = false; }
+            }
+        }
+        if root.busy : Text {
+            text: @tr("Installing... a password window may be waiting for you.");
+            color: Theme.text-muted;
+            font-size: Theme.font-body;
+        }
+        if root.status != "" : Text {
+            text: root.status;
+            color: Theme.text-muted;
+            font-size: Theme.font-body;
+            wrap: word-wrap;
+        }
+    }
+}

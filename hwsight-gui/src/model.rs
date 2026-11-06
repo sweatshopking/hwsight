@@ -8,7 +8,9 @@ use std::rc::Rc;
 use hwsight_core::device::Attention;
 use slint::{ModelRc, VecModel};
 
-use crate::{DetailGroupItem, DetailItem, DeviceItem, FirmwareItem, FixItem, Row, SoftwareItem};
+use crate::{
+    DetailGroupItem, DetailItem, DeviceItem, FirmwareItem, FixItem, Row, SoftwareItem, ToolItem,
+};
 
 /// Everything the window needs from one scan.
 pub struct View {
@@ -19,6 +21,8 @@ pub struct View {
     /// Working devices that have something that could be better.
     pub improve_count: i32,
     pub notes: Vec<String>,
+    /// Missing tools hwsight can install for the user (shown in their own banner).
+    pub tools: Vec<ToolItem>,
     /// Headline for the firmware banner, or "" when there is nothing to say.
     pub firmware_text: String,
     pub firmware_items: Vec<FirmwareItem>,
@@ -90,7 +94,19 @@ pub fn view(report: &ScanReport) -> View {
         .map(|p| hwsight_core::tr!("{}: {}", p.port, p.issue.message()))
         .collect();
     notes.extend(report.firmware_note.iter().cloned());
-    notes.extend(report.notes.iter().map(|n| n.message()));
+    let mut tools = Vec::new();
+    for note in &report.notes {
+        match note {
+            hwsight_core::ScanNote::MissingTool { tool } if tool.installable => {
+                tools.push(ToolItem {
+                    name: tool.name.clone().into(),
+                    benefit: tool.benefit.clone().into(),
+                    checked: true,
+                });
+            }
+            other => notes.push(other.message()),
+        }
+    }
 
     View {
         devices,
@@ -99,6 +115,7 @@ pub fn view(report: &ScanReport) -> View {
         problem_count: problems as i32,
         improve_count: improve as i32,
         notes,
+        tools,
         firmware_text,
         firmware_items,
     }

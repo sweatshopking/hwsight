@@ -21,6 +21,7 @@ mod ui {
 }
 use ui::{
     AppWindow, DetailGroupItem, DetailItem, DeviceItem, FirmwareItem, FixItem, Row, SoftwareItem,
+    ToolItem,
 };
 
 struct UpdateState {
@@ -60,6 +61,56 @@ fn main() -> Result<(), slint::PlatformError> {
                 items.set_row_data(index as usize, item);
             }
             w.set_firmware_checked(items.iter().filter(|i| i.checked).count() as i32);
+        }
+    });
+    window.on_tools_toggle({
+        let weak = window.as_weak();
+        move |index, on| {
+            let Some(w) = weak.upgrade() else { return };
+            let items = w.get_tools();
+            if let Some(mut item) = items.row_data(index as usize) {
+                item.checked = on;
+                items.set_row_data(index as usize, item);
+            }
+            w.set_tools_checked(items.iter().filter(|i| i.checked).count() as i32);
+        }
+    });
+    window.on_tools_install({
+        let (weak, devices, report) = (window.as_weak(), devices.clone(), last_report.clone());
+        move || {
+            let Some(w) = weak.upgrade() else { return };
+            if w.get_tools_busy() {
+                return;
+            }
+            let names: Vec<String> = w
+                .get_tools()
+                .iter()
+                .filter(|i| i.checked)
+                .map(|i| i.name.to_string())
+                .collect();
+            let distro = report
+                .lock()
+                .ok()
+                .and_then(|r| r.as_ref().map(|r| r.distro.clone()));
+            let Some(distro) = distro else { return };
+            if names.is_empty() {
+                return;
+            }
+            w.set_tools_busy(true);
+            w.set_tools_status("".into());
+            let (weak, devices, report) = (weak.clone(), devices.clone(), report.clone());
+            std::thread::spawn(move || {
+                let status = match hwsight_core::install_tools(&names, &distro) {
+                    Ok(_) => hwsight_core::tr!("Installed. Scanning again to use it."),
+                    Err(e) => e,
+                };
+                let _ = slint::invoke_from_event_loop(move || {
+                    let Some(w) = weak.upgrade() else { return };
+                    w.set_tools_status(status.into());
+                    w.set_tools_busy(false);
+                    start_scan(weak, devices, report);
+                });
+            });
         }
     });
     window.on_firmware_check({
@@ -515,6 +566,8 @@ fn start_scan(
             w.set_devices(ModelRc::from(Rc::new(VecModel::from(view.devices))));
             w.set_rows(ModelRc::from(Rc::new(VecModel::from(view.rows))));
             w.set_summary(view.summary.into());
+            w.set_tools_checked(view.tools.len() as i32);
+            w.set_tools(ModelRc::from(Rc::new(VecModel::from(view.tools))));
             w.set_firmware_text(view.firmware_text.into());
             w.set_firmware_checked(view.firmware_items.len() as i32);
             w.set_firmware_items(ModelRc::from(Rc::new(VecModel::from(view.firmware_items))));

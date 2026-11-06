@@ -49,6 +49,30 @@ impl Family {
     }
 }
 
+impl Family {
+    /// The program and arguments that install `packages` without asking questions, for
+    /// running through pkexec after the user confirmed. `None` where installing isn't
+    /// possible this way (read-only systems, unknown package managers).
+    pub fn install_argv(self, packages: &[&str], immutable: bool) -> Option<Vec<String>> {
+        if immutable {
+            return None;
+        }
+        let head: &[&str] = match self {
+            Self::Arch => &["pacman", "-S", "--noconfirm", "--needed"],
+            Self::Debian | Self::Ubuntu => &["apt-get", "install", "-y"],
+            Self::Fedora => &["dnf", "install", "-y"],
+            Self::OpenSuse => &["zypper", "--non-interactive", "install"],
+            Self::Unknown => return None,
+        };
+        Some(
+            head.iter()
+                .chain(packages)
+                .map(|s| (*s).to_owned())
+                .collect(),
+        )
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct Distro {
     /// `ID` from os-release, e.g. `cachyos`.

@@ -57,6 +57,7 @@ pub use firmware_updates::PendingUpdate;
 pub use fixes::{Fix, Fixes};
 pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
+pub use optional_tools::install_tools;
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::Rules;
 pub use system::SystemPaths;

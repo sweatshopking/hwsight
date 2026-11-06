@@ -77,6 +77,8 @@ pub struct MissingTool {
     pub benefit: String,
     /// The command that installs it, when the distro's package manager is known.
     pub command: Option<String>,
+    /// hwsight can install it for the user (after they confirm and give their password).
+    pub installable: bool,
 }
 
 impl MissingTool {
@@ -93,6 +95,57 @@ impl MissingTool {
                 self.benefit,
                 self.name
             ),
+        }
+    }
+}
+
+const ALL_TOOLS: [Tool; 4] = [Tool::Iw, Tool::NetworkManager, Tool::Fwupd, Tool::Udisks];
+
+/// Install the named tools (the `name` of a `MissingTool`) with the distro's package
+/// manager through pkexec, which asks the user for their password in the desktop's own
+/// window: hwsight never sees it. Only tools in hwsight's own table are accepted.
+pub fn install_tools(names: &[String], distro: &Distro) -> Result<String, String> {
+    let mut packages = Vec::new();
+    for name in names {
+        let tool = ALL_TOOLS
+            .iter()
+            .find(|t| t.name() == name)
+            .ok_or_else(|| crate::tr!("{} isn't a tool hwsight knows how to install.", name))?;
+        packages.push(tool.package(distro.family));
+    }
+    if packages.is_empty() {
+        return Err(crate::tr!("Nothing to install."));
+    }
+    let argv = distro
+        .family
+        .install_argv(&packages, distro.immutable)
+        .ok_or_else(|| {
+            crate::tr!("hwsight can't install software on this system. Use your system's package manager instead.")
+        })?;
+    let output = std::process::Command::new("pkexec")
+        .args(&argv)
+        .stdin(std::process::Stdio::null())
+        .output()
+        .map_err(|e| {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                crate::tr!("The pkexec program (polkit) isn't installed, so hwsight can't ask for your password.")
+            } else {
+                crate::tr!("Couldn't start the installer: {}", e)
+            }
+        })?;
+    match output.status.code() {
+        Some(0) => Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned()),
+        // pkexec: 126 means the password window was dismissed, 127 that it was refused.
+        Some(126) => Err(crate::tr!("Cancelled: the password wasn't entered.")),
+        Some(127) => Err(crate::tr!("Not allowed: the password was refused.")),
+        _ => {
+            let text = String::from_utf8_lossy(&output.stderr);
+            let last = text
+                .lines()
+                .rev()
+                .find(|l| !l.trim().is_empty())
+                .unwrap_or("");
+            Err(crate::tr!("The installer failed: {}", last.trim()))
         }
     }
 }
@@ -123,6 +176,10 @@ pub(crate) fn missing(wanted: &[Tool], dirs: &[PathBuf], distro: &Distro) -> Vec
             command: distro
                 .family
                 .install_command(tool.package(distro.family), distro.immutable),
+            installable: distro
+                .family
+                .install_argv(&[tool.package(distro.family)], distro.immutable)
+                .is_some(),
         })
         .collect()
 }
@@ -196,6 +253,34 @@ mod tests {
             arch[0].command.as_deref(),
             Some("sudo pacman -S networkmanager")
         );
+    }
+
+    #[test]
+    fn install_commands_are_built_per_distro_and_refused_where_they_cannot_work() {
+        let args = |family, immutable| family_argv(family, immutable);
+        assert_eq!(
+            args(Family::Arch, false).expect("argv"),
+            ["pacman", "-S", "--noconfirm", "--needed", "iw", "fwupd"]
+        );
+        assert_eq!(
+            args(Family::Ubuntu, false).expect("argv"),
+            ["apt-get", "install", "-y", "iw", "fwupd"]
+        );
+        assert!(args(Family::Fedora, true).is_none(), "read-only system");
+        assert!(args(Family::Unknown, false).is_none());
+    }
+
+    fn family_argv(family: Family, immutable: bool) -> Option<Vec<String>> {
+        family.install_argv(&["iw", "fwupd"], immutable)
+    }
+
+    #[test]
+    fn only_tools_from_the_table_can_be_installed() {
+        let d = distro(Family::Arch, false);
+        let err = install_tools(&["bash; rm -rf /".to_owned()], &d).expect_err("refused");
+        assert!(err.contains("isn't a tool hwsight knows"));
+        assert!(install_tools(&[], &d).is_err());
+        assert!(install_tools(&["iw".to_owned()], &distro(Family::Arch, true)).is_err());
     }
 
     #[test]

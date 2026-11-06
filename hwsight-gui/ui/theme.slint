@@ -58,6 +58,13 @@ export struct FirmwareItem {
     checked: bool,
 }
 
+// A missing tool hwsight can install: its name and what it would add.
+export struct ToolItem {
+    name: string,
+    benefit: string,
+    checked: bool,
+}
+
 export struct SoftwareItem {
     name: string,
     what: string,

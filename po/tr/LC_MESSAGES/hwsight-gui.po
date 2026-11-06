@@ -1,35 +1,35 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:18+0000\n"
+"POT-Creation-Date: 2026-11-06 07:24+0000\n"
 "Language: tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: hwsight-gui/ui/app.slint:146
+#: hwsight-gui/ui/app.slint:153
 msgid "Scanning your hardware..."
 msgstr "Donanımınız taranıyor..."
 
-#: hwsight-gui/ui/app.slint:157
+#: hwsight-gui/ui/app.slint:164
 msgid "No problems found"
 msgstr "Sorun bulunamadı"
 
-#: hwsight-gui/ui/app.slint:168
+#: hwsight-gui/ui/app.slint:175
 msgid "Copy report for all devices"
 msgstr "Tüm cihazların raporunu kopyala"
 
-#: hwsight-gui/ui/app.slint:172
+#: hwsight-gui/ui/app.slint:179
 msgid "Scanning..."
 msgstr "Taranıyor..."
 
-#: hwsight-gui/ui/app.slint:172
+#: hwsight-gui/ui/app.slint:179
 msgid "Scan again"
 msgstr "Tekrar tara"
 
-#: hwsight-gui/ui/app.slint:211
+#: hwsight-gui/ui/app.slint:226
 msgid "Nothing matches."
 msgstr "Eşleşme yok."
 
-#: hwsight-gui/ui/app.slint:230
+#: hwsight-gui/ui/app.slint:245
 msgid "Only problems"
 msgstr "Yalnızca sorunlar"
 
@@ -164,6 +164,18 @@ msgstr "Bilmekte fayda var"
 #: hwsight-gui/ui/components/search-box.slint:27
 msgid "Search devices"
 msgstr "Cihazlarda ara"
+
+#: hwsight-gui/ui/components/tools-banner.slint:33
+msgid "hwsight can show more if you install:"
+msgstr ""
+
+#: hwsight-gui/ui/components/tools-banner.slint:66
+msgid "Installing software needs your password. Your system will ask for it in its own window; hwsight never sees it. Install the ticked programs now?"
+msgstr ""
+
+#: hwsight-gui/ui/components/tools-banner.slint:86
+msgid "Installing... a password window may be waiting for you."
+msgstr ""
 
 #: hwsight-gui/ui/components/update-banner.slint:34
 msgid "Update now"
@@ -877,6 +889,51 @@ msgstr ""
 msgid "Firmware"
 msgstr ""
 
+msgid "The NVIDIA driver (nvidia-smi)"
+msgstr ""
+
+msgid "{} °C"
+msgstr ""
+
+msgid "The card is very hot and may slow itself down. Check that its fans are spinning and the case has airflow."
+msgstr ""
+
+msgid "Fan speed"
+msgstr ""
+
+msgid "{} W of {} W"
+msgstr ""
+
+msgid "{} W"
+msgstr ""
+
+msgid "Power use"
+msgstr ""
+
+msgid "{} MHz (up to {} MHz)"
+msgstr ""
+
+msgid "{} MHz"
+msgstr ""
+
+msgid "Graphics speed"
+msgstr ""
+
+msgid "Memory speed"
+msgstr ""
+
+msgid "Video memory in use"
+msgstr ""
+
+msgid "{} of {}"
+msgstr ""
+
+msgid "Graphics load"
+msgstr ""
+
+msgid "Power state"
+msgstr ""
+
 msgid "{} GB"
 msgstr ""
 
@@ -901,10 +958,7 @@ msgstr ""
 msgid "Video memory"
 msgstr ""
 
-msgid "Video memory in use"
-msgstr ""
-
-msgid "Graphics load"
+msgid "Sensors"
 msgstr ""
 
 msgid "Graphics driver"
@@ -1004,9 +1058,6 @@ msgid "Memory type"
 msgstr ""
 
 msgid "Slots used"
-msgstr ""
-
-msgid "{} of {}"
 msgstr ""
 
 msgid "Your memory is running at {} MT/s, but every stick in it is rated for at least {} MT/s. A memory profile (called XMP, EXPO, or DOCP) in the BIOS turns the faster speed on. If you set it lower on purpose to keep things stable, that's fine."
@@ -1177,6 +1228,30 @@ msgstr ""
 msgid "{} To turn this on, install {} with your system's package manager."
 msgstr ""
 
+msgid "{} isn't a tool hwsight knows how to install."
+msgstr ""
+
+msgid "Nothing to install."
+msgstr ""
+
+msgid "hwsight can't install software on this system. Use your system's package manager instead."
+msgstr ""
+
+msgid "The pkexec program (polkit) isn't installed, so hwsight can't ask for your password."
+msgstr ""
+
+msgid "Couldn't start the installer: {}"
+msgstr ""
+
+msgid "Cancelled: the password wasn't entered."
+msgstr ""
+
+msgid "Not allowed: the password was refused."
+msgstr ""
+
+msgid "The installer failed: {}"
+msgstr ""
+
 msgid "Unknown {} {}"
 msgstr "Bilinmeyen {} {}"
 
@@ -1214,9 +1289,6 @@ msgid "Powered down (D3hot)"
 msgstr ""
 
 msgid "Powered off (D3cold)"
-msgstr ""
-
-msgid "Power state"
 msgstr ""
 
 msgid "Active"
@@ -1306,28 +1378,13 @@ msgstr ""
 msgid "{} temperature"
 msgstr ""
 
-msgid "{} °C"
-msgstr ""
-
 msgid "This is within 5 °C of the highest temperature the maker allows ({} °C). Check that fans are spinning and vents are clear."
-msgstr ""
-
-msgid "Fan speed"
 msgstr ""
 
 msgid "{} speed"
 msgstr ""
 
 msgid "{} rpm"
-msgstr ""
-
-msgid "Power use"
-msgstr ""
-
-msgid "{} W"
-msgstr ""
-
-msgid "Sensors"
 msgstr ""
 
 msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
@@ -1500,6 +1557,9 @@ msgstr "hwsight {} kullanılabilir."
 
 msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} kullanılabilir. Paket yöneticinizle güncelleyin veya web sitesinden indirin."
+
+msgid "Installed. Scanning again to use it."
+msgstr ""
 
 msgid "The list of firmware updates is up to date."
 msgstr ""
