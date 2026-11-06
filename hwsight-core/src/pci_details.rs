@@ -388,10 +388,82 @@ fn resources(path: &Path) -> Vec<Detail> {
 
 /// Every group of details for the PCI device whose sysfs folder is `path`. Groups with
 /// nothing in them are left out.
+/// "256 MB" / "16 GB" for a size in bytes.
+fn size_text(bytes: u64) -> String {
+    let mib = bytes >> 20;
+    if mib >= 1024 {
+        crate::tr!("{} GB", mib / 1024)
+    } else {
+        crate::tr!("{} MB", mib)
+    }
+}
+
+/// Resizable BAR on a graphics card: whether the processor can reach all of the card's
+/// video memory at once. The card lists the window sizes it supports in
+/// `resourceN_resize` (bit 0 is 1 MB, bit 1 is 2 MB, and so on) and the window now in use
+/// is the size of BAR N in `resource`. A card that supports bigger windows but runs at
+/// 256 MB or less has the BIOS feature switched off.
+fn resizable_bar(path: &Path, category: Category) -> Vec<Detail> {
+    if category != Category::Graphics {
+        return Vec::new();
+    }
+    let Some(resource) = read(path, "resource") else {
+        return Vec::new();
+    };
+    let lines: Vec<&str> = resource.lines().collect();
+    for bar in 0..6 {
+        let name = format!("resource{bar}_resize");
+        let Some(mask) = read(path, &name).and_then(|t| parse_hex(&t)) else {
+            continue;
+        };
+        let Some(max_bit) = (0..64).rev().find(|bit| mask >> bit & 1 == 1) else {
+            continue;
+        };
+        let max = 1u64 << (20 + max_bit);
+        let current = lines.get(bar).and_then(|line| {
+            let mut parts = line.split_whitespace();
+            let start = parse_hex(parts.next()?)?;
+            let end = parse_hex(parts.next()?)?;
+            (end > start).then(|| end - start + 1)
+        });
+        let Some(current) = current else { continue };
+        let value = crate::tr!("{} of {}", size_text(current), size_text(max));
+        let detail = Detail::new(crate::tr!("Resizable BAR"), value, source(path, &name));
+        let detail = if current >= max {
+            detail.verdict(
+                Verdict::Good,
+                Some(crate::tr!(
+                    "The processor can reach all of the card's video memory at once, which is what games want."
+                )),
+            )
+        } else if current <= 256 << 20 {
+            detail.verdict(
+                Verdict::Reduced,
+                Some(crate::tr!(
+                    "Resizable BAR (also called Smart Access Memory) is switched off, so the processor can only reach a small part of the card's video memory at a time. Games can run a little slower. To turn it on, look in the BIOS for \"Resizable BAR\" and \"Above 4G Decoding\" and enable both."
+                )),
+            )
+        } else {
+            detail.verdict(
+                Verdict::Info,
+                Some(crate::tr!(
+                    "The processor reaches part of the card's video memory at once, which is more than the old limit but less than the card allows."
+                )),
+            )
+        };
+        return vec![detail];
+    }
+    Vec::new()
+}
+
 pub(crate) fn read_details(path: &Path, category: Category) -> Vec<DetailGroup> {
     [
         (crate::tr!("PCIe connection"), connection(path, category)),
         (crate::tr!("Connection errors"), errors(path)),
+        (
+            crate::tr!("Video memory access"),
+            resizable_bar(path, category),
+        ),
         (crate::tr!("Power"), power(path)),
         (crate::tr!("Resources"), resources(path)),
     ]
@@ -616,6 +688,28 @@ mod tests {
                 .filter(|d| d.label != "Link speed" && d.label != "Link width")
                 .all(|d| d.technical || d.label.contains("errors"))
         );
+    }
+
+    #[test]
+    fn resizable_bar_is_good_when_on_and_reduced_when_off() {
+        let on = "0x00000000fb000000 0x00000000fbffffff 0x40200\n0x0000004000000000 0x00000043ffffffff 0x14220c\n";
+        let off = "0x00000000fb000000 0x00000000fbffffff 0x40200\n0x0000004000000000 0x000000400fffffff 0x14220c\n";
+        for (resource, verdict, value) in [
+            (on, Verdict::Good, "16 GB of 16 GB"),
+            (off, Verdict::Reduced, "256 MB of 16 GB"),
+        ] {
+            let d = device(&[
+                ("resource", resource),
+                ("resource1_resize", "0000000000007fc0\n"),
+            ]);
+            let groups = in_english(|| read_details(d.path(), Category::Graphics));
+            let bar = item(&groups, "Resizable BAR");
+            assert_eq!(bar.value, value);
+            assert_eq!(bar.verdict, verdict);
+        }
+        let d = device(&[("resource", on), ("resource1_resize", "0000000000007fc0\n")]);
+        let groups = in_english(|| read_details(d.path(), Category::Network));
+        assert!(groups.iter().all(|g| g.title != "Video memory access"));
     }
 
     #[test]

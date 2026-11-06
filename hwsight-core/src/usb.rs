@@ -13,6 +13,7 @@ use std::io;
 use std::path::Path;
 
 use crate::descriptions::Descriptions;
+use crate::details::{Detail, DetailGroup, Verdict};
 use crate::device::{Bus, Category, Device, Status, diagnose, short_vendor};
 use crate::modules::{AliasDb, Blocklist, DriverCandidate};
 use crate::rules::Rules;
@@ -193,11 +194,76 @@ fn read_device(
         log_issues: Vec::new(),
         note,
         description,
-        details: Vec::new(),
+        details: connection_details(path, interfaces.iter().any(|i| i.class == 0x08)),
         software: Vec::new(),
         class_codes: interface_classes,
         fixes: Vec::new(),
     })
+}
+
+/// The name of a USB link speed in plain words, from sysfs's megabits per second.
+fn speed_name(mbps: u32) -> String {
+    match mbps {
+        0..=2 => crate::tr!("USB 1.0, low speed ({} Mb/s)", mbps),
+        3..=12 => crate::tr!("USB 1.1, full speed ({} Mb/s)", mbps),
+        13..=480 => crate::tr!("USB 2.0, high speed ({} Mb/s)", mbps),
+        481..=5000 => crate::tr!("USB 3.0, SuperSpeed (5 Gb/s)"),
+        5001..=10000 => crate::tr!("USB 3.1, SuperSpeed+ (10 Gb/s)"),
+        _ => crate::tr!("USB 3.2, SuperSpeed+ ({} Gb/s)", mbps / 1000),
+    }
+}
+
+/// The speed a device is connected at, the USB version it reports, and how much power it
+/// may draw. A USB 3 storage device that reports version 2.10 and runs at 480 Mb/s is
+/// most likely in a slow port or on a slow cable (USB 3 devices present themselves as
+/// USB 2.10 when they can't use their fast mode), so that gets a hint, not a verdict:
+/// plain USB 2 devices also report 2.10.
+fn connection_details(path: &Path, is_storage: bool) -> Vec<DetailGroup> {
+    let Some(mbps) = read_trimmed(path, "speed").and_then(|t| t.parse::<f64>().ok()) else {
+        return Vec::new();
+    };
+    let mbps = mbps as u32;
+    let source = path.join("speed").display().to_string();
+    let version = read_trimmed(path, "version");
+    let mut items = Vec::new();
+    let mut speed = Detail::new(crate::tr!("Connection speed"), speed_name(mbps), source)
+        .raw(format!("{mbps} Mb/s"));
+    let looks_like_usb3 = version
+        .as_deref()
+        .is_some_and(|v| v != "2.00" && v.starts_with("2."));
+    if is_storage && mbps <= 480 && looks_like_usb3 {
+        speed = speed.verdict(
+            Verdict::Info,
+            Some(crate::tr!(
+                "This storage device is running at USB 2 speed. If it's a USB 3 device, plugging it into a USB 3 port (usually blue, or marked SS) with a USB 3 cable would make it much faster. If it's an older device, this is as fast as it goes."
+            )),
+        );
+    }
+    items.push(speed);
+    if let Some(version) = version {
+        items.push(
+            Detail::new(
+                crate::tr!("USB version the device reports"),
+                version,
+                path.join("version").display().to_string(),
+            )
+            .technical(),
+        );
+    }
+    if let Some(power) = read_trimmed(path, "bMaxPower") {
+        items.push(
+            Detail::new(
+                crate::tr!("Most power it may draw"),
+                power.replace("mA", " mA"),
+                path.join("bMaxPower").display().to_string(),
+            )
+            .technical(),
+        );
+    }
+    vec![DetailGroup {
+        title: crate::tr!("USB connection"),
+        items,
+    }]
 }
 
 /// The interfaces of the device's active configuration, e.g. `1-5:1.0`, `1-5:1.1`.
@@ -539,6 +605,53 @@ mod tests {
         let blocked = find(&devices, "1-4");
         assert_eq!(blocked.status, Status::DriverBlocked);
         assert_eq!(blocked.driver_candidates[0].module, "btusb");
+    }
+
+    #[test]
+    fn connection_speed_is_named_and_slow_usb3_storage_gets_a_hint() {
+        let f = Fake::new();
+        for (name, speed, version, class) in [
+            ("1-1", "480", " 2.10", "08"),
+            ("1-2", "480", " 2.00", "08"),
+            ("1-3", "10000", " 3.10", "08"),
+        ] {
+            f.device(name, "0781", "5583", "00", Some("Disk"));
+            let dir = f.root.join(name);
+            fs::write(dir.join("speed"), format!("{speed}\n")).expect("write");
+            fs::write(dir.join("version"), format!("{version}\n")).expect("write");
+            fs::write(dir.join("bMaxPower"), "224mA\n").expect("write");
+            f.interface(
+                name,
+                0,
+                "0781",
+                "5583",
+                &format!("{class}/06/50"),
+                None,
+                &[],
+            );
+        }
+        let devices = f.scan("", "");
+        let group = |addr: &str| find(&devices, addr).details[0].clone();
+        let slow = group("1-1");
+        assert_eq!(slow.items[0].value, "USB 2.0, high speed (480 Mb/s)");
+        assert_eq!(slow.items[0].verdict, Verdict::Info);
+        assert!(
+            slow.items[0]
+                .explanation
+                .as_deref()
+                .unwrap_or("")
+                .contains("USB 3 port")
+        );
+        assert_eq!(slow.items[2].value, "224 mA");
+        assert_eq!(group("1-2").items[0].verdict, Verdict::Info);
+        assert!(
+            group("1-2").items[0].explanation.is_none(),
+            "plain USB 2 gets no hint"
+        );
+        assert_eq!(
+            group("1-3").items[0].value,
+            "USB 3.1, SuperSpeed+ (10 Gb/s)"
+        );
     }
 
     #[test]

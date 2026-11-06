@@ -16,14 +16,21 @@ pub struct Spd {
     pub base_mts: Option<u32>,
     /// Speeds of the factory overclock profiles (Intel XMP 3.0), fastest first.
     pub xmp_mts: Vec<u32>,
-    /// The stick carries an AMD EXPO profile. Its speed isn't decoded.
+    /// The stick carries an AMD EXPO profile.
     pub has_expo: bool,
+    /// Speeds of the EXPO profiles (up to two), fastest first.
+    pub expo_mts: Vec<u32>,
 }
 
 impl Spd {
     /// The fastest speed this stick says it can run at, profiles included.
     pub fn best_mts(&self) -> Option<u32> {
-        self.xmp_mts.first().copied().or(self.base_mts)
+        self.xmp_mts
+            .iter()
+            .chain(&self.expo_mts)
+            .max()
+            .copied()
+            .or(self.base_mts)
     }
 }
 
@@ -48,6 +55,10 @@ const DRAM_TYPE_DDR5: u8 = 0x12;
 const XMP_HEADER: usize = 0x280;
 const XMP_PROFILES: [usize; 5] = [0x2C0, 0x300, 0x340, 0x380, 0x3C0];
 const EXPO_HEADER: usize = 0x340;
+/// The EXPO block is a 10-byte header followed by up to two 40-byte profiles; each
+/// profile's shortest cycle time sits 4 bytes in. (Read from real sticks: 333 and 357 ps,
+/// which are the 6000 and 5600 their XMP profiles also list.)
+const EXPO_PROFILES: [usize; 2] = [0x34A, 0x372];
 
 /// Decode a DDR5 SPD dump. `None` when it isn't DDR5 or is too short to be one.
 pub fn parse_ddr5(bytes: &[u8]) -> Option<Spd> {
@@ -77,11 +88,23 @@ pub fn parse_ddr5(bytes: &[u8]) -> Option<Spd> {
         xmp_mts.sort_unstable_by(|a, b| b.cmp(a));
     }
     let has_expo = bytes[EXPO_HEADER..EXPO_HEADER + 4] == *b"EXPO";
+    let mut expo_mts = Vec::new();
+    if has_expo {
+        for start in EXPO_PROFILES {
+            if let Some(mts) = le16(bytes, start + 4).and_then(mts_from_cycle)
+                && !expo_mts.contains(&mts)
+            {
+                expo_mts.push(mts);
+            }
+        }
+        expo_mts.sort_unstable_by(|a, b| b.cmp(a));
+    }
     Some(Spd {
         part_number,
         base_mts,
         xmp_mts,
         has_expo,
+        expo_mts,
     })
 }
 
@@ -125,6 +148,9 @@ pub(crate) mod tests {
         }
         if expo {
             b[EXPO_HEADER..EXPO_HEADER + 4].copy_from_slice(b"EXPO");
+            for (cycle, start) in [333u16, 357].iter().zip(EXPO_PROFILES) {
+                b[start + 4..start + 6].copy_from_slice(&cycle.to_le_bytes());
+            }
         }
         b
     }
@@ -142,6 +168,24 @@ pub(crate) mod tests {
         let slower = parse_ddr5(&fake_spd("UD5-6000", 416, &[333, 357], true)).expect("ddr5");
         assert_eq!(slower.xmp_mts, [6000, 5600]);
         assert!(slower.has_expo);
+        assert_eq!(slower.expo_mts, [6000, 5600]);
+    }
+
+    #[test]
+    fn decodes_an_expo_block_dumped_from_a_real_stick() {
+        // The first 0x40 bytes of the block, as read from a Team Group DDR5-6000 stick.
+        let block: [u8; 0x40] = [
+            0x45, 0x58, 0x50, 0x4f, 0x10, 0x33, 0x11, 0x00, 0x00, 0x00, 0x25, 0x25, 0x30, 0x00,
+            0x4d, 0x01, 0x6e, 0x31, 0x6e, 0x31, 0x6e, 0x31, 0x76, 0x65, 0xe4, 0x96, 0x30, 0x75,
+            0x27, 0x01, 0xa0, 0x00, 0x82, 0x00, 0x88, 0x13, 0x88, 0x13, 0x20, 0x4e, 0x10, 0x27,
+            0xaa, 0x29, 0x10, 0x27, 0xc4, 0x09, 0x4c, 0x1d, 0x24, 0x24, 0x30, 0x00, 0x65, 0x01,
+            0xc8, 0x37, 0xc8, 0x37, 0xc8, 0x37, 0x24, 0x75,
+        ];
+        let mut bytes = fake_spd("UD5-6000", 416, &[], false);
+        bytes[EXPO_HEADER..EXPO_HEADER + 0x40].copy_from_slice(&block);
+        let spd = parse_ddr5(&bytes).expect("ddr5");
+        assert_eq!(spd.expo_mts, [6000, 5600]);
+        assert_eq!(spd.best_mts(), Some(6000));
     }
 
     #[test]

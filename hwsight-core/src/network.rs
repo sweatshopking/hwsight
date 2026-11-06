@@ -30,6 +30,56 @@ pub(crate) struct WifiLive {
     pub bitrate_kbps: u32,
     pub strength_percent: u8,
     pub supports_5ghz: bool,
+    /// The Wi-Fi generation the link uses now (4, 5, 6, or 7), from the `iw` program.
+    pub standard_in_use: Option<u8>,
+    /// The newest generation the adapter supports.
+    pub standard_max: Option<u8>,
+}
+
+/// The Wi-Fi generation of a link, from the bit-rate line of `iw dev <name> link`:
+/// `EHT-MCS` is Wi-Fi 7, `HE-MCS` Wi-Fi 6, `VHT-MCS` Wi-Fi 5, a bare `MCS` Wi-Fi 4.
+/// Nothing else in the output is looked at (it also names the network).
+fn standard_in_use(link: &str) -> Option<u8> {
+    let line = link
+        .lines()
+        .find(|l| l.trim_start().starts_with("tx bitrate:"))?;
+    line.split_whitespace().find_map(|word| match word {
+        "EHT-MCS" => Some(7),
+        "HE-MCS" => Some(6),
+        "VHT-MCS" => Some(5),
+        "MCS" => Some(4),
+        _ => None,
+    })
+}
+
+/// The newest Wi-Fi generation an adapter supports, from `iw phy <phy> info`.
+fn standard_max(info: &str) -> Option<u8> {
+    let has = |needle: &str| info.lines().any(|l| l.contains(needle));
+    if has("EHT Iftypes") {
+        Some(7)
+    } else if has("HE Iftypes") {
+        Some(6)
+    } else if has("VHT Capabilities") {
+        Some(5)
+    } else if has("HT TX/RX MCS rate indexes supported") {
+        Some(4)
+    } else {
+        None
+    }
+}
+
+/// Output of the `iw` program (usually installed with NetworkManager); nothing if it's missing.
+fn iw(args: &[&str]) -> Option<String> {
+    let output = std::process::Command::new("iw")
+        .args(args)
+        .env("LC_ALL", "C")
+        .stdin(std::process::Stdio::null())
+        .output()
+        .ok()?;
+    output
+        .status
+        .success()
+        .then(|| String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
 /// Wi-Fi adapters by interface name.
@@ -84,17 +134,19 @@ pub(crate) fn read_wifi_live() -> WifiByInterface {
         let Some(access_point) = access_point else {
             continue;
         };
-        found.insert(
-            name,
-            WifiLive {
-                frequency_mhz: access_point.get_property("Frequency").unwrap_or(0),
-                bitrate_kbps: wifi.get_property("Bitrate").unwrap_or(0),
-                strength_percent: access_point.get_property("Strength").unwrap_or(0),
-                supports_5ghz: wifi
-                    .get_property::<u32>("WirelessCapabilities")
-                    .is_ok_and(|c| c & CAP_5GHZ != 0),
-            },
-        );
+        let live = WifiLive {
+            frequency_mhz: access_point.get_property("Frequency").unwrap_or(0),
+            bitrate_kbps: wifi.get_property("Bitrate").unwrap_or(0),
+            strength_percent: access_point.get_property("Strength").unwrap_or(0),
+            supports_5ghz: wifi
+                .get_property::<u32>("WirelessCapabilities")
+                .is_ok_and(|c| c & CAP_5GHZ != 0),
+            standard_in_use: iw(&["dev", &name, "link"]).and_then(|t| standard_in_use(&t)),
+            standard_max: read(Path::new(&format!("/sys/class/net/{name}/phy80211/name")))
+                .and_then(|phy| iw(&["phy", &phy, "info"]))
+                .and_then(|t| standard_max(&t)),
+        };
+        found.insert(name, live);
     }
     found
 }
@@ -302,6 +354,26 @@ fn wifi_rows(dir: &Path, name: &str, proc_wireless: &Path, live: Option<&WifiLiv
                 .verdict(Verdict::Info, why),
             );
         }
+        if let Some(now) = live.standard_in_use {
+            let behind = live.standard_max.filter(|max| *max > now);
+            rows.push(
+                Detail::new(
+                    crate::tr!("Wi-Fi standard"),
+                    crate::tr!("Wi-Fi {}", now),
+                    crate::tr!("The iw program"),
+                )
+                .verdict(
+                    Verdict::Info,
+                    behind.map(|max| {
+                        crate::tr!(
+                            "This adapter supports Wi-Fi {}, but this connection uses Wi-Fi {}. The router (or its settings) is the limit, not the adapter.",
+                            max,
+                            now
+                        )
+                    }),
+                ),
+            );
+        }
         if live.bitrate_kbps > 0 {
             rows.push(
                 Detail::new(
@@ -498,8 +570,74 @@ mod tests {
                 bitrate_kbps: 720_600,
                 strength_percent: 60,
                 supports_5ghz: supports_5,
+                standard_in_use: Some(6),
+                standard_max: Some(7),
             },
         )])
+    }
+
+    #[test]
+    fn the_wifi_generation_is_read_from_iw_output() {
+        let link = |rate: &str| {
+            format!("Connected to 34:bc (on wlan0)\n\tSSID: home\n\ttx bitrate: {rate}\n")
+        };
+        assert_eq!(
+            standard_in_use(&link("720.6 MBit/s 80MHz HE-MCS 7 HE-NSS 2")),
+            Some(6)
+        );
+        assert_eq!(
+            standard_in_use(&link("2882 MBit/s 160MHz EHT-MCS 11 EHT-NSS 2")),
+            Some(7)
+        );
+        assert_eq!(
+            standard_in_use(&link("866.7 MBit/s 80MHz VHT-MCS 9 VHT-NSS 2")),
+            Some(5)
+        );
+        assert_eq!(
+            standard_in_use(&link("144.4 MBit/s MCS 15 short GI")),
+            Some(4)
+        );
+        assert_eq!(standard_in_use(&link("54.0 MBit/s")), None);
+        assert_eq!(standard_in_use("Not connected."), None);
+        assert_eq!(
+            standard_max("\t\tHE Iftypes: managed\n\t\tVHT Capabilities (0x1)\n"),
+            Some(6)
+        );
+        assert_eq!(
+            standard_max("\t\tEHT Iftypes: managed\n\t\tHE Iftypes: managed\n"),
+            Some(7)
+        );
+        assert_eq!(
+            standard_max("\t\tHT TX/RX MCS rate indexes supported: 0-15\n"),
+            Some(4)
+        );
+        assert_eq!(standard_max(""), None);
+    }
+
+    #[test]
+    fn a_router_limiting_the_adapter_is_explained() {
+        let root = tempfile::tempdir().expect("tempdir");
+        wifi_card(root.path(), true);
+        let rows = in_english(|| {
+            wifi_rows(
+                &root.path().join("net/wlan0"),
+                "wlan0",
+                &root.path().join("wireless"),
+                live(5805, true).get("wlan0"),
+            )
+        });
+        let standard = rows
+            .iter()
+            .find(|r| r.label == "Wi-Fi standard")
+            .expect("row");
+        assert_eq!(standard.value, "Wi-Fi 6");
+        assert!(
+            standard
+                .explanation
+                .as_deref()
+                .unwrap_or("")
+                .contains("supports Wi-Fi 7")
+        );
     }
 
     #[test]

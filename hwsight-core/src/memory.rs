@@ -290,6 +290,12 @@ fn stick_group(stick: &Slot, spd: Option<&Spd>, dmi: &Path, spd_dir: &Path) -> D
     if let Some(spd) = spd {
         let chip = spd_dir.display().to_string();
         let mut speeds = spd.xmp_mts.clone();
+        for mts in &spd.expo_mts {
+            if !speeds.contains(mts) {
+                speeds.push(*mts);
+            }
+        }
+        speeds.sort_unstable_by(|a, b| b.cmp(a));
         if speeds.is_empty() {
             speeds.extend(spd.base_mts);
         }
@@ -315,12 +321,23 @@ fn stick_group(stick: &Slot, spd: Option<&Spd>, dmi: &Path, spd_dir: &Path) -> D
                     .technical(),
             );
         }
+        let list = |speeds: &[u32]| {
+            speeds
+                .iter()
+                .map(u32::to_string)
+                .collect::<Vec<_>>()
+                .join(", ")
+        };
         let mut profiles = Vec::new();
         if !spd.xmp_mts.is_empty() {
-            profiles.push("XMP");
+            profiles.push(format!("XMP ({} MT/s)", list(&spd.xmp_mts)));
         }
         if spd.has_expo {
-            profiles.push("EXPO");
+            profiles.push(if spd.expo_mts.is_empty() {
+                "EXPO".to_owned()
+            } else {
+                format!("EXPO ({} MT/s)", list(&spd.expo_mts))
+            });
         }
         if !profiles.is_empty() {
             items.push(

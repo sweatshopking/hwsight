@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 07:08+0000\n"
+"POT-Creation-Date: 2026-11-06 07:13+0000\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -1066,6 +1066,18 @@ msgstr ""
 msgid "{} GHz"
 msgstr ""
 
+msgid "Wi-Fi standard"
+msgstr ""
+
+msgid "Wi-Fi {}"
+msgstr ""
+
+msgid "The iw program"
+msgstr ""
+
+msgid "This adapter supports Wi-Fi {}, but this connection uses Wi-Fi {}. The router (or its settings) is the limit, not the adapter."
+msgstr ""
+
 msgid "Connection speed"
 msgstr ""
 
@@ -1180,10 +1192,31 @@ msgstr ""
 msgid "Which group of processor cores and memory this device sits closest to."
 msgstr ""
 
+msgid "{} GB"
+msgstr ""
+
+msgid "{} MB"
+msgstr ""
+
+msgid "Resizable BAR"
+msgstr ""
+
+msgid "The processor can reach all of the card's video memory at once, which is what games want."
+msgstr ""
+
+msgid "Resizable BAR (also called Smart Access Memory) is switched off, so the processor can only reach a small part of the card's video memory at a time. Games can run a little slower. To turn it on, look in the BIOS for \"Resizable BAR\" and \"Above 4G Decoding\" and enable both."
+msgstr ""
+
+msgid "The processor reaches part of the card's video memory at once, which is more than the old limit but less than the card allows."
+msgstr ""
+
 msgid "PCIe connection"
 msgstr ""
 
 msgid "Connection errors"
+msgstr ""
+
+msgid "Video memory access"
 msgstr ""
 
 msgid "Power"
@@ -1218,6 +1251,36 @@ msgstr "Das Update konnte nicht gespeichert werden: {}"
 
 msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "Dieses Gerät wurde durch die USB-Sicherheitseinstellungen des Computers blockiert. Daher darf es niemand verwenden."
+
+msgid "USB 1.0, low speed ({} Mb/s)"
+msgstr ""
+
+msgid "USB 1.1, full speed ({} Mb/s)"
+msgstr ""
+
+msgid "USB 2.0, high speed ({} Mb/s)"
+msgstr ""
+
+msgid "USB 3.0, SuperSpeed (5 Gb/s)"
+msgstr ""
+
+msgid "USB 3.1, SuperSpeed+ (10 Gb/s)"
+msgstr ""
+
+msgid "USB 3.2, SuperSpeed+ ({} Gb/s)"
+msgstr ""
+
+msgid "This storage device is running at USB 2 speed. If it's a USB 3 device, plugging it into a USB 3 port (usually blue, or marked SS) with a USB 3 cable would make it much faster. If it's an older device, this is as fast as it goes."
+msgstr ""
+
+msgid "USB version the device reports"
+msgstr ""
+
+msgid "Most power it may draw"
+msgstr ""
+
+msgid "USB connection"
+msgstr ""
 
 msgid "USB device"
 msgstr "USB-Gerät"
