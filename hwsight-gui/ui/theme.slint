@@ -50,6 +50,15 @@ export struct FixItem {
     command: string,
 }
 
+export struct SoftwareItem {
+    name: string,
+    what: string,
+    installed: bool,
+    command: string,
+    how-to-get: string,
+    homepage: string,
+}
+
 export struct DeviceItem {
     name: string,
     vendor: string,
@@ -65,6 +74,7 @@ export struct DeviceItem {
     why: string,
     // Steps to fix it, most specific first; empty when it works.
     fixes: [FixItem],
+    software: [SoftwareItem],
     // Extra explanation, e.g. why no driver is needed.
     note: string,
     // What this kind of device does, in plain English.

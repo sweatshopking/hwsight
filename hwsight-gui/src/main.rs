@@ -18,7 +18,7 @@ use slint::{ComponentHandle, Model, ModelRc, SharedString, VecModel};
 mod ui {
     slint::include_modules!();
 }
-use ui::{AppWindow, DeviceItem, FixItem, Row};
+use ui::{AppWindow, DeviceItem, FixItem, Row, SoftwareItem};
 
 struct UpdateState {
     release: Option<hwsight_core::app_update::Release>,

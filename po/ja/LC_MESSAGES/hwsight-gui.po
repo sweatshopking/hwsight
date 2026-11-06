@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -49,52 +49,56 @@ msgstr "問題"
 msgid "How to fix"
 msgstr "解決方法"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "便利なソフトウェア"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "インストール済み"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "コピーしました"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "フォーラム用にコピー"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "このデバイスの短いレポートをコピーします。ユーザー名とコンピューター名は削除されます。"
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "詳細"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "種類"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "ドライバー"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "なし"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "ハードウェア ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "接続"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "アドレス"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "このデバイスはまだデータベースにありません。上のハードウェア ID をオンラインで検索できます。"
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -126,8 +130,7 @@ msgstr "更新をキャンセルしました。"
 msgid "hwsight is up to date."
 msgstr "hwsight は最新です。"
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "この hwsight はパッケージマネージャーまたは {} から更新されます。"
 
 msgid "Couldn't update hwsight: {}"
@@ -253,32 +256,22 @@ msgstr "ドライバーなし"
 msgid "Reserved for a virtual machine"
 msgstr "仮想マシン用に予約済み"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "起動時にファームウェアファイル {} がありませんでしたが、現在はインストールされています。再起動で直るはずです。"
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "ドライバーに必要なファームウェアファイル {} がありません。{} パッケージに含まれています。"
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "ドライバーに必要なファームウェアファイルがインストールされていません: {}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "ここに接続したデバイスを接続できませんでした。通常はケーブル不良、デバイスの故障、電力不足が原因です。別のケーブルまたはポートを試してください。"
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "ここに接続したデバイスを接続できませんでした（{}）。通常はケーブル不良、デバイスの故障、電力不足が原因です。別のケーブルまたはポートを試してください。"
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "この USB ポートは電力を使いすぎていると報告しました。接続したデバイスが故障しているか、独自の電源が必要な可能性があります。"
 
 msgid "The {} driver couldn't start this device ({})."
@@ -326,14 +319,10 @@ msgstr "準備が完了しなかった別の部分を待っていました"
 msgid "an unexpected error"
 msgstr "予期しないエラー"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "カーネルのドライバー一覧を読み取れないため、ドライバーのないデバイスに利用可能なドライバーがあるか hwsight では確認できません。"
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "カーネルログを読み取れないため、hwsight ではデバイスが動作しない理由を確認できません。一部のシステムでは管理者だけが読めます。"
 
 msgid "Couldn't read the USB device list: {}"
@@ -342,14 +331,10 @@ msgstr "USB デバイス一覧を読み取れませんでした: {}"
 msgid "Couldn't read the PCI device list: {}"
 msgstr "PCI デバイス一覧を読み取れませんでした: {}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "データ更新（{}）には新しいバージョンの hwsight が必要です。使用するには hwsight を更新してください。"
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "破損したデータファイル（{}）をスキップし、組み込みのコピーを使用します。詳細: {}"
 
 msgid "USB bus {}, port {}"
@@ -364,14 +349,19 @@ msgstr "不明な{} {}"
 msgid "Unknown {}"
 msgstr "不明な{}"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{} はお使いのディストリビューションのソフトウェア ソースにはありませんが、このコマンドで Flathub からインストールできます。"
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{} はお使いのディストリビューションのソフトウェア ソースにはありません。アプリ ストア (Discover や GNOME ソフトウェアなど) か Flathub で「{}」を探すか、Web サイトのインストール手順に従ってください: {}"
+
 msgid "Data updates aren't available in this version."
 msgstr "このバージョンではデータ更新を利用できません。"
 
 msgid "Couldn't download the update: {}"
 msgstr "更新をダウンロードできませんでした: {}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "ダウンロードした更新はセキュリティチェックに失敗したため、インストールされませんでした。"
 
 msgid "A data update needs a newer version of hwsight."
@@ -383,9 +373,7 @@ msgstr "ダウンロードした更新が破損していたため（{}）、イ�
 msgid "Couldn't save the update: {}"
 msgstr "更新を保存できませんでした: {}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "このデバイスはコンピューターの USB セキュリティ設定でブロックされているため、使用できません。"
 
 msgid "USB device"
@@ -397,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "hwsight {} が利用できます（現在は {}）。hwsight --update を実行してインストールしてください。"
 
 msgid "hwsight {} is the newest version."
@@ -421,6 +408,15 @@ msgstr "{}、利用可能: {}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}、まだデバイスデータベースにありません"
+
+msgid "Useful software: {} (installed)"
+msgstr "便利なソフトウェア: {} (インストール済み)"
+
+msgid "Useful software: {}"
+msgstr "便利なソフトウェア: {}"
+
+msgid "Install: {}"
+msgstr "インストール: {}"
 
 msgid "Why:"
 msgstr "理由："
@@ -469,9 +465,7 @@ msgstr "{} を {} に更新しました"
 msgid "hwsight {} is available."
 msgstr "hwsight {} を利用できます。"
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} が利用できます。パッケージマネージャーで更新するか、ウェブサイトからダウンロードしてください。"
 
 msgid "No devices found"

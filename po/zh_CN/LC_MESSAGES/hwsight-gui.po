@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -49,52 +49,56 @@ msgstr "问题"
 msgid "How to fix"
 msgstr "如何修复"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "实用软件"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "已安装"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "已复制"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "复制用于论坛发帖"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "复制此设备的简短报告。报告中会删除用户名和计算机名。"
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "详细信息"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "类型"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "驱动程序"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "无"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "硬件 ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "连接"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "地址"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "此设备尚未收录在设备数据库中。你可以在线搜索上面的硬件 ID。"
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -126,8 +130,7 @@ msgstr "更新已取消。"
 msgid "hwsight is up to date."
 msgstr "hwsight 已是最新版本。"
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "此版本 hwsight 通过软件包管理器或从 {} 更新。"
 
 msgid "Couldn't update hwsight: {}"
@@ -253,32 +256,22 @@ msgstr "没有驱动程序"
 msgid "Reserved for a virtual machine"
 msgstr "已为虚拟机保留"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "计算机启动时缺少固件文件 {}，但现在已安装。重新启动应该可以解决问题。"
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "驱动程序需要固件文件 {}，它包含在 {} 软件包中。"
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "驱动程序需要未安装的固件文件：{}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "插入此处的设备无法连接。通常是线缆损坏、设备故障或供电不足。请尝试其他线缆或端口。"
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "插入此处的设备无法连接（{}）。通常是线缆损坏、设备故障或供电不足。请尝试其他线缆或端口。"
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "此 USB 端口报告功耗过高。连接的设备可能有故障，或需要独立供电。"
 
 msgid "The {} driver couldn't start this device ({})."
@@ -326,14 +319,10 @@ msgstr "它在等待另一个始终未就绪的部分"
 msgid "an unexpected error"
 msgstr "意外错误"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "无法读取内核驱动程序列表，因此 hwsight 无法判断没有驱动程序的设备是否有可用驱动程序。"
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "无法读取内核日志，因此 hwsight 无法说明设备为何无法工作。在某些系统上只有管理员可以读取它。"
 
 msgid "Couldn't read the USB device list: {}"
@@ -342,14 +331,10 @@ msgstr "无法读取 USB 设备列表：{}"
 msgid "Couldn't read the PCI device list: {}"
 msgstr "无法读取 PCI 设备列表：{}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "数据更新（{}）需要更新版本的 hwsight。请更新 hwsight 后使用。"
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "已跳过损坏的数据文件（{}），因此使用内置副本。详细信息：{}"
 
 msgid "USB bus {}, port {}"
@@ -364,14 +349,19 @@ msgstr "未知 {} {}"
 msgid "Unknown {}"
 msgstr "未知 {}"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{} 不在你的发行版软件源中，但你可以用这条命令从 Flathub 安装它。"
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{} 不在你的发行版软件源中。请在应用商店（例如 Discover 或 GNOME 软件）或 Flathub 中搜索“{}”，或按照它网站上的安装步骤操作：{}"
+
 msgid "Data updates aren't available in this version."
 msgstr "此版本不提供数据更新。"
 
 msgid "Couldn't download the update: {}"
 msgstr "无法下载更新：{}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "下载的更新未通过安全检查，因此未安装。"
 
 msgid "A data update needs a newer version of hwsight."
@@ -383,9 +373,7 @@ msgstr "下载的更新已损坏（{}），因此未安装。"
 msgid "Couldn't save the update: {}"
 msgstr "无法保存更新：{}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "此设备被计算机的 USB 安全设置阻止，因此无法使用。"
 
 msgid "USB device"
@@ -397,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "hwsight {} 可用（当前为 {}）。运行 hwsight --update 进行安装。"
 
 msgid "hwsight {} is the newest version."
@@ -421,6 +408,15 @@ msgstr "{}，可用：{}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}，尚未在设备数据库中"
+
+msgid "Useful software: {} (installed)"
+msgstr "实用软件：{}（已安装）"
+
+msgid "Useful software: {}"
+msgstr "实用软件：{}"
+
+msgid "Install: {}"
+msgstr "安装：{}"
 
 msgid "Why:"
 msgstr "原因："
@@ -469,9 +465,7 @@ msgstr "已将 {} 更新到 {}"
 msgid "hwsight {} is available."
 msgstr "hwsight {} 可用。"
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} 可用。请使用软件包管理器更新，或从网站下载。"
 
 msgid "No devices found"

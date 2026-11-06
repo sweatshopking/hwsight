@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: pt_BR\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -49,52 +49,56 @@ msgstr "O que está errado"
 msgid "How to fix"
 msgstr "Como corrigir"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "SOFTWARE ÚTIL"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "Instalado"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "Copiado"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "Copiar para uma postagem no fórum"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Copia um relatório curto sobre este dispositivo. Seu nome de usuário e o nome do computador são removidos."
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "DETALHES"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "Tipo"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "Driver"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "Nenhum"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "ID do hardware"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "Conexão"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "Endereço"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Este dispositivo ainda não está no banco de dados. Você pode pesquisar o ID de hardware acima na Internet."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -126,8 +130,7 @@ msgstr "A atualização foi cancelada."
 msgid "hwsight is up to date."
 msgstr "hwsight está atualizado."
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "Esta cópia do hwsight é atualizada pelo gerenciador de pacotes ou de {}."
 
 msgid "Couldn't update hwsight: {}"
@@ -253,32 +256,22 @@ msgstr "Nenhum driver"
 msgid "Reserved for a virtual machine"
 msgstr "Reservado para uma máquina virtual"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "O arquivo de firmware {} estava ausente quando o computador iniciou, mas já está instalado. Reiniciar deve resolver."
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "O driver precisa do arquivo de firmware {}. Ele está no pacote {}."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "O driver precisa de um arquivo de firmware que não está instalado: {}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Não foi possível conectar um dispositivo ligado aqui. Normalmente isso ocorre por causa de um cabo ruim, dispositivo com defeito ou energia insuficiente. Tente outro cabo ou porta."
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Não foi possível conectar um dispositivo ligado aqui ({}). Normalmente isso ocorre por causa de um cabo ruim, dispositivo com defeito ou energia insuficiente. Tente outro cabo ou porta."
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "Esta porta USB informou consumo excessivo de energia. O dispositivo conectado pode estar com defeito ou precisar de sua própria fonte de alimentação."
 
 msgid "The {} driver couldn't start this device ({})."
@@ -326,14 +319,10 @@ msgstr "estava esperando outra parte que nunca ficou pronta"
 msgid "an unexpected error"
 msgstr "um erro inesperado"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "Não foi possível ler a lista de drivers do kernel, então o hwsight não pode dizer se há um driver disponível para dispositivos sem um."
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "Não foi possível ler o log do kernel, então o hwsight não pode dizer por que um dispositivo não funciona. Em alguns sistemas, apenas administradores podem lê-lo."
 
 msgid "Couldn't read the USB device list: {}"
@@ -342,14 +331,10 @@ msgstr "Não foi possível ler a lista de dispositivos USB: {}"
 msgid "Couldn't read the PCI device list: {}"
 msgstr "Não foi possível ler a lista de dispositivos PCI: {}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "Uma atualização de dados ({}) precisa de uma versão mais recente do hwsight. Atualize o hwsight para usá-la."
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "Um arquivo de dados danificado ({}) foi ignorado, então a cópia integrada será usada. Detalhes: {}"
 
 msgid "USB bus {}, port {}"
@@ -364,14 +349,19 @@ msgstr "{} {} desconhecido"
 msgid "Unknown {}"
 msgstr "{} desconhecido"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{} não está nas fontes de software da sua distribuição, mas você pode instalá-lo pelo Flathub com este comando."
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{} não está nas fontes de software da sua distribuição. Procure \"{}\" na sua loja de aplicativos (como o Discover ou o GNOME Software) ou no Flathub, ou siga os passos de instalação no site dele: {}"
+
 msgid "Data updates aren't available in this version."
 msgstr "As atualizações de dados não estão disponíveis nesta versão."
 
 msgid "Couldn't download the update: {}"
 msgstr "Não foi possível baixar a atualização: {}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "A atualização baixada falhou na verificação de segurança, por isso não foi instalada."
 
 msgid "A data update needs a newer version of hwsight."
@@ -383,9 +373,7 @@ msgstr "A atualização baixada estava danificada ({}), por isso não foi instal
 msgid "Couldn't save the update: {}"
 msgstr "Não foi possível salvar a atualização: {}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "Este dispositivo foi bloqueado pelas configurações de segurança USB do computador, então nada pode usá-lo."
 
 msgid "USB device"
@@ -397,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "hwsight {} está disponível (você tem {}). Execute hwsight --update para instalá-lo."
 
 msgid "hwsight {} is the newest version."
@@ -421,6 +408,15 @@ msgstr "{}, disponível: {}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}, ainda não está no banco de dados de dispositivos"
+
+msgid "Useful software: {} (installed)"
+msgstr "Software útil: {} (instalado)"
+
+msgid "Useful software: {}"
+msgstr "Software útil: {}"
+
+msgid "Install: {}"
+msgstr "Instalar: {}"
 
 msgid "Why:"
 msgstr "Motivo:"
@@ -471,9 +467,7 @@ msgstr "{} atualizado para {}"
 msgid "hwsight {} is available."
 msgstr "hwsight {} está disponível."
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} está disponível. Atualize-o com seu gerenciador de pacotes ou baixe-o do site."
 
 msgid "No devices found"

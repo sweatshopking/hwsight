@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -49,52 +49,56 @@ msgstr "Sorun nedir"
 msgid "How to fix"
 msgstr "Nasıl düzeltilir"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "YARARLI YAZILIMLAR"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "Yüklü"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "Kopyalandı"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "Forum gönderisi için kopyala"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Bu aygıt hakkında kısa bir rapor kopyalanır. Kullanıcı adınız ve bilgisayar adınız kaldırılır."
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "AYRINTILAR"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "Tür"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "Sürücü"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "Yok"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "Donanım kimliği"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "Bağlantı"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "Adres"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Bu aygıt henüz aygıt veritabanında yok. Yukarıdaki donanım kimliğini çevrimiçi arayabilirsiniz."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -126,8 +130,7 @@ msgstr "Güncelleme iptal edildi."
 msgid "hwsight is up to date."
 msgstr "hwsight güncel."
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "Bu hwsight kopyası paket yöneticiniz veya {} üzerinden güncellenir."
 
 msgid "Couldn't update hwsight: {}"
@@ -253,32 +256,22 @@ msgstr "Sürücü yok"
 msgid "Reserved for a virtual machine"
 msgstr "Sanal makine için ayrıldı"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "Bilgisayar başlarken {} ürün yazılımı dosyası eksikti, ancak şimdi yüklü. Yeniden başlatmak sorunu çözebilir."
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "Sürücünün {} ürün yazılımı dosyasına ihtiyacı var. Bu dosya {} paketindedir."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "Sürücünün yüklü olmayan bir ürün yazılımı dosyasına ihtiyacı var: {}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Buraya takılan aygıt bağlanamadı. Genellikle nedeni bozuk kablo, arızalı aygıt veya yetersiz güçtür. Başka bir kablo ya da bağlantı noktası deneyin."
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Buraya takılan aygıt bağlanamadı ({}). Genellikle nedeni bozuk kablo, arızalı aygıt veya yetersiz güçtür. Başka bir kablo ya da bağlantı noktası deneyin."
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "Bu USB bağlantı noktası fazla güç çekildiğini bildirdi. Bağlı aygıt arızalı olabilir veya kendi güç kaynağına ihtiyaç duyabilir."
 
 msgid "The {} driver couldn't start this device ({})."
@@ -326,14 +319,10 @@ msgstr "hiç hazır olmayan başka bir parçayı bekliyordu"
 msgid "an unexpected error"
 msgstr "beklenmeyen bir hata"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "Çekirdeğin sürücü listesi okunamadı; bu nedenle hwsight sürücüsü olmayan aygıtlar için sürücü bulunup bulunmadığını söyleyemez."
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "Çekirdek günlüğü okunamadı; bu nedenle hwsight bir aygıtın neden çalışmadığını söyleyemez. Bazı sistemlerde günlüğü yalnızca yöneticiler okuyabilir."
 
 msgid "Couldn't read the USB device list: {}"
@@ -342,14 +331,10 @@ msgstr "USB aygıt listesi okunamadı: {}"
 msgid "Couldn't read the PCI device list: {}"
 msgstr "PCI aygıt listesi okunamadı: {}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "Bir veri güncellemesi ({}) için daha yeni bir hwsight sürümü gerekir. Kullanmak için hwsightı güncelleyin."
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "Hasarlı veri dosyası ({}) atlandı; bunun yerine yerleşik kopya kullanılıyor. Ayrıntılar: {}"
 
 msgid "USB bus {}, port {}"
@@ -364,14 +349,19 @@ msgstr "Bilinmeyen {} {}"
 msgid "Unknown {}"
 msgstr "Bilinmeyen {}"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{} dağıtımınızın yazılım kaynaklarında yok, ancak bu komutla Flathub'dan yükleyebilirsiniz."
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{} dağıtımınızın yazılım kaynaklarında yok. Uygulama mağazanızda (Discover veya GNOME Yazılım gibi) ya da Flathub'da \"{}\" diye arayın veya web sitesindeki kurulum adımlarını izleyin: {}"
+
 msgid "Data updates aren't available in this version."
 msgstr "Bu sürümde veri güncellemeleri kullanılamıyor."
 
 msgid "Couldn't download the update: {}"
 msgstr "Güncelleme indirilemedi: {}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "İndirilen güncelleme güvenlik denetiminden geçemedi, bu yüzden yüklenmedi."
 
 msgid "A data update needs a newer version of hwsight."
@@ -383,9 +373,7 @@ msgstr "İndirilen güncelleme bozuktu ({}), bu yüzden yüklenmedi."
 msgid "Couldn't save the update: {}"
 msgstr "Güncelleme kaydedilemedi: {}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "Bu aygıt bilgisayarın USB güvenlik ayarları tarafından engellendiği için hiçbir şey kullanamaz."
 
 msgid "USB device"
@@ -397,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "hwsight {} kullanılabilir (sizdə {}). Yüklemek için hwsight --update komutunu çalıştırın."
 
 msgid "hwsight {} is the newest version."
@@ -421,6 +408,15 @@ msgstr "{}, kullanılabilir: {}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}, henüz aygıt veritabanında değil"
+
+msgid "Useful software: {} (installed)"
+msgstr "Yararlı yazılım: {} (yüklü)"
+
+msgid "Useful software: {}"
+msgstr "Yararlı yazılım: {}"
+
+msgid "Install: {}"
+msgstr "Yükle: {}"
 
 msgid "Why:"
 msgstr "Neden:"
@@ -471,9 +467,7 @@ msgstr "{} {} olarak güncellendi"
 msgid "hwsight {} is available."
 msgstr "hwsight {} kullanılabilir."
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {} kullanılabilir. Paket yöneticinizle güncelleyin veya web sitesinden indirin."
 
 msgid "No devices found"

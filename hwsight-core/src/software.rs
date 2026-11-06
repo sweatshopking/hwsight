@@ -2,8 +2,9 @@
 //! receiver, liquidctl for a liquid cooler, ...), from the updatable `software.toml`.
 
 use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::{self, DataDirs, DataFile, DataProblem, DataSource};
 use crate::data_text::DataText;
@@ -33,6 +34,75 @@ pub struct Program {
     pub get: Option<String>,
     packages: HashMap<String, String>,
     matchers: Vec<Matcher>,
+}
+
+/// Filesystem-only checks for programs and Flatpak applications.
+#[derive(Debug, Clone)]
+pub struct InstallCheck {
+    pub path_dirs: Vec<PathBuf>,
+    pub flatpak_dirs: Vec<PathBuf>,
+}
+
+impl InstallCheck {
+    /// Folders on `$PATH`, and the system and user Flatpak app folders.
+    pub fn system() -> Self {
+        let path_dirs = std::env::var_os("PATH")
+            .map(|path| std::env::split_paths(&path).collect::<Vec<_>>())
+            .into_iter()
+            .flatten()
+            .filter(|path| !path.as_os_str().is_empty())
+            .collect();
+        let flatpak_dirs = std::iter::once(PathBuf::from("/var/lib/flatpak/app"))
+            .chain(
+                std::env::var_os("HOME")
+                    .map(|home| PathBuf::from(home).join(".local/share/flatpak/app")),
+            )
+            .collect();
+        Self {
+            path_dirs,
+            flatpak_dirs,
+        }
+    }
+
+    /// One of the program's commands is an executable file on PATH, or its Flathub app
+    /// is installed. Only looks at files; never runs anything.
+    pub fn is_installed(&self, program: &Program) -> bool {
+        program.commands.iter().any(|command| {
+            self.path_dirs.iter().any(|dir| {
+                let path = dir.join(command);
+                is_executable(&path)
+            })
+        }) || program
+            .flathub
+            .as_ref()
+            .is_some_and(|app| self.flatpak_dirs.iter().any(|dir| dir.join(app).is_dir()))
+    }
+}
+
+#[cfg(unix)]
+fn is_executable(path: &Path) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    path.is_file()
+        && path
+            .metadata()
+            .is_ok_and(|m| m.permissions().mode() & 0o111 != 0)
+}
+
+#[cfg(not(unix))]
+fn is_executable(path: &Path) -> bool {
+    path.is_file()
+}
+
+/// One "useful software" recommendation for a device, ready to show.
+#[derive(Debug, Clone, Serialize)]
+pub struct Tip {
+    pub id: String,
+    pub name: String,
+    pub what: String,
+    pub homepage: String,
+    pub installed: bool,
+    pub install_command: Option<String>,
+    pub how_to_get: Option<String>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -235,6 +305,54 @@ impl Software {
         program.get.as_deref().map(|t| self.text.get(t).to_owned())
     }
 
+    /// The advice for one program: installed or not, and if not, the install command
+    /// (Flathub first on an immutable distro, then a distro package, then Flathub) and
+    /// how to get it when no distro package gave the command.
+    pub fn tip(&self, program: &Program, distro: &Distro, check: &InstallCheck) -> Tip {
+        let installed = check.is_installed(program);
+        let package_command = self
+            .package_for(program, distro)
+            .and_then(|package| distro.family.install_command(package, distro.immutable));
+        let flatpak_command = program
+            .flathub
+            .as_ref()
+            .map(|id| format!("flatpak install flathub {id}"));
+        let install_command = if installed {
+            None
+        } else if distro.immutable {
+            flatpak_command.clone().or(package_command.clone())
+        } else {
+            package_command.clone().or(flatpak_command.clone())
+        };
+        let from_package = install_command.is_some() && install_command == package_command;
+        let how_to_get = if installed || from_package {
+            None
+        } else if let Some(get) = self.get(program) {
+            Some(get)
+        } else if flatpak_command.is_some() && flatpak_command == install_command {
+            Some(crate::tr!(
+                "{} isn't in your distro's software sources, but you can install it from Flathub with this command.",
+                program.name
+            ))
+        } else {
+            Some(crate::tr!(
+                "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}",
+                program.name,
+                program.search,
+                program.homepage
+            ))
+        };
+        Tip {
+            id: program.id.clone(),
+            name: program.name.clone(),
+            what: self.what(program),
+            homepage: program.homepage.clone(),
+            installed,
+            install_command,
+            how_to_get,
+        }
+    }
+
     /// Every English text in the built-in file, for the translation checks.
     #[cfg(test)]
     pub(crate) fn english_texts() -> Vec<String> {
@@ -251,6 +369,7 @@ impl Software {
 mod tests {
     use super::*;
     use crate::distro::Family;
+    use std::fs;
 
     fn distro(id: &str) -> Distro {
         Distro::from_os_release(&format!("ID={id}\n"), false)
@@ -343,5 +462,190 @@ mod tests {
         let s = s.with_text(text);
         assert_eq!(s.what(&solaar), "Koppelt Logitech-Geräte.");
         assert_eq!(s.get(&solaar), None);
+    }
+
+    fn program<'a>(software: &'a Software, id: &str) -> &'a Program {
+        software
+            .table
+            .programs
+            .iter()
+            .find(|p| p.id == id)
+            .expect("program")
+    }
+
+    #[test]
+    fn install_check_finds_a_command_on_path() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let executable = temp.path().join("solaar");
+        fs::write(&executable, "").expect("write");
+        let mut mode = fs::metadata(&executable).expect("metadata").permissions();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            mode.set_mode(0o755);
+        }
+        fs::set_permissions(&executable, mode).expect("permissions");
+        let check = InstallCheck {
+            path_dirs: vec![temp.path().to_owned()],
+            flatpak_dirs: vec![],
+        };
+        assert!(check.is_installed(program(&Software::embedded(), "solaar")));
+        fs::write(temp.path().join("liquidctl"), "").expect("write");
+        assert!(!check.is_installed(program(&Software::embedded(), "liquidctl")));
+    }
+
+    #[test]
+    fn install_check_finds_a_flatpak() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        fs::create_dir(temp.path().join("org.openrgb.OpenRGB")).expect("mkdir");
+        let check = InstallCheck {
+            path_dirs: vec![],
+            flatpak_dirs: vec![temp.path().to_owned()],
+        };
+        assert!(check.is_installed(program(&Software::embedded(), "openrgb")));
+    }
+
+    #[test]
+    fn tip_uses_the_distro_package() {
+        let s = Software::embedded();
+        let tip = s.tip(
+            program(&s, "liquidctl"),
+            &distro("fedora"),
+            &InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
+        );
+        assert_eq!(
+            tip.install_command.as_deref(),
+            Some("sudo dnf install liquidctl")
+        );
+        assert_eq!(tip.how_to_get, None);
+    }
+
+    #[test]
+    fn tip_prefers_flathub_on_an_immutable_distro() {
+        let s = Software::embedded();
+        let d = Distro::from_os_release("ID=fedora\n", true);
+        let tip = s.tip(
+            program(&s, "openrgb"),
+            &d,
+            &InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
+        );
+        assert_eq!(
+            tip.install_command.as_deref(),
+            Some("flatpak install flathub org.openrgb.OpenRGB")
+        );
+        // Fedora packages it, but the Flathub command is the one shown, so say why.
+        assert!(
+            tip.how_to_get
+                .as_deref()
+                .is_some_and(|t| t.contains("Flathub"))
+        );
+    }
+
+    #[test]
+    fn tip_falls_back_to_flathub() {
+        let s = Software::embedded();
+        let tip = s.tip(
+            program(&s, "openrgb"),
+            &distro("debian"),
+            &InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
+        );
+        assert_eq!(
+            tip.install_command.as_deref(),
+            Some("flatpak install flathub org.openrgb.OpenRGB")
+        );
+        assert!(
+            tip.how_to_get
+                .as_deref()
+                .is_some_and(|t| t.contains("Flathub"))
+        );
+    }
+
+    #[test]
+    fn tip_uses_the_get_text() {
+        let s = Software::embedded();
+        let tip = crate::i18n::in_english(|| {
+            s.tip(
+                program(&s, "liquidctl"),
+                &distro("opensuse-tumbleweed"),
+                &InstallCheck {
+                    path_dirs: vec![],
+                    flatpak_dirs: vec![],
+                },
+            )
+        });
+        assert_eq!(tip.install_command, None);
+        assert_eq!(tip.how_to_get, s.get(program(&s, "liquidctl")));
+    }
+
+    #[test]
+    fn tip_explains_how_to_search() {
+        let s = Software {
+            version: "test".into(),
+            source: DataSource::Embedded,
+            table: Table {
+                programs: vec![Program {
+                    id: "test".into(),
+                    name: "Test app".into(),
+                    what: "Does tests.".into(),
+                    homepage: "https://example.com".into(),
+                    commands: vec![],
+                    flathub: None,
+                    search: "test app package".into(),
+                    get: None,
+                    packages: HashMap::new(),
+                    matchers: vec![],
+                }],
+            },
+            text: DataText::english(),
+        };
+        let tip = crate::i18n::in_english(|| {
+            s.tip(
+                &s.table.programs[0],
+                &distro("debian"),
+                &InstallCheck {
+                    path_dirs: vec![],
+                    flatpak_dirs: vec![],
+                },
+            )
+        });
+        let advice = tip.how_to_get.expect("advice");
+        assert!(advice.contains("Test app"));
+        assert!(advice.contains("test app package"));
+        assert!(advice.contains("https://example.com"));
+    }
+
+    #[test]
+    fn installed_tip_has_no_command() {
+        let s = Software::embedded();
+        let temp = tempfile::tempdir().expect("tempdir");
+        let command = temp.path().join("liquidctl");
+        fs::write(&command, "").expect("write");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut permissions = fs::metadata(&command).expect("metadata").permissions();
+            permissions.set_mode(0o755);
+            fs::set_permissions(&command, permissions).expect("permissions");
+        }
+        let tip = s.tip(
+            program(&s, "liquidctl"),
+            &distro("fedora"),
+            &InstallCheck {
+                path_dirs: vec![temp.path().to_owned()],
+                flatpak_dirs: vec![],
+            },
+        );
+        assert!(tip.installed);
+        assert_eq!(tip.install_command, None);
+        assert_eq!(tip.how_to_get, None);
     }
 }

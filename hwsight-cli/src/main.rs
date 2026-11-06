@@ -299,6 +299,28 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             detail = hwsight_core::tr!("{}, not in the device database yet", detail);
         }
         writeln!(out, "      {detail}")?;
+        for tip in &device.software {
+            if tip.installed {
+                writeln!(
+                    out,
+                    "      {}",
+                    hwsight_core::tr!("Useful software: {} (installed)", tip.name)
+                )?;
+            } else {
+                writeln!(
+                    out,
+                    "      {}",
+                    hwsight_core::tr!("Useful software: {}", tip.name)
+                )?;
+                writeln!(out, "        {}", tip.what)?;
+                if let Some(command) = &tip.install_command {
+                    writeln!(out, "        {}", hwsight_core::tr!("Install: {}", command))?;
+                }
+                if let Some(how) = &tip.how_to_get {
+                    writeln!(out, "        {how}")?;
+                }
+            }
+        }
         if device.status.is_problem() {
             if let Some(what) = &device.missing_interface {
                 writeln!(

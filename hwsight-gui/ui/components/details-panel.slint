@@ -1,5 +1,5 @@
 import { ScrollView } from "std-widgets.slint";
-import { Theme, DeviceItem, FixItem } from "../theme.slint";
+import { Theme, DeviceItem, FixItem, SoftwareItem } from "../theme.slint";
 import { StatusPill } from "status-pill.slint";
 import { AccentButton } from "accent-button.slint";
 
@@ -132,6 +132,68 @@ export component DetailsPanel inherits Rectangle {
                                     horizontal-stretch: 1;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+            if root.device.software.length > 0 : Rectangle {
+                background: Theme.surface-raised;
+                border-radius: Theme.radius-small;
+                VerticalLayout {
+                    padding: 16px;
+                    spacing: Theme.gap;
+                    Text {
+                        text: @tr("USEFUL SOFTWARE");
+                        color: Theme.text-muted;
+                        font-size: Theme.font-small;
+                        font-weight: 700;
+                        letter-spacing: 1px;
+                    }
+                    for software in root.device.software : VerticalLayout {
+                        spacing: 8px;
+                        HorizontalLayout {
+                            spacing: 8px;
+                            Text {
+                                text: software.name;
+                                color: Theme.text;
+                                font-size: Theme.font-body;
+                                font-weight: 700;
+                                horizontal-stretch: 1;
+                            }
+                            if software.installed : StatusPill {
+                                kind: "ok";
+                                text: @tr("Installed");
+                            }
+                        }
+                        Text {
+                            text: software.what;
+                            color: Theme.text-muted;
+                            wrap: word-wrap;
+                        }
+                        if software.command != "" : Rectangle {
+                            background: Theme.background;
+                            border-radius: 6px;
+                            HorizontalLayout {
+                                padding: 10px;
+                                TextInput {
+                                    text: software.command;
+                                    read-only: true;
+                                    single-line: true;
+                                    color: Theme.highlight;
+                                    font-family: "monospace";
+                                    horizontal-stretch: 1;
+                                }
+                            }
+                        }
+                        if software.how-to-get != "" : Text {
+                            text: software.how-to-get;
+                            color: Theme.text-muted;
+                            wrap: word-wrap;
+                        }
+                        Text {
+                            text: software.homepage;
+                            color: Theme.text-muted;
+                            wrap: word-wrap;
                         }
                     }
                 }

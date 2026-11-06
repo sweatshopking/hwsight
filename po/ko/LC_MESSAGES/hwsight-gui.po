@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: ko\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -49,52 +49,56 @@ msgstr "문제"
 msgid "How to fix"
 msgstr "해결 방법"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "유용한 소프트웨어"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "설치됨"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "복사됨"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "포럼 게시물용으로 복사"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "이 장치의 간단한 보고서를 복사합니다. 사용자 이름과 컴퓨터 이름은 삭제됩니다."
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "세부 정보"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "종류"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "드라이버"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "없음"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "하드웨어 ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "연결"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "주소"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "이 장치는 아직 장치 데이터베이스에 없습니다. 위의 하드웨어 ID를 온라인에서 검색할 수 있습니다."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -126,8 +130,7 @@ msgstr "업데이트가 취소되었습니다."
 msgid "hwsight is up to date."
 msgstr "hwsight가 최신 상태입니다."
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "이 hwsight는 패키지 관리자를 통해 또는 {}에서 업데이트됩니다."
 
 msgid "Couldn't update hwsight: {}"
@@ -253,32 +256,22 @@ msgstr "드라이버 없음"
 msgid "Reserved for a virtual machine"
 msgstr "가상 머신용으로 예약됨"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "컴퓨터가 시작될 때 펌웨어 파일 {}이(가) 없었지만 지금은 설치되어 있습니다. 다시 시작하면 해결됩니다."
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "드라이버에 필요한 펌웨어 파일 {}이(가) 설치되어 있지 않습니다. {} 패키지에 포함되어 있습니다."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "드라이버에 필요한 펌웨어 파일이 설치되어 있지 않습니다: {}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "여기에 연결한 장치를 연결하지 못했습니다. 보통 케이블 불량, 장치 고장 또는 전원 부족이 원인입니다. 다른 케이블이나 포트를 사용해 보세요."
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "여기에 연결한 장치를 연결하지 못했습니다({}). 보통 케이블 불량, 장치 고장 또는 전원 부족이 원인입니다. 다른 케이블이나 포트를 사용해 보세요."
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "이 USB 포트가 전력 과다 사용을 보고했습니다. 연결한 장치가 고장 났거나 자체 전원이 필요할 수 있습니다."
 
 msgid "The {} driver couldn't start this device ({})."
@@ -326,14 +319,10 @@ msgstr "준비되지 않은 다른 부분을 기다리고 있었습니다"
 msgid "an unexpected error"
 msgstr "예기치 않은 오류"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "커널의 드라이버 목록을 읽을 수 없어 hwsight가 드라이버 없는 장치에 사용 가능한 드라이버가 있는지 확인할 수 없습니다."
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "커널 로그를 읽을 수 없어 hwsight가 장치가 작동하지 않는 이유를 알 수 없습니다. 일부 시스템에서는 관리자만 읽을 수 있습니다."
 
 msgid "Couldn't read the USB device list: {}"
@@ -342,14 +331,10 @@ msgstr "USB 장치 목록을 읽을 수 없습니다: {}"
 msgid "Couldn't read the PCI device list: {}"
 msgstr "PCI 장치 목록을 읽을 수 없습니다: {}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "데이터 업데이트({})에는 최신 버전의 hwsight가 필요합니다. 사용하려면 hwsight를 업데이트하세요."
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "손상된 데이터 파일({})을 건너뛰어 기본 제공 사본을 사용합니다. 세부 정보: {}"
 
 msgid "USB bus {}, port {}"
@@ -364,14 +349,19 @@ msgstr "알 수 없는 {} {}"
 msgid "Unknown {}"
 msgstr "알 수 없는 {}"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{}은(는) 배포판의 소프트웨어 저장소에 없지만, 이 명령으로 Flathub에서 설치할 수 있습니다."
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{}은(는) 배포판의 소프트웨어 저장소에 없습니다. 앱 스토어(Discover나 GNOME 소프트웨어 등)나 Flathub에서 \"{}\"을(를) 찾거나, 웹사이트의 설치 방법을 따르세요: {}"
+
 msgid "Data updates aren't available in this version."
 msgstr "이 버전에서는 데이터 업데이트를 사용할 수 없습니다."
 
 msgid "Couldn't download the update: {}"
 msgstr "업데이트를 다운로드할 수 없습니다: {}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "다운로드한 업데이트가 보안 검사를 통과하지 못해 설치되지 않았습니다."
 
 msgid "A data update needs a newer version of hwsight."
@@ -383,9 +373,7 @@ msgstr "다운로드한 업데이트가 손상되어({}) 설치되지 않았습�
 msgid "Couldn't save the update: {}"
 msgstr "업데이트를 저장할 수 없습니다: {}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "컴퓨터의 USB 보안 설정에서 이 장치를 차단하여 아무것도 사용할 수 없습니다."
 
 msgid "USB device"
@@ -397,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "hwsight {}을(를) 사용할 수 있습니다(현재 {}). hwsight --update를 실행하여 설치하세요."
 
 msgid "hwsight {} is the newest version."
@@ -421,6 +408,15 @@ msgstr "{}, 사용 가능: {}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}, 아직 장치 데이터베이스에 없음"
+
+msgid "Useful software: {} (installed)"
+msgstr "유용한 소프트웨어: {} (설치됨)"
+
+msgid "Useful software: {}"
+msgstr "유용한 소프트웨어: {}"
+
+msgid "Install: {}"
+msgstr "설치: {}"
 
 msgid "Why:"
 msgstr "이유:"
@@ -469,9 +465,7 @@ msgstr "{}을(를) {}(으)로 업데이트함"
 msgid "hwsight {} is available."
 msgstr "hwsight {}을(를) 사용할 수 있습니다."
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "hwsight {}을(를) 사용할 수 있습니다. 패키지 관리자로 업데이트하거나 웹사이트에서 다운로드하세요."
 
 msgid "No devices found"

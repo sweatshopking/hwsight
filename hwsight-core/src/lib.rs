@@ -167,6 +167,7 @@ pub struct Scanner {
     /// Folders the kernel loads firmware from.
     pub firmware_dirs: Vec<PathBuf>,
     pub distro: Distro,
+    pub install_check: software::InstallCheck,
 }
 
 /// Where to get kernel log lines.
@@ -193,6 +194,7 @@ impl Scanner {
             kernel_log: KernelLogInput::System,
             firmware_dirs: kernel_log::firmware_dirs(),
             distro: Distro::detect(),
+            install_check: software::InstallCheck::system(),
         }
     }
 
@@ -211,7 +213,10 @@ impl Scanner {
         let descriptions = descriptions.with_text(text.clone());
         notes.extend(problems.into_iter().map(ScanNote::from));
         let (fixes, problems) = Fixes::load(&self.data_dirs);
-        let fixes = fixes.with_text(text);
+        let fixes = fixes.with_text(text.clone());
+        notes.extend(problems.into_iter().map(ScanNote::from));
+        let (software, problems) = software::Software::load(&self.data_dirs);
+        let software = software.with_text(text);
         notes.extend(problems.into_iter().map(ScanNote::from));
 
         let names = PciNames::load(&self.data_dirs);
@@ -310,6 +315,21 @@ impl Scanner {
         }
         for device in &mut devices {
             device.fixes = fixes.suggest(device);
+            let (vendor, product) = device
+                .hardware_id
+                .split_once(':')
+                .and_then(|(v, p)| {
+                    Some((
+                        u16::from_str_radix(v, 16).ok()?,
+                        u16::from_str_radix(p, 16).ok()?,
+                    ))
+                })
+                .unwrap_or((0, 0));
+            device.software = software
+                .for_device(device.bus, &device.class_codes, vendor, product)
+                .into_iter()
+                .map(|program| software.tip(program, &self.distro, &self.install_check))
+                .collect();
         }
         // What's left is about USB ports with nothing working plugged in: devices that
         // couldn't connect never appear in the device list at all.
@@ -490,6 +510,10 @@ mod tests {
             ]),
             firmware_dirs: vec![root.join("firmware")],
             distro: Distro::from_os_release("ID=debian\n", false),
+            install_check: software::InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
         };
         let report = scanner.scan();
         assert!(report.notes.is_empty(), "{:?}", report.notes);
@@ -516,5 +540,61 @@ mod tests {
                 .is_some_and(|n| n.contains("non-free-firmware"))
         );
         assert_eq!(report.distro.family, Family::Debian);
+    }
+
+    #[test]
+    fn bolt_receiver_gets_solaar() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let usb = temp.path().join("usb");
+        let device = usb.join("1-1");
+        let interface = device.join("1-1:1.0");
+        fs::create_dir_all(&interface).expect("mkdir");
+        for (name, value) in [
+            ("idVendor", "046d"),
+            ("idProduct", "c548"),
+            ("bDeviceClass", "00"),
+        ] {
+            fs::write(device.join(name), value).expect("write");
+        }
+        fs::write(device.join("authorized"), "1").expect("write");
+        fs::write(interface.join("bInterfaceClass"), "03").expect("write");
+        fs::write(interface.join("bInterfaceSubClass"), "01").expect("write");
+        fs::write(interface.join("bInterfaceProtocol"), "01").expect("write");
+        fs::write(
+            interface.join("modalias"),
+            "usb:v046DpC548d0100dc00dsc00dp00ic03isc01ip01in00",
+        )
+        .expect("write");
+        fs::write(temp.path().join("cmdline"), "").expect("write");
+        let scanner = Scanner {
+            data_dirs: DataDirs::only(&temp.path().join("data")),
+            pci_devices: temp.path().join("pci"),
+            usb_devices: usb,
+            kernel_modules: None,
+            loaded_modules: temp.path().join("modules"),
+            modprobe_dirs: vec![],
+            kernel_cmdline: temp.path().join("cmdline"),
+            kernel_log: KernelLogInput::Skip,
+            firmware_dirs: vec![],
+            distro: Distro::from_os_release("ID=debian\n", false),
+            install_check: software::InstallCheck {
+                path_dirs: vec![],
+                flatpak_dirs: vec![],
+            },
+        };
+        let report = scanner.scan();
+        let receiver = report
+            .devices
+            .iter()
+            .find(|d| d.hardware_id == "046d:c548")
+            .expect("receiver");
+        assert_eq!(
+            receiver
+                .software
+                .iter()
+                .map(|t| t.id.as_str())
+                .collect::<Vec<_>>(),
+            ["solaar"]
+        );
     }
 }

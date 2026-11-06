@@ -7,7 +7,7 @@ use std::rc::Rc;
 
 use slint::{ModelRc, VecModel};
 
-use crate::{DeviceItem, FixItem, Row};
+use crate::{DeviceItem, FixItem, Row, SoftwareItem};
 
 /// Everything the window needs from one scan.
 pub struct View {
@@ -171,6 +171,18 @@ fn device_item(d: &Device) -> DeviceItem {
             command: f.command.clone().unwrap_or_default().into(),
         })
         .collect();
+    let software: Vec<SoftwareItem> = d
+        .software
+        .iter()
+        .map(|s| SoftwareItem {
+            name: s.name.clone().into(),
+            what: s.what.clone().into(),
+            installed: s.installed,
+            command: s.install_command.clone().unwrap_or_default().into(),
+            how_to_get: s.how_to_get.clone().unwrap_or_default().into(),
+            homepage: s.homepage.clone().into(),
+        })
+        .collect();
 
     DeviceItem {
         name: d.display_name.clone().into(),
@@ -194,6 +206,7 @@ fn device_item(d: &Device) -> DeviceItem {
         .into(),
         why: why.join("\n").into(),
         fixes: ModelRc::from(Rc::new(VecModel::from(fixes))),
+        software: ModelRc::from(Rc::new(VecModel::from(software))),
         note: d.note.clone().unwrap_or_default().into(),
         description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
@@ -262,6 +275,10 @@ mod tests {
             ]),
             firmware_dirs: Vec::new(),
             distro: hwsight_core::Distro::from_os_release("ID=arch\n", false),
+            install_check: hwsight_core::software::InstallCheck {
+                path_dirs: Vec::new(),
+                flatpak_dirs: Vec::new(),
+            },
         };
         scanner.scan()
     }
@@ -305,6 +322,45 @@ mod tests {
         let gpu = &v.devices[0];
         assert_eq!(gpu.status_kind.as_str(), "ok");
         assert!(gpu.why.is_empty() && gpu.fixes.row_count() == 0);
+    }
+
+    fn tip(installed: bool) -> hwsight_core::software::Tip {
+        hwsight_core::software::Tip {
+            id: "solaar".into(),
+            name: "Solaar".into(),
+            what: "Pairs Logitech mice.".into(),
+            homepage: "https://pwr-solaar.github.io/Solaar/".into(),
+            installed,
+            install_command: (!installed).then(|| "sudo pacman -S solaar".into()),
+            how_to_get: None,
+        }
+    }
+
+    #[test]
+    fn installed_software_has_no_command() {
+        let mut r = report();
+        r.devices[0].software = vec![tip(true)];
+        let item = view(&r).devices[0].software.row_data(0).expect("item");
+        assert_eq!(item.name.as_str(), "Solaar");
+        assert!(item.installed);
+        assert_eq!(item.command.as_str(), "");
+        assert_eq!(item.how_to_get.as_str(), "");
+        assert_eq!(
+            item.homepage.as_str(),
+            "https://pwr-solaar.github.io/Solaar/"
+        );
+    }
+
+    #[test]
+    fn missing_software_carries_its_command() {
+        let mut r = report();
+        r.devices[0].software = vec![tip(false)];
+        let v = view(&r);
+        let item = v.devices[0].software.row_data(0).expect("item");
+        assert!(!item.installed);
+        assert_eq!(item.what.as_str(), "Pairs Logitech mice.");
+        assert_eq!(item.command.as_str(), "sudo pacman -S solaar");
+        assert_eq!(v.devices[1].software.row_count(), 0);
     }
 
     #[test]

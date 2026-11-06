@@ -121,3 +121,12 @@ In `model.rs`: the two tests from step 6.
 - [ ] nothing committed, nothing pushed, no co-author line
 
 ## Done notes
+- 2026-11-06: Copilot ran out of monthly credits partway through. Its core work (steps 1 to
+  4, the core tests) was kept after review. Claude finished the rest: moved the GUI
+  section out of the "How to fix" step loop (it repeated once per step) and removed a
+  `height: 0px` it had added, exported `SoftwareItem` to Rust, fixed the Scanner
+  builder in the GUI tests, wrote the two `model.rs` tests, made "how to get" also
+  explain the Flathub command on immutable distros that do package the program, put the
+  CLI `what` text on its own line, and translated the 7 new strings in all 11 catalogs.
+  Checked on the owner's PC: CLI and app show Solaar (installed), liquidctl
+  (`sudo pacman -S liquidctl`), and OpenRGB (installed). ALL CHECKS PASSED.

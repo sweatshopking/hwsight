@@ -6,7 +6,7 @@
 // components.
 
 import { ScrollView, Button, ListView, Switch, Palette } from "std-widgets.slint";
-import { Theme, DeviceItem, FixItem } from "theme.slint";
+import { Theme, DeviceItem, FixItem, SoftwareItem } from "theme.slint";
 import { CategoryHeader } from "components/category-header.slint";
 import { DeviceRow } from "components/device-row.slint";
 import { DetailsPanel } from "components/details-panel.slint";
@@ -18,7 +18,7 @@ import { SearchBox } from "components/search-box.slint";
 import { CopyText } from "components/copy-text.slint";
 
 // Re-exported so the Rust side can set theme tokens and build device items.
-export { Theme, DeviceItem, FixItem }
+export { Theme, DeviceItem, FixItem, SoftwareItem }
 
 // One row of the device list: either a category heading or a device.
 export struct Row {

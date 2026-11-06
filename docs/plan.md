@@ -1362,7 +1362,7 @@ Order (each task starts only after the one before is reviewed):
    data file); descriptions and fix steps use it, English where a text has no
    translation. `--json` and `--report` stay English.
 5. **Copilot 15 (done 2026-11-06):** machine-draft the 11 data text files (below).
-5b. **Copilot 16:** software recommendations (`software.toml`, core, CLI, GUI); its texts
+5b. **Copilot 16 (done 2026-11-06, finished by Claude):** software recommendations (`software.toml`, core, CLI, GUI); its texts
    use the same data text files. Spec: `docs/copilot-16.md`.
 6. **Claude 15:** detail levels foundation (data model, Simple / More details /
    Technical toggle, `hwsight --details`). Also fix the layout for long translations

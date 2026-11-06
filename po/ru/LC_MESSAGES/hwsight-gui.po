@@ -1,10 +1,9 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: hwsight-gui/ui/app.slint:131
 msgid "Scanning your hardware..."
@@ -50,52 +49,56 @@ msgstr "Что не так"
 msgid "How to fix"
 msgstr "Как исправить"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr "ПОЛЕЗНЫЕ ПРОГРАММЫ"
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr "Установлено"
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr "Скопировано"
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr "Копировать для сообщения на форуме"
 
-#: hwsight-gui/ui/components/details-panel.slint:154
-msgid ""
-"Copies a short report about this device. Your user name and computer name "
-"are removed."
+#: hwsight-gui/ui/components/details-panel.slint:216
+msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "Копируется краткий отчёт об устройстве. Имя пользователя и компьютера удаляются."
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr "ПОДРОБНОСТИ"
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr "Тип"
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr "Драйвер"
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr "Нет"
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr "ID оборудования"
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr "Подключение"
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr "Адрес"
 
-#: hwsight-gui/ui/components/details-panel.slint:228
-msgid ""
-"This device isn't in the device database yet. Its hardware ID above can be "
-"searched for online."
+#: hwsight-gui/ui/components/details-panel.slint:290
+msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "Этого устройства пока нет в базе данных. Найдите его идентификатор оборудования в интернете."
 
 #: hwsight-gui/ui/components/notes-banner.slint:19
@@ -127,8 +130,7 @@ msgstr "Обновление отменено."
 msgid "hwsight is up to date."
 msgstr "hwsight обновлён."
 
-msgid ""
-"This copy of hwsight is updated through your package manager or from {}."
+msgid "This copy of hwsight is updated through your package manager or from {}."
 msgstr "Эта копия hwsight обновляется через менеджер пакетов или из {}."
 
 msgid "Couldn't update hwsight: {}"
@@ -254,32 +256,22 @@ msgstr "Нет драйвера"
 msgid "Reserved for a virtual machine"
 msgstr "Зарезервировано для виртуальной машины"
 
-msgid ""
-"Firmware file {} was missing when the computer started, but it's installed "
-"now. Restarting should fix this."
+msgid "Firmware file {} was missing when the computer started, but it's installed now. Restarting should fix this."
 msgstr "При запуске компьютера не было файла прошивки {}, но теперь он установлен. Перезапуск должен решить проблему."
 
-msgid ""
-"The driver needs a firmware file that isn't installed: {}. It comes in the "
-"{} package."
+msgid "The driver needs a firmware file that isn't installed: {}. It comes in the {} package."
 msgstr "Драйверу нужен файл прошивки {}, который входит в пакет {}."
 
 msgid "The driver needs a firmware file that isn't installed: {}"
 msgstr "Драйверу нужен неустановленный файл прошивки: {}"
 
-msgid ""
-"A device plugged in here couldn't connect. This is usually a bad cable, a "
-"faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect. This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Подключённое сюда устройство не удалось подключить. Обычно причина в плохом кабеле, неисправном устройстве или нехватке питания. Попробуйте другой кабель или порт."
 
-msgid ""
-"A device plugged in here couldn't connect ({}). This is usually a bad cable, "
-"a faulty device, or not enough power. Try another cable or port."
+msgid "A device plugged in here couldn't connect ({}). This is usually a bad cable, a faulty device, or not enough power. Try another cable or port."
 msgstr "Подключённое сюда устройство не удалось подключить ({}). Обычно причина в плохом кабеле, неисправном устройстве или нехватке питания. Попробуйте другой кабель или порт."
 
-msgid ""
-"This USB port reported drawing too much power. The device plugged into it "
-"may be faulty or need its own power supply."
+msgid "This USB port reported drawing too much power. The device plugged into it may be faulty or need its own power supply."
 msgstr "Этот USB-порт сообщил о слишком большом потреблении энергии. Устройство может быть неисправно или нуждаться в отдельном питании."
 
 msgid "The {} driver couldn't start this device ({})."
@@ -327,14 +319,10 @@ msgstr "оно ждало другую часть, которая так и не
 msgid "an unexpected error"
 msgstr "непредвиденная ошибка"
 
-msgid ""
-"Couldn't read the kernel's list of drivers, so hwsight can't tell whether a "
-"driver is available for devices without one."
+msgid "Couldn't read the kernel's list of drivers, so hwsight can't tell whether a driver is available for devices without one."
 msgstr "Не удалось прочитать список драйверов ядра, поэтому hwsight не может определить, доступен ли драйвер для устройств без него."
 
-msgid ""
-"Couldn't read the kernel log, so hwsight can't say why a device isn't "
-"working. On some systems only administrators can read it."
+msgid "Couldn't read the kernel log, so hwsight can't say why a device isn't working. On some systems only administrators can read it."
 msgstr "Не удалось прочитать журнал ядра, поэтому hwsight не может сказать, почему устройство не работает. В некоторых системах его могут читать только администраторы."
 
 msgid "Couldn't read the USB device list: {}"
@@ -343,14 +331,10 @@ msgstr "Не удалось прочитать список USB-устройст
 msgid "Couldn't read the PCI device list: {}"
 msgstr "Не удалось прочитать список PCI-устройств: {}"
 
-msgid ""
-"A data update ({}) needs a newer version of hwsight. Update hwsight to use "
-"it."
+msgid "A data update ({}) needs a newer version of hwsight. Update hwsight to use it."
 msgstr "Для обновления данных ({}) нужна более новая версия hwsight. Обновите hwsight, чтобы использовать его."
 
-msgid ""
-"A damaged data file ({}) was skipped, so the built-in copy is used instead. "
-"Details: {}"
+msgid "A damaged data file ({}) was skipped, so the built-in copy is used instead. Details: {}"
 msgstr "Повреждённый файл данных ({}) пропущен, поэтому используется встроенная копия. Подробности: {}"
 
 msgid "USB bus {}, port {}"
@@ -365,14 +349,19 @@ msgstr "Неизвестный {} {}"
 msgid "Unknown {}"
 msgstr "Неизвестный {}"
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr "{} нет в источниках программ вашего дистрибутива, но его можно установить из Flathub этой командой."
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr "{} нет в источниках программ вашего дистрибутива. Найдите «{}» в магазине приложений (например, Discover или GNOME Software) или на Flathub либо следуйте инструкциям по установке на сайте: {}"
+
 msgid "Data updates aren't available in this version."
 msgstr "Обновления данных недоступны в этой версии."
 
 msgid "Couldn't download the update: {}"
 msgstr "Не удалось скачать обновление: {}"
 
-msgid ""
-"The downloaded update failed its security check, so it wasn't installed."
+msgid "The downloaded update failed its security check, so it wasn't installed."
 msgstr "Загруженное обновление не прошло проверку безопасности, поэтому оно не установлено."
 
 msgid "A data update needs a newer version of hwsight."
@@ -384,9 +373,7 @@ msgstr "Загруженное обновление повреждено ({}), �
 msgid "Couldn't save the update: {}"
 msgstr "Не удалось сохранить обновление: {}"
 
-msgid ""
-"This device was blocked by the computer's USB security settings, so nothing "
-"is allowed to use it."
+msgid "This device was blocked by the computer's USB security settings, so nothing is allowed to use it."
 msgstr "Это устройство заблокировано настройками USB-безопасности компьютера, поэтому его нельзя использовать."
 
 msgid "USB device"
@@ -398,8 +385,7 @@ msgstr "{} {}"
 msgid "USB {}"
 msgstr "USB {}"
 
-msgid ""
-"hwsight {} is available (you have {}). Run hwsight --update to install it."
+msgid "hwsight {} is available (you have {}). Run hwsight --update to install it."
 msgstr "Доступна hwsight {} (у вас {}). Выполните hwsight --update для установки."
 
 msgid "hwsight {} is the newest version."
@@ -422,6 +408,15 @@ msgstr "{}, доступно: {}"
 
 msgid "{}, not in the device database yet"
 msgstr "{}, ещё нет в базе данных устройств"
+
+msgid "Useful software: {} (installed)"
+msgstr "Полезная программа: {} (установлена)"
+
+msgid "Useful software: {}"
+msgstr "Полезная программа: {}"
+
+msgid "Install: {}"
+msgstr "Установка: {}"
 
 msgid "Why:"
 msgstr "Причина:"
@@ -474,9 +469,7 @@ msgstr "{} обновлено до {}"
 msgid "hwsight {} is available."
 msgstr "Доступна hwsight {}."
 
-msgid ""
-"hwsight {} is available. Update it with your package manager, or download it "
-"from the website."
+msgid "hwsight {} is available. Update it with your package manager, or download it from the website."
 msgstr "Доступна hwsight {}. Обновите её через менеджер пакетов или скачайте с сайта."
 
 msgid "No devices found"

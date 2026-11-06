@@ -339,6 +339,8 @@ mod tests {
             missing_interface: None,
             note: None,
             description: None,
+            software: vec![],
+            class_codes: vec![],
             fixes: Vec::new(),
         }
     }

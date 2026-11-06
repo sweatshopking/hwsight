@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-05 23:55+0000\n"
+"POT-Creation-Date: 2026-11-06 04:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,49 +56,57 @@ msgstr ""
 msgid "How to fix"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:146
+msgid "USEFUL SOFTWARE"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:165
+msgid "Installed"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copied"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:147
+#: hwsight-gui/ui/components/details-panel.slint:209
 msgid "Copy for a forum post"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:154
+#: hwsight-gui/ui/components/details-panel.slint:216
 msgid ""
 "Copies a short report about this device. Your user name and computer name "
 "are removed."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:168
+#: hwsight-gui/ui/components/details-panel.slint:230
 msgid "DETAILS"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:177
+#: hwsight-gui/ui/components/details-panel.slint:239
 msgid "Type"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:187
+#: hwsight-gui/ui/components/details-panel.slint:249
 msgid "Driver"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:189
+#: hwsight-gui/ui/components/details-panel.slint:251
 msgid "None"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:197
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "Hardware ID"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:207
+#: hwsight-gui/ui/components/details-panel.slint:269
 msgid "Connection"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:217
+#: hwsight-gui/ui/components/details-panel.slint:279
 msgid "Address"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:228
+#: hwsight-gui/ui/components/details-panel.slint:290
 msgid ""
 "This device isn't in the device database yet. Its hardware ID above can be "
 "searched for online."
@@ -352,6 +360,12 @@ msgstr ""
 msgid "Unknown {}"
 msgstr ""
 
+msgid "{} isn't in your distro's software sources, but you can install it from Flathub with this command."
+msgstr ""
+
+msgid "{} isn't in your distro's software sources. Look for \"{}\" in your app store (such as Discover or GNOME Software) or on Flathub, or follow the install steps on its website: {}"
+msgstr ""
+
 msgid "Data updates aren't available in this version."
 msgstr ""
 
@@ -404,6 +418,15 @@ msgid "{}, available: {}"
 msgstr ""
 
 msgid "{}, not in the device database yet"
+msgstr ""
+
+msgid "Useful software: {} (installed)"
+msgstr ""
+
+msgid "Useful software: {}"
+msgstr ""
+
+msgid "Install: {}"
 msgstr ""
 
 msgid "Why:"
