@@ -229,6 +229,7 @@ fn device_item(d: &Device) -> DeviceItem {
         bus: match d.bus {
             hwsight_core::Bus::Pci => hwsight_core::tr!("PCI"),
             hwsight_core::Bus::Usb => hwsight_core::tr!("USB"),
+            hwsight_core::Bus::System => hwsight_core::tr!("Built in"),
             _ => hwsight_core::tr!("Other"),
         }
         .into(),
@@ -308,6 +309,7 @@ mod tests {
                 path_dirs: Vec::new(),
                 flatpak_dirs: Vec::new(),
             },
+            system: hwsight_core::SystemPaths::none(),
         };
         scanner.scan()
     }

@@ -14,6 +14,8 @@ use crate::modules::DriverCandidate;
 pub enum Bus {
     Pci,
     Usb,
+    /// Part of the computer itself, not plugged in: memory, the motherboard, and so on.
+    System,
 }
 
 /// Plain-English device groups, in the order they're shown.
@@ -34,6 +36,8 @@ pub enum Category {
     Security,
     Accelerators,
     Processors,
+    Memory,
+    Motherboard,
     SystemDevices,
     Other,
 }
@@ -55,6 +59,8 @@ impl Category {
             Self::Security => crate::tr!("Security and encryption"),
             Self::Accelerators => crate::tr!("AI and compute accelerators"),
             Self::Processors => crate::tr!("Processors"),
+            Self::Memory => crate::tr!("Memory"),
+            Self::Motherboard => crate::tr!("Motherboard and BIOS"),
             Self::SystemDevices => crate::tr!("System devices"),
             Self::Other => crate::tr!("Other devices"),
         }
@@ -77,6 +83,8 @@ impl Category {
             Self::Security => crate::tr!("security device"),
             Self::Accelerators => crate::tr!("accelerator"),
             Self::Processors => crate::tr!("processor"),
+            Self::Memory => crate::tr!("memory"),
+            Self::Motherboard => crate::tr!("motherboard"),
             Self::SystemDevices => crate::tr!("system device"),
             Self::Other => crate::tr!("device"),
         }
@@ -178,6 +186,50 @@ pub struct Device {
     /// Steps to fix a problem, most specific first (from fixes.toml). Empty when the
     /// device works.
     pub fixes: Vec<crate::fixes::Fix>,
+}
+
+/// What a built-in device (memory, the motherboard) is made from.
+pub(crate) struct BuiltIn {
+    pub address: &'static str,
+    pub sysfs_path: PathBuf,
+    pub display_name: String,
+    pub vendor_name: Option<String>,
+    pub category: Category,
+    pub hardware_id: String,
+    pub description: String,
+    pub details: Vec<crate::details::DetailGroup>,
+}
+
+impl Device {
+    /// A part of the computer that isn't on a bus (memory, the motherboard), working
+    /// unless a reader says otherwise. Facts about it go in `details`.
+    pub(crate) fn built_in(spec: BuiltIn) -> Self {
+        Self {
+            bus: Bus::System,
+            address: spec.address.to_owned(),
+            sysfs_path: spec.sysfs_path,
+            display_name: spec.display_name,
+            vendor_name: spec.vendor_name,
+            product_name: None,
+            model_name: None,
+            class_name: None,
+            category: spec.category,
+            hardware_id: spec.hardware_id,
+            unrecognized: false,
+            modalias: None,
+            driver: None,
+            driver_candidates: Vec::new(),
+            status: Status::Working,
+            log_issues: Vec::new(),
+            missing_interface: None,
+            note: None,
+            description: Some(spec.description),
+            details: spec.details,
+            software: Vec::new(),
+            class_codes: Vec::new(),
+            fixes: Vec::new(),
+        }
+    }
 }
 
 /// Placeholder drivers that hold a device for passing through to a virtual machine.

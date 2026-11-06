@@ -1719,12 +1719,25 @@ windows), `Device.details` (in `--json`), CLI `hwsight --details ADDRESS`, GUI l
 the long-translation layout fix (window minimum width 960px; the switch no longer depends
 on its label widths). Checked in en, de, fr, ru at 960px.
 
+Memory and the motherboard are done too (2026-11-06, `Bus::System`, `system.rs`, `memory.rs`,
+`spd.rs`, `board.rs`): the firmware's memory table (udev's world-readable copy at
+`/run/udev/data/+dmi:id`) plus each stick's SPD chip (XMP speeds decoded; EXPO only
+detected, its speed isn't decoded yet). Verdicts: running speed vs the slowest stick's
+rating (flagged only if more than 400 MT/s short), mixed models, and uneven sticks per
+channel. Serial numbers are never read. On this PC it finds 4800 running, 6000 rated,
+mixed 6400/6000 sticks, and A:1 B:2 channels.
+
 Still to do for the detail levels:
-- **Translate the 40 new strings** in all 11 catalogs (left English on purpose, so the
+- **Translate the new strings (83 untranslated per language now, plus 2 data texts per
+  `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the
   readers can settle first; `every_language_is_complete` fails until then). Do it in one
   batch after the next readers land, and read the machine output properly (see
   CLAUDE.md "Lessons").
-- Readers, one per area, using `docs/learn-from-qldm.md` (RAM SPD first).
+- Readers still to write, using `docs/learn-from-qldm.md`: CPU, drives (NVMe/SATA health via
+  UDisks2), battery, monitors (EDID), USB speed vs port, network link, audio, per-stick RAM
+  temperature (hwmon under spd5118; needs a slot mapping), EXPO speed decode, ReBAR verdict.
+- GUI: the Details block (Driver / Hardware ID / Connection / Address) still shows
+  "Driver: None" for built-in devices; hide rows that don't apply.
 - Privacy: add a `sensitive` flag to `Detail` with the first reader that has a serial
   number or MAC address (USB), hidden behind a "show" eye icon and left out of reports.
 - Tooltips per label (plan rule), "Copy" per group, "Copy all"/"Save report".

@@ -3,6 +3,7 @@
 //! No UI code lives here, so the command line and graphical apps share one engine.
 
 pub mod app_update;
+mod board;
 pub mod data;
 pub mod data_text;
 pub mod descriptions;
@@ -13,6 +14,7 @@ pub mod firmware;
 pub mod fixes;
 pub mod i18n;
 pub mod kernel_log;
+mod memory;
 pub mod modules;
 mod pci;
 mod pci_details;
@@ -20,6 +22,8 @@ pub mod pci_ids;
 pub mod report;
 pub mod rules;
 pub mod software;
+mod spd;
+mod system;
 pub mod update;
 mod usb;
 pub mod usb_ids;
@@ -39,6 +43,7 @@ pub use kernel_log::{LogIssue, LogSource};
 pub use modules::{Blocklist, DriverCandidate};
 pub use pci_ids::{IdsSource, PciNames};
 pub use rules::Rules;
+pub use system::SystemPaths;
 pub use usb_ids::UsbNames;
 
 /// Everything a scan found, plus anything that limited it.
@@ -170,6 +175,8 @@ pub struct Scanner {
     pub firmware_dirs: Vec<PathBuf>,
     pub distro: Distro,
     pub install_check: software::InstallCheck,
+    /// Where memory and motherboard information comes from.
+    pub system: SystemPaths,
 }
 
 /// Where to get kernel log lines.
@@ -197,6 +204,7 @@ impl Scanner {
             firmware_dirs: kernel_log::firmware_dirs(),
             distro: Distro::detect(),
             install_check: software::InstallCheck::system(),
+            system: SystemPaths::system(),
         }
     }
 
@@ -250,6 +258,7 @@ impl Scanner {
                 error: e.to_string(),
             }),
         }
+        devices.extend(system::scan(&self.system, &descriptions));
         let usb_names = UsbNames::load(&self.data_dirs);
         match usb::scan(
             &self.usb_devices,
@@ -516,6 +525,7 @@ mod tests {
                 path_dirs: vec![],
                 flatpak_dirs: vec![],
             },
+            system: SystemPaths::none(),
         };
         let report = scanner.scan();
         assert!(report.notes.is_empty(), "{:?}", report.notes);
@@ -583,6 +593,7 @@ mod tests {
                 path_dirs: vec![],
                 flatpak_dirs: vec![],
             },
+            system: SystemPaths::none(),
         };
         let report = scanner.scan();
         let receiver = report

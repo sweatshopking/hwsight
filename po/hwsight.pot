@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-06 04:28+0000\n"
+"POT-Creation-Date: 2026-11-06 04:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,6 +167,36 @@ msgstr ""
 msgid "Couldn't update hwsight: {}"
 msgstr ""
 
+msgid "Maker"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Revision"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "UEFI"
+msgstr ""
+
+msgid "Legacy BIOS"
+msgstr ""
+
+msgid "Started in"
+msgstr ""
+
+msgid "Motherboard"
+msgstr ""
+
+msgid "BIOS"
+msgstr ""
+
 msgid "Graphics"
 msgstr ""
 
@@ -207,6 +237,12 @@ msgid "AI and compute accelerators"
 msgstr ""
 
 msgid "Processors"
+msgstr ""
+
+msgid "Memory"
+msgstr ""
+
+msgid "Motherboard and BIOS"
 msgstr ""
 
 msgid "System devices"
@@ -255,6 +291,12 @@ msgid "accelerator"
 msgstr ""
 
 msgid "processor"
+msgstr ""
+
+msgid "memory"
+msgstr ""
+
+msgid "motherboard"
 msgstr ""
 
 msgid "system device"
@@ -372,6 +414,90 @@ msgid "USB bus {}, port {}"
 msgstr ""
 
 msgid "{}, then hub port {}"
+msgstr ""
+
+msgid "Installed memory"
+msgstr ""
+
+msgid "Memory type"
+msgstr ""
+
+msgid "Slots used"
+msgstr ""
+
+msgid "{} of {}"
+msgstr ""
+
+msgid "Your memory is running at {} MT/s, but every stick in it is rated for at least {} MT/s. A memory profile (called XMP, EXPO, or DOCP) in the BIOS turns the faster speed on. If you set it lower on purpose to keep things stable, that's fine."
+msgstr ""
+
+msgid "Running speed"
+msgstr ""
+
+msgid "Rated speed"
+msgstr ""
+
+msgid "The memory sticks' own chips (SPD)"
+msgstr ""
+
+msgid "The fastest speed every stick says it can run at, using its factory profile. The slowest stick sets this."
+msgstr ""
+
+msgid "Matching sticks"
+msgstr ""
+
+msgid "All the same model"
+msgstr ""
+
+msgid "Different models"
+msgstr ""
+
+msgid "These sticks are not all the same model. Mixed sticks can only run as fast as the slowest one, and sometimes need a lower speed to stay stable."
+msgstr ""
+
+msgid "The sticks aren't spread evenly across the memory channels. The same number of sticks on each channel gives the most speed and memory bandwidth."
+msgstr ""
+
+msgid "Two sticks on one channel can also make it harder to run at high speeds."
+msgstr ""
+
+msgid "Sticks per memory channel"
+msgstr ""
+
+msgid "Most memory the board supports"
+msgstr ""
+
+msgid "Memory stick in {}"
+msgstr ""
+
+msgid "Memory stick in {}, channel {}"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Part number"
+msgstr ""
+
+msgid "Rated speeds"
+msgstr ""
+
+msgid "The speeds this stick was sold for. A memory profile (XMP, EXPO, or DOCP) in the BIOS turns them on."
+msgstr ""
+
+msgid "Standard speed"
+msgstr ""
+
+msgid "Memory profiles"
+msgstr ""
+
+msgid "Speed in use"
+msgstr ""
+
+msgid "Memory ({} GB {})"
+msgstr ""
+
+msgid "Memory ({} GB)"
 msgstr ""
 
 msgid "Unknown {} {}"
@@ -622,6 +748,9 @@ msgid "PCI"
 msgstr ""
 
 msgid "USB"
+msgstr ""
+
+msgid "Built in"
 msgstr ""
 
 msgid "Other"

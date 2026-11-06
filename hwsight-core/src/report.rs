@@ -79,6 +79,7 @@ fn device_section(device: &Device) -> String {
     let bus = match device.bus {
         Bus::Pci => "PCI",
         Bus::Usb => "USB",
+        Bus::System => "built in",
     };
     lines.push(format!(
         "- Hardware ID: `{}` ({bus}, address `{}`)",
