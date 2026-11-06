@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 06:52+0000\n"
+"POT-Creation-Date: 2026-11-06 06:58+0000\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
@@ -1252,6 +1252,15 @@ msgstr "Порты USB"
 
 msgid "No devices found."
 msgstr "Устройства не найдены."
+
+msgid "1 device could be better"
+msgid_plural "{n} devices could be better"
+msgstr[0] "{n} устройство могло бы работать лучше"
+msgstr[1] "{n} устройства могли бы работать лучше"
+msgstr[2] "{n} устройств могли бы работать лучше"
+
+msgid "No problems found, but {}."
+msgstr "Проблем не найдено, но {}."
 
 msgid "No problems found."
 msgstr "Проблем не найдено."

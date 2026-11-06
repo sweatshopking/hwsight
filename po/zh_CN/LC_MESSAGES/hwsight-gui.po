@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 06:52+0000\n"
+"POT-Creation-Date: 2026-11-06 06:58+0000\n"
 "Language: zh_CN\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -1248,6 +1248,13 @@ msgstr "USB 端口"
 
 msgid "No devices found."
 msgstr "未找到设备。"
+
+msgid "1 device could be better"
+msgid_plural "{n} devices could be better"
+msgstr[0] "{n} 个设备还可以更好"
+
+msgid "No problems found, but {}."
+msgstr "未发现问题，但{}。"
 
 msgid "No problems found."
 msgstr "未发现问题。"

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 06:52+0000\n"
+"POT-Creation-Date: 2026-11-06 06:58+0000\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -1250,6 +1250,14 @@ msgstr "Ports USB"
 
 msgid "No devices found."
 msgstr "Aucun appareil trouvé."
+
+msgid "1 device could be better"
+msgid_plural "{n} devices could be better"
+msgstr[0] "{n} appareil pourrait être mieux"
+msgstr[1] "{n} appareils pourraient être mieux"
+
+msgid "No problems found, but {}."
+msgstr "Aucun problème trouvé, mais {}."
 
 msgid "No problems found."
 msgstr "Aucun problème trouvé."

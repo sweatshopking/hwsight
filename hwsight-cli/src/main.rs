@@ -522,6 +522,16 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
     writeln!(out)?;
     match (devices, problems) {
         (0, 0) => writeln!(out, "{}", hwsight_core::tr!("No devices found."))?,
+        (_, 0) if opts.problems_only && !shown.is_empty() => {
+            let n = shown.len();
+            let text =
+                hwsight_core::tr!("1 device could be better" | "{n} devices could be better" % n);
+            writeln!(
+                out,
+                "{}",
+                hwsight_core::tr!("No problems found, but {}.", text)
+            )?
+        }
         (_, 0) if opts.problems_only => {
             writeln!(out, "{}", hwsight_core::tr!("No problems found."))?
         }

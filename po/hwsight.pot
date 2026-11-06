@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-06 06:52+0000\n"
+"POT-Creation-Date: 2026-11-06 06:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1260,6 +1260,14 @@ msgid "USB ports"
 msgstr ""
 
 msgid "No devices found."
+msgstr ""
+
+msgid "1 device could be better"
+msgid_plural "{n} devices could be better"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "No problems found, but {}."
 msgstr ""
 
 msgid "No problems found."
