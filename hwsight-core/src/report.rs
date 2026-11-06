@@ -112,6 +112,13 @@ fn device_section(device: &Device) -> String {
     if let Some(note) = &device.note {
         lines.push(format!("- Note: {note}"));
     }
+    for finding in device.findings() {
+        let kind = match finding.verdict {
+            crate::details::Verdict::Problem => "Needs attention",
+            _ => "Could be better",
+        };
+        lines.push(format!("- {kind}: {}: {}", finding.label, finding.value));
+    }
     if device.status.is_problem() && !device.log_issues.is_empty() {
         lines.push(String::new());
         lines.push("Kernel log:".to_owned());
@@ -188,12 +195,27 @@ fn build_markdown(
                 .iter()
                 .filter(|device| device.status.is_problem())
                 .collect::<Vec<_>>();
-            lines.push(format!(
+            // Working devices with an amber or red finding (RAM below its rating, a hot
+            // drive) are worth a forum helper's attention too.
+            let better = report
+                .devices
+                .iter()
+                .filter(|device| !device.status.is_problem() && !device.findings().is_empty())
+                .collect::<Vec<_>>();
+            let mut summary = format!(
                 "{} devices, {} with problems.",
                 report.devices.len(),
                 problems.len()
-            ));
+            );
+            if !better.is_empty() {
+                summary.push_str(&format!(" {} could be better.", better.len()));
+            }
+            lines.push(summary);
             for device in problems {
+                lines.push(String::new());
+                lines.push(device_section(device));
+            }
+            for device in better {
                 lines.push(String::new());
                 lines.push(device_section(device));
             }
@@ -205,7 +227,7 @@ fn build_markdown(
             for device in report
                 .devices
                 .iter()
-                .filter(|device| !device.status.is_problem())
+                .filter(|device| !device.status.is_problem() && device.findings().is_empty())
             {
                 let line = format!(
                     "- {} ({}, `{}`)",
@@ -512,5 +534,78 @@ mod tests {
         );
         assert!(text.ends_with('\n'));
         assert!(!text.ends_with("\n\n"));
+    }
+
+    fn no_privacy() -> Privacy {
+        Privacy {
+            home: None,
+            user: None,
+            host: None,
+        }
+    }
+
+    fn with_finding(address: &str, verdict: crate::details::Verdict) -> Device {
+        use crate::details::{Detail, DetailGroup};
+        let mut d = device(Status::Working, address);
+        d.details = vec![DetailGroup {
+            title: "Memory".into(),
+            items: vec![
+                Detail::new("Fine thing".into(), "ok".into(), "x".into())
+                    .verdict(crate::details::Verdict::Good, None),
+                Detail::new("Running speed".into(), "4800 MT/s".into(), "x".into())
+                    .verdict(verdict, Some("Slower than rated.".into())),
+            ],
+        }];
+        d
+    }
+
+    #[test]
+    fn attention_comes_from_the_worst_verdict() {
+        use crate::device::Attention;
+        assert_eq!(device(Status::Working, "a").attention(), Attention::Fine);
+        let amber = with_finding("b", crate::details::Verdict::Reduced);
+        assert_eq!(amber.attention(), Attention::CouldBeBetter);
+        assert_eq!(
+            amber.findings().len(),
+            1,
+            "good and info rows are not findings"
+        );
+        let red = with_finding("c", crate::details::Verdict::Problem);
+        assert_eq!(red.attention(), Attention::NeedsAttention);
+    }
+
+    #[test]
+    fn working_devices_with_findings_are_listed_in_the_report_but_not_as_problems() {
+        let all = report(vec![
+            device(Status::Working, "plain"),
+            with_finding("ram", crate::details::Verdict::Reduced),
+        ]);
+        let text = markdown_with_kernel(&all, None, &no_privacy(), None);
+        assert!(
+            text.contains("2 devices, 0 with problems. 1 could be better."),
+            "{text}"
+        );
+        assert!(
+            text.contains("- Could be better: Running speed: 4800 MT/s"),
+            "{text}"
+        );
+        let working = text
+            .split("#### Working devices")
+            .nth(1)
+            .expect("working list");
+        assert_eq!(
+            working.matches("Test device").count(),
+            1,
+            "the one with a finding isn't repeated here"
+        );
+        let single = markdown_with_kernel(&all, Some("ram"), &no_privacy(), None);
+        assert!(single.contains("- Could be better: Running speed: 4800 MT/s"));
+        let red = markdown_with_kernel(
+            &report(vec![with_finding("hot", crate::details::Verdict::Problem)]),
+            Some("hot"),
+            &no_privacy(),
+            None,
+        );
+        assert!(red.contains("- Needs attention: Running speed: 4800 MT/s"));
     }
 }

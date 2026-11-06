@@ -1756,6 +1756,21 @@ below the screen's best, and refresh rate below the fastest offered at that size
 when 5 Hz or more short). Without driver data it still shows the screen's own best picture.
 Not yet: variable refresh rate (VRR) and whether HDR is switched on, multi-monitor layout.
 
+Monitors also show variable refresh rate (driver `vrr_capable` and the CRTC's
+`VRR_ENABLED`; "off right now" is normal on a desktop) with the screen's refresh range
+from its EDID, and whether HDR is actually on (BT.2020 colour space).
+
+**Findings at the Simple level (owner decision 2026-11-06: "issues should be visible at
+simple").** Any detail with an amber (Reduced) or red (Problem) verdict is a finding
+(`Device::findings()`, `Device::attention()`). A working device with findings shows an amber
+"Could be better" (or red "Needs attention") pill and dot instead of the green one, a box
+of its findings at the Simple level (the other levels show them in place), is kept by "Only
+problems", is counted in the header ("58 devices, 1 could be better"), shows in the CLI
+list and `--problems`, and in the forum report (with a "could be better" count). Keep
+verdicts honest: an amber finding must be something a person can act on. Internal PCIe
+bridges and chipset ports slowing down when idle are Info, never amber (they were false
+alarms); a graphics card's idle link slowdown is Info too.
+
 Still to do for the detail levels:
 - **Translate the new strings (83 untranslated per language now, plus 2 data texts per
   `text-<lang>.toml`: `memory` and `motherboard` descriptions)** in all 11 catalogs (left English on purpose, so the

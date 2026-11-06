@@ -5,6 +5,7 @@ use hwsight_core::{Device, LogIssue, ScanReport, Status, short_vendor};
 
 use std::rc::Rc;
 
+use hwsight_core::device::Attention;
 use slint::{ModelRc, VecModel};
 
 use crate::{DetailGroupItem, DetailItem, DeviceItem, FixItem, Row, SoftwareItem};
@@ -15,6 +16,8 @@ pub struct View {
     pub rows: Vec<Row>,
     pub summary: String,
     pub problem_count: i32,
+    /// Working devices that have something that could be better.
+    pub improve_count: i32,
     pub notes: Vec<String>,
 }
 
@@ -28,14 +31,24 @@ pub fn view(report: &ScanReport) -> View {
         .filter(|d| d.status.is_problem())
         .count()
         + report.port_issues.len();
+    let improve = report
+        .devices
+        .iter()
+        .filter(|d| !d.status.is_problem() && d.attention() != Attention::Fine)
+        .count();
     let total = report.devices.len();
-    let summary = match (total, problems) {
-        (0, _) => hwsight_core::tr!("No devices found"),
-        (_, 0) => {
+    let summary = match (total, problems, improve) {
+        (0, _, _) => hwsight_core::tr!("No devices found"),
+        (_, 0, 0) => {
             let devices = hwsight_core::tr!("1 device" | "{n} devices" % total);
             hwsight_core::tr!("{}, no problems found", devices)
         }
-        (_, _) => {
+        (_, 0, _) => {
+            let devices = hwsight_core::tr!("1 device" | "{n} devices" % total);
+            let better = hwsight_core::tr!("1 could be better" | "{n} could be better" % improve);
+            hwsight_core::tr!("{}, {}", devices, better)
+        }
+        (_, _, _) => {
             let devices = hwsight_core::tr!("1 device" | "{n} devices" % total);
             let problems = hwsight_core::tr!("1 problem" | "{n} problems" % problems);
             hwsight_core::tr!("{}, {}", devices, problems)
@@ -55,6 +68,7 @@ pub fn view(report: &ScanReport) -> View {
         rows,
         summary,
         problem_count: problems as i32,
+        improve_count: improve as i32,
         notes,
     }
 }
@@ -81,10 +95,11 @@ pub fn filter_rows(devices: &[Device], query: &str, only_problems: bool) -> Vec<
             device.hardware_id.to_lowercase(),
             device.driver.as_deref().unwrap_or_default().to_lowercase(),
         ];
-        let matches = (!only_problems || device.status.is_problem())
-            && words
-                .iter()
-                .all(|word| fields.iter().any(|field| field.contains(word)));
+        let matches =
+            (!only_problems || device.status.is_problem() || device.attention() != Attention::Fine)
+                && words
+                    .iter()
+                    .all(|word| fields.iter().any(|field| field.contains(word)));
         if !matches {
             continue;
         }
@@ -140,8 +155,16 @@ pub fn next_device(rows: &[Row], selected: i32, step: i32) -> i32 {
     devices[next]
 }
 
-/// "ok", "warn", "error", or "neutral": picks the status colour in the UI.
-pub fn status_kind(status: Status) -> &'static str {
+/// "ok", "warn", "error", or "neutral": picks the status colour in the UI. A device whose
+/// drivers are fine but that has an amber or red finding shows that colour instead.
+pub fn status_kind(status: Status, attention: Attention) -> &'static str {
+    if !status.is_problem() {
+        match attention {
+            Attention::NeedsAttention => return "error",
+            Attention::CouldBeBetter => return "warn",
+            Attention::Fine => {}
+        }
+    }
     match status {
         Status::Working => "ok",
         Status::NoDriverNeeded | Status::ReservedForVirtualMachine => "neutral",
@@ -149,6 +172,19 @@ pub fn status_kind(status: Status) -> &'static str {
             "warn"
         }
         Status::NoDriver | Status::DriverBlocked | Status::DriveFailing => "error",
+    }
+}
+
+/// The words next to a device's colour: its driver status, or, when that's fine but
+/// something could be better, say so plainly.
+fn status_text(d: &Device) -> String {
+    if d.status.is_problem() {
+        return d.status.summary();
+    }
+    match d.attention() {
+        Attention::NeedsAttention => hwsight_core::tr!("Needs attention"),
+        Attention::CouldBeBetter => hwsight_core::tr!("Could be better"),
+        Attention::Fine => d.status.summary(),
     }
 }
 
@@ -183,6 +219,18 @@ fn device_item(d: &Device) -> DeviceItem {
             homepage: s.homepage.clone().into(),
         })
         .collect();
+
+    let finding_items = |detail: &hwsight_core::details::Detail| DetailItem {
+        label: detail.label.clone().into(),
+        // "Label: value" as one line, written the way the language writes it.
+        value: hwsight_core::tr!("{}: {}", detail.label, detail.value).into(),
+        raw: Default::default(),
+        explanation: detail.explanation.clone().unwrap_or_default().into(),
+        source: Default::default(),
+        kind: detail.verdict.kind().into(),
+        technical: false,
+    };
+    let findings: Vec<DetailItem> = d.findings().into_iter().map(finding_items).collect();
 
     let details: Vec<DetailGroupItem> = d
         .details
@@ -221,8 +269,8 @@ fn device_item(d: &Device) -> DeviceItem {
             .unwrap_or_default()
             .into(),
         category: d.category.label().into(),
-        status_kind: status_kind(d.status).into(),
-        status_text: d.status.summary().into(),
+        status_kind: status_kind(d.status, d.attention()).into(),
+        status_text: status_text(d).into(),
         driver: d.driver.clone().unwrap_or_default().into(),
         hardware_id: d.hardware_id.clone().into(),
         address: d.address.clone().into(),
@@ -237,6 +285,7 @@ fn device_item(d: &Device) -> DeviceItem {
         fixes: ModelRc::from(Rc::new(VecModel::from(fixes))),
         software: ModelRc::from(Rc::new(VecModel::from(software))),
         details: ModelRc::from(Rc::new(VecModel::from(details))),
+        findings: ModelRc::from(Rc::new(VecModel::from(findings))),
         note: d.note.clone().unwrap_or_default().into(),
         description: d.description.clone().unwrap_or_default().into(),
         unrecognized: d.unrecognized,
@@ -429,6 +478,77 @@ mod tests {
         assert_eq!(v.devices[1].details.row_count(), 0);
     }
 
+    fn with_amber_finding(
+        r: &mut ScanReport,
+        device: usize,
+        verdict: hwsight_core::details::Verdict,
+    ) {
+        use hwsight_core::details::{Detail, DetailGroup};
+        r.devices[device].details = vec![DetailGroup {
+            title: "Memory".into(),
+            items: vec![
+                Detail::new("Running speed".into(), "4800 MT/s".into(), "x".into())
+                    .verdict(verdict, Some("Slower than rated.".into())),
+            ],
+        }];
+    }
+
+    #[test]
+    fn a_working_device_with_a_finding_shows_it_at_the_simple_level() {
+        use hwsight_core::details::Verdict;
+        let mut r = report();
+        with_amber_finding(&mut r, 0, Verdict::Reduced);
+        let v = view(&r);
+        let gpu = &v.devices[0];
+        assert_eq!(gpu.status_kind.as_str(), "warn", "amber, not green");
+        assert_eq!(gpu.status_text.as_str(), "Could be better");
+        let finding = gpu.findings.row_data(0).expect("finding");
+        assert_eq!(finding.value.as_str(), "Running speed: 4800 MT/s");
+        assert_eq!(finding.explanation.as_str(), "Slower than rated.");
+        assert_eq!(finding.kind.as_str(), "warn");
+        assert_eq!(v.improve_count, 1);
+        assert_eq!(
+            v.problem_count, 1,
+            "the missing-firmware card is still the one problem"
+        );
+        assert_eq!(v.devices[1].findings.row_count(), 0);
+
+        with_amber_finding(&mut r, 0, Verdict::Problem);
+        let v = view(&r);
+        assert_eq!(v.devices[0].status_kind.as_str(), "error");
+        assert_eq!(v.devices[0].status_text.as_str(), "Needs attention");
+    }
+
+    #[test]
+    fn the_header_says_how_many_could_be_better_when_nothing_is_broken() {
+        use hwsight_core::details::Verdict;
+        let mut r = report();
+        r.devices.retain(|d| !d.status.is_problem());
+        assert_eq!(view(&r).summary, "1 device, no problems found");
+        with_amber_finding(&mut r, 0, Verdict::Reduced);
+        let v = view(&r);
+        assert_eq!(v.problem_count, 0);
+        assert_eq!(v.improve_count, 1);
+        assert_eq!(v.summary, "1 device, 1 could be better");
+    }
+
+    #[test]
+    fn only_problems_also_keeps_devices_with_findings() {
+        use hwsight_core::details::Verdict;
+        let mut r = report();
+        with_amber_finding(&mut r, 0, Verdict::Reduced);
+        let shown: Vec<i32> = filter_rows(&r.devices, "", true)
+            .iter()
+            .filter(|row| !row.is_header)
+            .map(|row| row.device)
+            .collect();
+        assert_eq!(
+            shown,
+            [0, 1],
+            "the card with a finding and the one with a problem"
+        );
+    }
+
     #[test]
     fn every_status_has_a_kind() {
         for (status, kind) in [
@@ -442,7 +562,7 @@ mod tests {
             (Status::DriveFailing, "error"),
             (Status::DriverBlocked, "error"),
         ] {
-            assert_eq!(status_kind(status), kind, "{status:?}");
+            assert_eq!(status_kind(status, Attention::Fine), kind, "{status:?}");
         }
     }
 

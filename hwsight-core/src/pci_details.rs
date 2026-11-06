@@ -72,6 +72,15 @@ fn connection(path: &Path, category: Category) -> Vec<Detail> {
                 )
             });
             (Verdict::Good, why)
+        } else if category == Category::SystemDevices {
+            // Bridges and chipset ports inside the board slow down when nothing is using
+            // them. There's nothing for a person to fix, so it must never look like a fault.
+            (
+                Verdict::Info,
+                Some(crate::tr!(
+                    "This is a connection inside the computer. It slows down when nothing is using it, to save power. This is normal."
+                )),
+            )
         } else if matches!(category, Category::Graphics | Category::Accelerators) {
             (
                 Verdict::Info,
@@ -104,6 +113,13 @@ fn connection(path: &Path, category: Category) -> Vec<Detail> {
         let limit = slot.map_or(device_max, |(_, width)| width.min(device_max));
         let (verdict, why) = if now >= limit {
             (Verdict::Good, None)
+        } else if category == Category::SystemDevices {
+            (
+                Verdict::Info,
+                Some(crate::tr!(
+                    "This is a connection inside the computer. It slows down when nothing is using it, to save power. This is normal."
+                )),
+            )
         } else {
             (
                 Verdict::Reduced,
@@ -453,6 +469,23 @@ mod tests {
         );
         let drive = in_english(|| read_details(temp.path(), Category::Storage));
         assert_eq!(item(&drive, "Link speed").verdict, Verdict::Reduced);
+    }
+
+    #[test]
+    fn links_inside_the_board_are_never_flagged() {
+        let temp = device(&[
+            ("current_link_speed", "2.5 GT/s PCIe\n"),
+            ("current_link_width", "1\n"),
+            ("max_link_speed", "16.0 GT/s PCIe\n"),
+            ("max_link_width", "4\n"),
+        ]);
+        let groups = in_english(|| read_details(temp.path(), Category::SystemDevices));
+        assert_eq!(item(&groups, "Link speed").verdict, Verdict::Info);
+        assert_eq!(item(&groups, "Link width").verdict, Verdict::Info);
+        // The same readings on a card in a slot are worth a look.
+        let card = in_english(|| read_details(temp.path(), Category::Network));
+        assert_eq!(item(&card, "Link speed").verdict, Verdict::Reduced);
+        assert_eq!(item(&card, "Link width").verdict, Verdict::Reduced);
     }
 
     #[test]

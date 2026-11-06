@@ -327,7 +327,11 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
     let shown: Vec<_> = report
         .devices
         .iter()
-        .filter(|d| !opts.problems_only || d.status.is_problem())
+        .filter(|d| {
+            !opts.problems_only
+                || d.status.is_problem()
+                || d.attention() != hwsight_core::device::Attention::Fine
+        })
         .collect();
 
     let mut current: Option<Category> = None;
@@ -339,7 +343,22 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             writeln!(out, "{}", paint(&device.category.label(), "\x1b[1m", color))?;
             current = Some(device.category);
         }
+        // A working device with an amber or red finding shows that instead of a green tick.
+        let attention = if device.status.is_problem() {
+            hwsight_core::device::Attention::Fine
+        } else {
+            device.attention()
+        };
         let status_code = match device.status {
+            Status::Working | Status::NoDriverNeeded
+                if attention != hwsight_core::device::Attention::Fine =>
+            {
+                if attention == hwsight_core::device::Attention::NeedsAttention {
+                    "\x1b[31m"
+                } else {
+                    "\x1b[33m"
+                }
+            }
             Status::Working => "\x1b[32m",
             Status::NoDriverNeeded | Status::ReservedForVirtualMachine => "\x1b[2m",
             Status::DriverAvailableNotLoaded
@@ -349,7 +368,7 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
         };
         let mut line = format!(
             "  {} {}",
-            paint(symbol(device.status), status_code, color),
+            paint(symbol(device.status, attention), status_code, color),
             device.display_name
         );
         if let Some(vendor) = &device.vendor_name {
@@ -383,6 +402,21 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
             detail = hwsight_core::tr!("{}, not in the device database yet", detail);
         }
         writeln!(out, "      {detail}")?;
+        for finding in device.findings() {
+            let (mark, code) = match finding.verdict {
+                hwsight_core::details::Verdict::Problem => ("✗", "\x1b[31m"),
+                _ => ("!", "\x1b[33m"),
+            };
+            writeln!(
+                out,
+                "      {} {}",
+                paint(mark, code, color),
+                hwsight_core::tr!("{}: {}", finding.label, finding.value)
+            )?;
+            if let Some(why) = &finding.explanation {
+                writeln!(out, "        {why}")?;
+            }
+        }
         for tip in &device.software {
             if tip.installed {
                 writeln!(
@@ -509,7 +543,13 @@ fn print_text(report: &ScanReport, opts: &Options, color: bool) -> io::Result<()
     Ok(())
 }
 
-fn symbol(status: Status) -> &'static str {
+fn symbol(status: Status, attention: hwsight_core::device::Attention) -> &'static str {
+    use hwsight_core::device::Attention;
+    match (status, attention) {
+        (Status::Working | Status::NoDriverNeeded, Attention::CouldBeBetter) => return "!",
+        (Status::Working | Status::NoDriverNeeded, Attention::NeedsAttention) => return "✗",
+        _ => {}
+    }
     match status {
         Status::Working | Status::NoDriverNeeded => "✓",
         Status::DriverAvailableNotLoaded | Status::DriverNotAttached | Status::DriverNotReady => {

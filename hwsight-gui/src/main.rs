@@ -438,6 +438,7 @@ fn start_scan(
             w.set_rows(ModelRc::from(Rc::new(VecModel::from(view.rows))));
             w.set_summary(view.summary.into());
             w.set_problem_count(view.problem_count);
+            w.set_improve_count(view.improve_count);
             let notes: Vec<SharedString> = view.notes.into_iter().map(Into::into).collect();
             w.set_notes(ModelRc::from(Rc::new(VecModel::from(notes))));
             if w.get_selected() >= device_count {

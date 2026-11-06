@@ -76,6 +76,47 @@ export component DetailsPanel inherits Rectangle {
                     wrap: word-wrap;
                 }
             }
+            // Things that work but could be better, or are wrong: shown at the Simple level,
+            // where the details below aren't. (The other levels show them in place.)
+            if root.level == 0 && root.device.findings.length > 0 : Rectangle {
+                background: root.status-colour.with-alpha(0.10);
+                border-width: 1px;
+                border-color: root.status-colour.with-alpha(0.35);
+                border-radius: Theme.radius-small;
+                VerticalLayout {
+                    padding: 16px;
+                    spacing: Theme.gap;
+                    Text {
+                        text: root.device.status-kind == "error" ? @tr("Needs attention") : @tr("Could be better");
+                        color: Theme.text;
+                        font-size: Theme.font-body;
+                        font-weight: 700;
+                    }
+                    for finding in root.device.findings : VerticalLayout {
+                        spacing: 4px;
+                        HorizontalLayout {
+                            spacing: 8px;
+                            VerticalLayout {
+                                alignment: start;
+                                padding-top: 4px;
+                                StatusDot { kind: finding.kind; }
+                            }
+                            Text {
+                                text: finding.value;
+                                color: Theme.text;
+                                font-weight: 700;
+                                wrap: word-wrap;
+                                horizontal-stretch: 1;
+                            }
+                        }
+                        if finding.explanation != "" : Text {
+                            text: finding.explanation;
+                            color: Theme.text;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+            }
             if root.device.why != "" : Rectangle {
                 background: root.status-colour.with-alpha(0.10);
                 border-width: 1px;

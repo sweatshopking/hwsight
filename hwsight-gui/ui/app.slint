@@ -48,6 +48,7 @@ export component AppWindow inherits Window {
     in property <[Row]> rows;
     in property <string> summary;          // e.g. "51 devices, no problems found"
     in property <int> problem-count;
+    in property <int> improve-count;       // working devices with something that could be better
     in property <[string]> notes;          // things that limited the scan
     in property <bool> scanning;
     in property <string> update-text;
@@ -143,8 +144,8 @@ export component AppWindow inherits Window {
                 alignment: center;
                 horizontal-stretch: 0;
                 StatusPill {
-                    kind: root.problem-count == 0 ? "ok" : "warn";
-                    text: root.problem-count == 0 ? @tr("No problems found") : root.summary;
+                    kind: root.problem-count == 0 && root.improve-count == 0 ? "ok" : "warn";
+                    text: root.problem-count == 0 && root.improve-count == 0 ? @tr("No problems found") : root.summary;
                 }
             }
             Rectangle {

@@ -42,6 +42,13 @@ pub(crate) struct Live {
     pub modes: Vec<LiveMode>,
     /// The mode in use right now, if the screen is switched on.
     pub current: Option<LiveMode>,
+    /// The connection can do variable refresh rate (the driver's `vrr_capable`).
+    pub vrr_capable: Option<bool>,
+    /// Variable refresh rate is switched on this moment (many desktops only turn it on
+    /// while a game is full screen).
+    pub vrr_enabled: Option<bool>,
+    /// The screen is being driven in an HDR colour space right now.
+    pub hdr_active: Option<bool>,
 }
 
 /// Live data by sysfs connector name, e.g. `card1-DP-1`.
@@ -92,6 +99,16 @@ fn live_mode(mode: &Mode) -> Option<LiveMode> {
     })
 }
 
+/// The value of a named property (like `vrr_capable`) on a connector or CRTC.
+fn property<T: drm::control::ResourceHandle>(card: &Card, handle: T, name: &str) -> Option<u64> {
+    let set = card.get_properties(handle).ok()?;
+    let (handles, values) = set.as_props_and_values();
+    handles.iter().zip(values).find_map(|(h, value)| {
+        let info = card.get_property(*h).ok()?;
+        (info.name().to_str().ok()? == name).then_some(*value)
+    })
+}
+
 /// Ask every graphics card for its connected screens. Never forces a re-probe (that can
 /// make a screen flicker) and never changes anything.
 pub(crate) fn read_live() -> LiveModes {
@@ -129,18 +146,26 @@ pub(crate) fn read_live() -> LiveModes {
             let Some(kind) = interface_name(info.interface()) else {
                 continue;
             };
-            let current = info
+            let crtc = info
                 .current_encoder()
                 .and_then(|e| card.get_encoder(e).ok())
-                .and_then(|e| e.crtc())
+                .and_then(|e| e.crtc());
+            let current = crtc
                 .and_then(|c| card.get_crtc(c).ok())
                 .and_then(|c| c.mode())
                 .and_then(|m| live_mode(&m));
+            // Colour spaces 9 and 10 are the two BT.2020 ones, which is how HDR is sent.
+            let hdr_active = property(&card, *handle, "Colorspace").map(|v| v == 9 || v == 10);
             found.insert(
                 format!("{name}-{kind}-{}", info.interface_id()),
                 Live {
                     modes: info.modes().iter().filter_map(live_mode).collect(),
                     current,
+                    vrr_capable: property(&card, *handle, "vrr_capable").map(|v| v != 0),
+                    vrr_enabled: crtc
+                        .and_then(|c| property(&card, c, "VRR_ENABLED"))
+                        .map(|v| v != 0),
+                    hdr_active,
                 },
             );
         }
@@ -261,6 +286,46 @@ fn screen_rows(edid: Option<&Edid>, live: Option<&Live>, source: &str) -> Vec<De
             .verdict(Verdict::Info, None),
         );
     }
+    if let Some(capable) = live.and_then(|l| l.vrr_capable) {
+        let enabled = live.and_then(|l| l.vrr_enabled).unwrap_or(false);
+        let (value, verdict) = match (capable, enabled) {
+            (true, true) => (crate::tr!("Supported, and on"), Verdict::Good),
+            (true, false) => (crate::tr!("Supported, off right now"), Verdict::Info),
+            (false, _) => (crate::tr!("Not supported"), Verdict::Info),
+        };
+        let why = if capable {
+            crate::tr!(
+                "Variable refresh rate lets the screen follow a game's frame rate, which avoids tearing and stutter. Many desktops only switch it on while a game is full screen, so 'off right now' is normal."
+            )
+        } else {
+            crate::tr!(
+                "Variable refresh rate isn't available on this screen or over this connection."
+            )
+        };
+        rows.push(
+            Detail::new(
+                crate::tr!("Variable refresh rate (VRR)"),
+                value,
+                source.to_owned(),
+            )
+            .verdict(verdict, Some(why)),
+        );
+        if let (true, Some((low, high))) = (capable, edid.and_then(|e| e.refresh_range)) {
+            rows.push(
+                Detail::new(
+                    crate::tr!("Refresh rate range"),
+                    crate::tr!("{} to {} Hz", low, high),
+                    source.to_owned(),
+                )
+                .verdict(
+                    Verdict::Info,
+                    Some(crate::tr!(
+                        "The rates the screen can follow. Below the lowest, variable refresh rate stops helping."
+                    )),
+                ),
+            );
+        }
+    }
     if let Some(edid) = edid {
         if let Some(inches) = edid.diagonal_inches() {
             rows.push(
@@ -287,13 +352,15 @@ fn screen_rows(edid: Option<&Edid>, live: Option<&Live>, source: &str) -> Vec<De
                 ),
             );
         }
+        let hdr_on = live.and_then(|l| l.hdr_active);
         rows.push(
             Detail::new(
                 crate::tr!("HDR"),
-                if edid.hdr {
-                    crate::tr!("Supported")
-                } else {
-                    crate::tr!("Not reported")
+                match (edid.hdr, hdr_on) {
+                    (true, Some(true)) => crate::tr!("Supported, and turned on"),
+                    (true, Some(false)) => crate::tr!("Supported, but turned off"),
+                    (true, None) => crate::tr!("Supported"),
+                    (false, _) => crate::tr!("Not reported"),
                 },
                 source.to_owned(),
             )
@@ -485,6 +552,7 @@ mod tests {
             Live {
                 modes,
                 current: Some(current),
+                ..Live::default()
             },
         )])
     }
@@ -539,6 +607,69 @@ mod tests {
                 .value
                 .starts_with("3440 × 1440: 100, 60 Hz; 2560 × 1440: 100 Hz")
         );
+    }
+
+    fn with_state(
+        vrr_capable: Option<bool>,
+        vrr_enabled: Option<bool>,
+        hdr: Option<bool>,
+    ) -> LiveModes {
+        let mut modes = live(mode(3440, 1440, 100.0));
+        let entry = modes.get_mut("card1-DP-1").expect("screen");
+        entry.vrr_capable = vrr_capable;
+        entry.vrr_enabled = vrr_enabled;
+        entry.hdr_active = hdr;
+        modes
+    }
+
+    #[test]
+    fn variable_refresh_rate_and_hdr_state_are_shown() {
+        let d = build_one(&with_state(Some(true), Some(false), Some(true)));
+        let vrr = item(&d, "Variable refresh rate (VRR)");
+        assert_eq!(vrr.value, "Supported, off right now");
+        assert_eq!(vrr.verdict, Verdict::Info, "off at the desktop is normal");
+        assert!(
+            vrr.explanation
+                .as_deref()
+                .is_some_and(|t| t.contains("only switch it on while a game is full screen"))
+        );
+        assert_eq!(item(&d, "Refresh rate range").value, "48 to 100 Hz");
+        assert_eq!(item(&d, "HDR").value, "Supported, and turned on");
+
+        let on = build_one(&with_state(Some(true), Some(true), Some(false)));
+        assert_eq!(
+            item(&on, "Variable refresh rate (VRR)").value,
+            "Supported, and on"
+        );
+        assert_eq!(
+            item(&on, "Variable refresh rate (VRR)").verdict,
+            Verdict::Good
+        );
+        assert_eq!(item(&on, "HDR").value, "Supported, but turned off");
+
+        let none = build_one(&with_state(Some(false), None, None));
+        assert_eq!(
+            item(&none, "Variable refresh rate (VRR)").value,
+            "Not supported"
+        );
+        assert!(
+            !none
+                .details
+                .iter()
+                .flat_map(|g| &g.items)
+                .any(|i| i.label == "Refresh rate range"),
+            "no range for a screen that can't do it"
+        );
+        let unknown = build_one(&live(mode(3440, 1440, 100.0)));
+        assert!(
+            !unknown
+                .details
+                .iter()
+                .flat_map(|g| &g.items)
+                .any(|i| i.label.starts_with("Variable")),
+            "nothing is claimed when the driver doesn't say"
+        );
+        assert_eq!(item(&unknown, "HDR").value, "Supported");
     }
 
     #[test]

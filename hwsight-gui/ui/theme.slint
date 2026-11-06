@@ -96,6 +96,8 @@ export struct DeviceItem {
     fixes: [FixItem],
     software: [SoftwareItem],
     details: [DetailGroupItem],
+    // Details that could be better or are wrong, so the Simple level can show them.
+    findings: [DetailItem],
     // Extra explanation, e.g. why no driver is needed.
     note: string,
     // What this kind of device does, in plain English.

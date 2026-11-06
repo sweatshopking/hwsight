@@ -1,35 +1,35 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-11-06 05:16+0000\n"
+"POT-Creation-Date: 2026-11-06 05:25+0000\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: hwsight-gui/ui/app.slint:136
+#: hwsight-gui/ui/app.slint:137
 msgid "Scanning your hardware..."
 msgstr "ハードウェアをスキャンしています…"
 
-#: hwsight-gui/ui/app.slint:147
+#: hwsight-gui/ui/app.slint:148
 msgid "No problems found"
 msgstr "問題はありません"
 
-#: hwsight-gui/ui/app.slint:158
+#: hwsight-gui/ui/app.slint:159
 msgid "Copy report for all devices"
 msgstr "すべてのデバイスのレポートをコピー"
 
-#: hwsight-gui/ui/app.slint:162
+#: hwsight-gui/ui/app.slint:163
 msgid "Scanning..."
 msgstr "スキャン中…"
 
-#: hwsight-gui/ui/app.slint:162
+#: hwsight-gui/ui/app.slint:163
 msgid "Scan again"
 msgstr "再スキャン"
 
-#: hwsight-gui/ui/app.slint:191
+#: hwsight-gui/ui/app.slint:192
 msgid "Nothing matches."
 msgstr "一致するものがありません。"
 
-#: hwsight-gui/ui/app.slint:210
+#: hwsight-gui/ui/app.slint:211
 msgid "Only problems"
 msgstr "問題のみ"
 
@@ -41,71 +41,79 @@ msgstr "デバイスを選択すると詳細が表示されます"
 msgid "WHAT IT DOES"
 msgstr "機能"
 
-#: hwsight-gui/ui/components/details-panel.slint:88
+#: hwsight-gui/ui/components/details-panel.slint:90
+msgid "Needs attention"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:90
+msgid "Could be better"
+msgstr ""
+
+#: hwsight-gui/ui/components/details-panel.slint:129
 msgid "What's wrong"
 msgstr "問題"
 
-#: hwsight-gui/ui/components/details-panel.slint:107
+#: hwsight-gui/ui/components/details-panel.slint:148
 msgid "How to fix"
 msgstr "解決方法"
 
-#: hwsight-gui/ui/components/details-panel.slint:155
+#: hwsight-gui/ui/components/details-panel.slint:196
 msgid "USEFUL SOFTWARE"
 msgstr "便利なソフトウェア"
 
-#: hwsight-gui/ui/components/details-panel.slint:174
+#: hwsight-gui/ui/components/details-panel.slint:215
 msgid "Installed"
 msgstr "インストール済み"
 
-#: hwsight-gui/ui/components/details-panel.slint:218
+#: hwsight-gui/ui/components/details-panel.slint:259
 msgid "No more details could be read for this device."
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:264
+#: hwsight-gui/ui/components/details-panel.slint:305
 msgid "As read: {}"
 msgstr ""
 
-#: hwsight-gui/ui/components/details-panel.slint:284
+#: hwsight-gui/ui/components/details-panel.slint:325
 msgid "Copied"
 msgstr "コピーしました"
 
-#: hwsight-gui/ui/components/details-panel.slint:284
+#: hwsight-gui/ui/components/details-panel.slint:325
 msgid "Copy for a forum post"
 msgstr "フォーラム用にコピー"
 
-#: hwsight-gui/ui/components/details-panel.slint:291
+#: hwsight-gui/ui/components/details-panel.slint:332
 msgid "Copies a short report about this device. Your user name and computer name are removed."
 msgstr "このデバイスの短いレポートをコピーします。ユーザー名とコンピューター名は削除されます。"
 
-#: hwsight-gui/ui/components/details-panel.slint:305
+#: hwsight-gui/ui/components/details-panel.slint:346
 msgid "DETAILS"
 msgstr "詳細"
 
-#: hwsight-gui/ui/components/details-panel.slint:314
+#: hwsight-gui/ui/components/details-panel.slint:355
 msgid "Type"
 msgstr "種類"
 
-#: hwsight-gui/ui/components/details-panel.slint:324
+#: hwsight-gui/ui/components/details-panel.slint:365
 msgid "Driver"
 msgstr "ドライバー"
 
-#: hwsight-gui/ui/components/details-panel.slint:326
+#: hwsight-gui/ui/components/details-panel.slint:367
 msgid "None"
 msgstr "なし"
 
-#: hwsight-gui/ui/components/details-panel.slint:334
+#: hwsight-gui/ui/components/details-panel.slint:375
 msgid "Hardware ID"
 msgstr "ハードウェア ID"
 
-#: hwsight-gui/ui/components/details-panel.slint:344
+#: hwsight-gui/ui/components/details-panel.slint:385
 msgid "Connection"
 msgstr "接続"
 
-#: hwsight-gui/ui/components/details-panel.slint:354
+#: hwsight-gui/ui/components/details-panel.slint:395
 msgid "Address"
 msgstr "アドレス"
 
-#: hwsight-gui/ui/components/details-panel.slint:365
+#: hwsight-gui/ui/components/details-panel.slint:406
 msgid "This device isn't in the device database yet. Its hardware ID above can be searched for online."
 msgstr "このデバイスはまだデータベースにありません。上のハードウェア ID をオンラインで検索できます。"
 
@@ -506,6 +514,33 @@ msgstr ""
 msgid "{} at {}"
 msgstr ""
 
+msgid "Supported, and on"
+msgstr ""
+
+msgid "Supported, off right now"
+msgstr ""
+
+msgid "Not supported"
+msgstr ""
+
+msgid "Variable refresh rate lets the screen follow a game's frame rate, which avoids tearing and stutter. Many desktops only switch it on while a game is full screen, so 'off right now' is normal."
+msgstr ""
+
+msgid "Variable refresh rate isn't available on this screen or over this connection."
+msgstr ""
+
+msgid "Variable refresh rate (VRR)"
+msgstr ""
+
+msgid "Refresh rate range"
+msgstr ""
+
+msgid "{} to {} Hz"
+msgstr ""
+
+msgid "The rates the screen can follow. Below the lowest, variable refresh rate stops helping."
+msgstr ""
+
 msgid "Size"
 msgstr ""
 
@@ -522,6 +557,12 @@ msgid "More bits give smoother colour gradients, without visible banding."
 msgstr ""
 
 msgid "HDR"
+msgstr ""
+
+msgid "Supported, and turned on"
+msgstr ""
+
+msgid "Supported, but turned off"
 msgstr ""
 
 msgid "Supported"
@@ -887,6 +928,9 @@ msgstr ""
 msgid "The slot this is plugged into only supports {}, so this is as fast as it can go here."
 msgstr ""
 
+msgid "This is a connection inside the computer. It slows down when nothing is using it, to save power. This is normal."
+msgstr ""
+
 msgid "Graphics cards slow this connection down when nothing is asking much of them, to save power, and speed it up when needed. This is normal. Its full speed can only be seen while it's busy."
 msgstr ""
 
@@ -1049,6 +1093,9 @@ msgstr "{}、利用可能: {}"
 msgid "{}, not in the device database yet"
 msgstr "{}、まだデバイスデータベースにありません"
 
+msgid "{}: {}"
+msgstr "{}: {}"
+
 msgid "Useful software: {} (installed)"
 msgstr "便利なソフトウェア: {} (インストール済み)"
 
@@ -1114,8 +1161,9 @@ msgstr "デバイスが見つかりません"
 msgid "{}, no problems found"
 msgstr "{}、問題は見つかりませんでした"
 
-msgid "{}: {}"
-msgstr "{}: {}"
+msgid "1 could be better"
+msgid_plural "{n} could be better"
+msgstr[0] ""
 
 msgid "PCI"
 msgstr "PCI"

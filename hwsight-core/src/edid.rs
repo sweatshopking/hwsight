@@ -32,6 +32,8 @@ pub struct Edid {
     /// The screen's own product name, e.g. "MSI MP341CQ".
     pub name: Option<String>,
     pub hdr: bool,
+    /// The refresh rates the screen says it can run at (lowest, highest), in Hz.
+    pub refresh_range: Option<(u16, u16)>,
     /// The first (preferred) detailed timing.
     pub preferred: Option<Timing>,
     /// Every detailed timing in the base block.
@@ -128,11 +130,22 @@ pub fn parse(bytes: &[u8]) -> Option<Edid> {
     };
 
     let mut name = None;
+    let mut refresh_range = None;
     let mut timings = Vec::new();
     for descriptor in bytes[54..126].as_chunks::<18>().0 {
         if descriptor[0] == 0 && descriptor[1] == 0 {
-            if descriptor[3] == 0xFC {
-                name = text(&descriptor[5..18]);
+            match descriptor[3] {
+                0xFC => name = text(&descriptor[5..18]),
+                0xFD => {
+                    // Range limits: bits 0-1 of byte 4 add 255 Hz to the rates (EDID 1.4).
+                    let offsets = descriptor[4] & 0x03;
+                    let low = u16::from(descriptor[5]) + if offsets == 3 { 255 } else { 0 };
+                    let high = u16::from(descriptor[6]) + if offsets >= 2 { 255 } else { 0 };
+                    if low > 0 && high >= low {
+                        refresh_range = Some((low, high));
+                    }
+                }
+                _ => {}
             }
         } else if let Some(t) = timing(descriptor) {
             timings.push(t);
@@ -155,6 +168,7 @@ pub fn parse(bytes: &[u8]) -> Option<Edid> {
         height_cm: bytes[22],
         name,
         hdr,
+        refresh_range,
         preferred: timings.first().copied(),
         timings,
     })
@@ -218,6 +232,7 @@ mod tests {
             edid.hdr,
             "the HDR static metadata block is in the CTA extension"
         );
+        assert_eq!(edid.refresh_range, Some((48, 100)));
         let inches = edid.diagonal_inches().expect("size");
         assert!((inches - 34.1).abs() < 0.1, "{inches}");
         let preferred = edid.preferred.expect("preferred");

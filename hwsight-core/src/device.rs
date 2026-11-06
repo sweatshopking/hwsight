@@ -197,6 +197,42 @@ pub struct Device {
     pub fixes: Vec<crate::fixes::Fix>,
 }
 
+/// Whether a working device has anything a person should know about, from the verdicts on
+/// its details (separate from `Status`, which is about drivers).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Attention {
+    /// Nothing to report.
+    Fine,
+    /// Works, but something could be better (an amber finding).
+    CouldBeBetter,
+    /// Something is wrong even though it works (a red finding).
+    NeedsAttention,
+}
+
+impl Device {
+    /// Details whose verdict is amber or red, in the order they appear.
+    pub fn findings(&self) -> Vec<&crate::details::Detail> {
+        use crate::details::Verdict;
+        self.details
+            .iter()
+            .flat_map(|group| &group.items)
+            .filter(|d| matches!(d.verdict, Verdict::Reduced | Verdict::Problem))
+            .collect()
+    }
+
+    pub fn attention(&self) -> Attention {
+        use crate::details::Verdict;
+        let findings = self.findings();
+        if findings.iter().any(|d| d.verdict == Verdict::Problem) {
+            Attention::NeedsAttention
+        } else if findings.is_empty() {
+            Attention::Fine
+        } else {
+            Attention::CouldBeBetter
+        }
+    }
+}
+
 /// What a built-in device (memory, the motherboard) is made from.
 pub(crate) struct BuiltIn {
     pub address: &'static str,
