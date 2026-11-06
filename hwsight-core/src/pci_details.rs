@@ -54,8 +54,30 @@ fn slot_limit(path: &Path) -> Option<(f64, u32)> {
     Some((speed, width))
 }
 
+/// A card's extra functions (its HDMI audio, its USB-C controller) share the card's one
+/// physical connection, so they slow down and speed up with it. True when this is function
+/// 1 to 7 of a slot whose function 0 is a display controller (PCI class 03xx).
+fn shares_link_with_graphics(path: &Path) -> bool {
+    let Ok(real) = fs::canonicalize(path) else {
+        return false;
+    };
+    let (Some(name), Some(parent)) = (real.file_name().and_then(|n| n.to_str()), real.parent())
+    else {
+        return false;
+    };
+    let Some((slot, function)) = name.rsplit_once('.') else {
+        return false;
+    };
+    if function == "0" {
+        return false;
+    }
+    read(&parent.join(format!("{slot}.0")), "class").is_some_and(|c| c.starts_with("0x03"))
+}
+
 fn connection(path: &Path, category: Category) -> Vec<Detail> {
     let mut items = Vec::new();
+    let graphics_like = matches!(category, Category::Graphics | Category::Accelerators)
+        || shares_link_with_graphics(path);
     let slot = slot_limit(path);
 
     let current = read(path, "current_link_speed");
@@ -81,7 +103,7 @@ fn connection(path: &Path, category: Category) -> Vec<Detail> {
                     "This is a connection inside the computer. It slows down when nothing is using it, to save power. This is normal."
                 )),
             )
-        } else if matches!(category, Category::Graphics | Category::Accelerators) {
+        } else if graphics_like {
             (
                 Verdict::Info,
                 Some(crate::tr!(
@@ -541,6 +563,50 @@ mod tests {
         );
         let drive = in_english(|| read_details(temp.path(), Category::Storage));
         assert_eq!(item(&drive, "Link speed").verdict, Verdict::Reduced);
+    }
+
+    #[test]
+    fn a_graphics_cards_audio_function_gets_the_same_idle_pass_as_the_card() {
+        let root = tempfile::tempdir().expect("tempdir");
+        for function in ["0", "1"] {
+            let dir = root.path().join(format!("0000:01:00.{function}"));
+            fs::create_dir_all(&dir).expect("mkdir");
+            let class = if function == "0" {
+                "0x030000\n"
+            } else {
+                "0x040300\n"
+            };
+            for (name, text) in [
+                ("class", class),
+                ("current_link_speed", "2.5 GT/s PCIe\n"),
+                ("max_link_speed", "32.0 GT/s PCIe\n"),
+            ] {
+                fs::write(dir.join(name), text).expect("write");
+            }
+        }
+        let audio = root.path().join("0000:01:00.1");
+        let groups = in_english(|| read_details(&audio, Category::Sound));
+        let speed = item(&groups, "Link speed");
+        assert_eq!(speed.verdict, Verdict::Info, "{speed:#?}");
+        assert!(
+            speed
+                .explanation
+                .as_deref()
+                .unwrap_or("")
+                .contains("Graphics cards slow")
+        );
+        // A sound card with no graphics sibling is still flagged.
+        let lone = root.path().join("0000:02:00.1");
+        fs::create_dir_all(&lone).expect("mkdir");
+        for (name, text) in [
+            ("class", "0x040300\n"),
+            ("current_link_speed", "2.5 GT/s PCIe\n"),
+            ("max_link_speed", "32.0 GT/s PCIe\n"),
+        ] {
+            fs::write(lone.join(name), text).expect("write");
+        }
+        let groups = in_english(|| read_details(&lone, Category::Sound));
+        assert_eq!(item(&groups, "Link speed").verdict, Verdict::Reduced);
     }
 
     #[test]
